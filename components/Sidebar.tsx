@@ -66,25 +66,25 @@ export default function Sidebar() {
                 />
             )}
             
-            <aside className={`fixed md:static inset-y-0 left-0 w-64 bg-slate-950 text-slate-300 flex flex-col min-h-screen shrink-0 border-r border-slate-800/60 shadow-xl z-50 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+            <aside className={`fixed md:static inset-y-0 left-0 w-64 bg-[#79985F] text-white/90 flex flex-col min-h-screen shrink-0 border-r border-black/10 shadow-xl z-50 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
                 {/* Logo Header */}
-                <div className="h-16 flex items-center px-6 border-b border-slate-800/80 bg-slate-950/50">
+                <div className="h-16 flex items-center px-6 border-b border-black/10 bg-transparent">
                     <Link href="/" onClick={closeSidebar} className="flex items-center gap-3 group">
                     <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-green-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                         <ShieldCheck size={20} className="text-white" />
                     </div>
                     <div>
-                        <h1 className="text-base font-bold text-white tracking-tight leading-none group-hover:text-green-400 transition-colors">
+                        <h1 className="text-base font-bold text-white tracking-tight leading-none group-hover:text-green-200 transition-colors">
                             PM Control
                         </h1>
-                        <span className="text-[11px] font-semibold text-slate-400 tracking-wider uppercase">Center</span>
+                        <span className="text-[11px] font-semibold text-white/60 tracking-wider uppercase">Center</span>
                     </div>
                 </Link>
             </div>
 
             {/* Navigation Menu */}
             <nav className="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
-                <div className="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <div className="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-white/60">
                     Main Menu
                 </div>
 
@@ -99,11 +99,11 @@ export default function Sidebar() {
                             onClick={closeSidebar}
                             className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 ${
                                 active
-                                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold shadow-md shadow-emerald-500/25'
-                                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80 font-medium'
+                                    ? 'bg-black/20 text-white font-semibold shadow-md'
+                                    : 'text-white/80 hover:text-white hover:bg-black/10 font-medium'
                             }`}
                         >
-                            <Icon size={19} className={active ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'} />
+                            <Icon size={19} className={active ? 'text-white' : 'text-white/80 group-hover:text-white'} />
                             <span className="text-sm">{item.name}</span>
                             {item.href === '/chat' && chatUnreadCount > 0 && (
                                 <span className="ml-auto text-[10px] font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full min-w-[20px] text-center pulse-badge">
@@ -116,17 +116,17 @@ export default function Sidebar() {
             </nav>
 
             {/* Footer / Settings */}
-            <div className="p-3 border-t border-slate-800/80 bg-slate-950/40 space-y-1">
+            <div className="p-3 border-t border-black/10 bg-transparent space-y-1">
                 <Link
                     href="/settings"
                     onClick={closeSidebar}
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 ${
                         isActive('/settings')
-                            ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold shadow-md shadow-emerald-500/25'
-                            : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80 font-medium'
+                            ? 'bg-black/20 text-white font-semibold shadow-md'
+                            : 'text-white/80 hover:text-white hover:bg-black/10 font-medium'
                     }`}
                 >
-                    <Settings size={19} className={isActive('/settings') ? 'text-white' : 'text-slate-400'} />
+                    <Settings size={19} className={isActive('/settings') ? 'text-white' : 'text-white/80'} />
                     <span className="text-sm">Settings</span>
                 </Link>
                 {role === "ADMIN" && (
@@ -136,11 +136,11 @@ export default function Sidebar() {
                             onClick={closeSidebar}
                             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 ${
                                 isActive('/admin/approvals')
-                                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold shadow-md shadow-amber-500/25'
-                                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80 font-medium'
+                                    ? 'bg-amber-500/90 text-white font-semibold shadow-md shadow-amber-500/25'
+                                    : 'text-white/80 hover:text-white hover:bg-black/10 font-medium'
                             }`}
                         >
-                            <UserCheck size={19} className={isActive('/admin/approvals') ? 'text-white' : 'text-slate-400'} />
+                            <UserCheck size={19} className={isActive('/admin/approvals') ? 'text-white' : 'text-white/80'} />
                             <span className="text-sm">Approvals</span>
                             {pendingCount > 0 && (
                                 <span className="ml-auto text-[10px] font-extrabold bg-amber-500 text-white px-2 py-0.5 rounded-full min-w-[20px] text-center pulse-badge">
@@ -153,11 +153,11 @@ export default function Sidebar() {
                             onClick={closeSidebar}
                             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 ${
                                 pathname === '/admin' || (isActive('/admin') && !isActive('/admin/approvals'))
-                                    ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white font-semibold shadow-md shadow-rose-500/25'
-                                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80 font-medium'
+                                    ? 'bg-rose-500/90 text-white font-semibold shadow-md shadow-rose-500/25'
+                                    : 'text-white/80 hover:text-white hover:bg-black/10 font-medium'
                             }`}
                         >
-                            <ShieldAlert size={19} className={isActive('/admin') ? 'text-white' : 'text-slate-400'} />
+                            <ShieldAlert size={19} className={isActive('/admin') ? 'text-white' : 'text-white/80'} />
                             <span className="text-sm">Admin Panel</span>
                         </Link>
                     </>

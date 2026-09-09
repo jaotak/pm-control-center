@@ -4,10 +4,12 @@ import { useState, useEffect, useTransition } from "react";
 import { Bell, Check, Inbox } from "lucide-react";
 import { markNotificationAsRead } from "@/app/actions/notification";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 type Notification = { id: string; title: string; message: string; link: string | null };
 
 export default function NotificationBell({ initialNotifications = [] }: { initialNotifications?: Notification[] }) {
+    const { status } = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState(initialNotifications);
     const [, startTransition] = useTransition();
@@ -24,6 +26,8 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
 
     // SSE — real-time live notification stream
     useEffect(() => {
+        if (status !== "authenticated") return;
+
         const source = new EventSource("/api/notifications/stream");
         source.onmessage = (event) => {
             try {
@@ -34,8 +38,11 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                 // parse error — ignore
             }
         };
+        source.onerror = () => {
+            source.close();
+        };
         return () => source.close();
-    }, []);
+    }, [status]);
 
     const handleMarkAsRead = (id: string, link: string | null) => {
         startTransition(async () => {

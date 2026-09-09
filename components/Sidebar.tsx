@@ -50,6 +50,9 @@ export default function Sidebar() {
                 }
             } catch {}
         };
+        es.onerror = () => {
+            es.close();
+        };
         return () => es.close();
     }, [session?.user]);
 

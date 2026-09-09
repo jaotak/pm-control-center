@@ -14,8 +14,9 @@ export const authOptions = {
             async authorize(credentials) {
                 if (!credentials?.username || !credentials?.password) return null;
 
+                const email = credentials.username.trim();
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.username }
+                    where: { email }
                 });
 
                 if (!user) return null;
@@ -45,7 +46,8 @@ export const authOptions = {
                     name: user.name,
                     email: user.email,
                     role: user.role,
-                    avatarUrl: user.avatarUrl
+                    avatarUrl: user.avatarUrl,
+                    theme: user.theme || "light",
                 };
             }
         })
@@ -59,9 +61,11 @@ export const authOptions = {
                 token.role = user.role;
                 token.id = user.id;
                 token.avatarUrl = user.avatarUrl;
+                token.theme = (user as any).theme || "light";
             }
-            if (trigger === "update" && session?.avatarUrl !== undefined) {
-                token.avatarUrl = session.avatarUrl;
+            if (trigger === "update") {
+                if (session?.avatarUrl !== undefined) token.avatarUrl = session.avatarUrl;
+                if (session?.theme !== undefined) token.theme = session.theme;
             }
             return token;
         },
@@ -70,6 +74,7 @@ export const authOptions = {
                 session.user.role = token.role;
                 session.user.id = token.id;
                 session.user.avatarUrl = token.avatarUrl;
+                session.user.theme = token.theme || "light";
             }
             return session;
         }

@@ -8,7 +8,6 @@ import { ThemeProvider } from "@/app/context/ThemeContext";
 import { SidebarProvider } from "@/app/context/SidebarContext";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/prisma";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,17 +17,14 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // Read the user's persisted theme from DB to avoid flash on first load
   let initialTheme: "light" | "dark" = "light";
   try {
     const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
-    if (userId) {
-      const user = await prisma.user.findUnique({ where: { id: userId }, select: { theme: true } });
-      if (user?.theme === "dark") initialTheme = "dark";
+    if ((session?.user as any)?.theme === "dark") {
+      initialTheme = "dark";
     }
   } catch {
-    // If DB is unreachable, fall back to light
+    // Fall back to light
   }
 
   return (

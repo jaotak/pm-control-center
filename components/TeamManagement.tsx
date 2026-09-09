@@ -54,7 +54,7 @@ export default function TeamManagement({
                 <div className="space-y-3">
                     <label className="block text-sm font-bold text-gray-800">💻 ทีม Developer ในโปรเจกต์นี้</label>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <select
                             value={selectedDevId}
                             onChange={(e) => setSelectedDevId(e.target.value)}
@@ -72,7 +72,7 @@ export default function TeamManagement({
                                     setSelectedDevId("");
                                 }
                             }}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors"
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center sm:justify-start gap-1.5 transition-colors whitespace-nowrap shrink-0"
                         >
                             <UserPlus size={16} /> ดึงตัวเข้าทีม
                         </button>

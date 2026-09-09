@@ -35,6 +35,7 @@ export default function LoginPage() {
                 setError("ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง");
             }
             setIsLoading(false);
+        } else {
             window.location.href = "/";
         }
     };

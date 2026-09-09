@@ -32,17 +32,36 @@ export async function GET(req: NextRequest) {
                 if (isClosed) return;
 
                 try {
-                    // 1. Calculate unread messages count per room & total unread
+                    // 1. Calculate unread messages count per room & total unread, and fetch latest message
                     const memberships = await prisma.chatMember.findMany({
                         where: { userId },
                         select: {
                             chatRoomId: true,
                             lastReadAt: true,
+                            chatRoom: {
+                                select: {
+                                    messages: {
+                                        orderBy: { createdAt: "desc" },
+                                        take: 1,
+                                        select: {
+                                            id: true,
+                                            body: true,
+                                            senderId: true,
+                                            createdAt: true,
+                                            attachmentUrl: true,
+                                            sender: {
+                                                select: { name: true },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
                         },
                     });
 
                     let totalUnread = 0;
                     const roomUnreadMap: Record<string, number> = {};
+                    const roomLatestMessages: Record<string, any> = {};
 
                     for (const m of memberships) {
                         const count = await prisma.chatMessage.count({
@@ -54,6 +73,17 @@ export async function GET(req: NextRequest) {
                         });
                         roomUnreadMap[m.chatRoomId] = count;
                         totalUnread += count;
+
+                        if (m.chatRoom?.messages?.length > 0) {
+                            const latestMsg = m.chatRoom.messages[0];
+                            roomLatestMessages[m.chatRoomId] = {
+                                id: latestMsg.id,
+                                body: latestMsg.body || (latestMsg.attachmentUrl ? "[ไฟล์แนบ]" : ""),
+                                senderId: latestMsg.senderId,
+                                senderName: latestMsg.sender?.name,
+                                createdAt: latestMsg.createdAt,
+                            };
+                        }
                     }
 
                     // 2. Fetch new messages for the currently open chat room if specified
@@ -90,6 +120,7 @@ export async function GET(req: NextRequest) {
                     send({
                         totalUnread,
                         roomUnreadMap,
+                        roomLatestMessages,
                         activeRoomId: activeRoomId || null,
                         newMessages,
                         timestamp: Date.now(),

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Users, Shield, Clock, CheckCheck } from "lucide-react";
+import { ArrowLeft, Users, Shield, Clock, CheckCheck, Check } from "lucide-react";
 import { ChatRoomSummary } from "@/app/actions/chat";
 import ChatInput from "./ChatInput";
 
@@ -304,7 +304,7 @@ export default function ChatWindow({
                                             }`}
                                         >
                                             <span>{formatMessageTime(msg.createdAt)}</span>
-                                            {isMe && <CheckCheck size={13} className="text-indigo-500" />}
+                                            {isMe && <Check size={13} className="text-indigo-200" />}
                                         </div>
                                     </div>
                                 </div>

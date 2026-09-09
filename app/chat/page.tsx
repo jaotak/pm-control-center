@@ -103,18 +103,36 @@ export default function ChatPage() {
                     }
                 }
 
-                // Update unread counts on rooms
-                if (data.roomUnreadMap) {
+                // Update unread counts and latest messages on rooms
+                if (data.roomUnreadMap || data.roomLatestMessages) {
                     setRooms((prev) => {
                         let hasChanged = false;
                         const updated = prev.map((r) => {
-                            const newCount = r.id === selectedRoomIdRef.current ? 0 : (data.roomUnreadMap[r.id] ?? 0);
-                            if (r.unreadCount !== newCount) {
+                            let newCount = r.unreadCount;
+                            if (data.roomUnreadMap) {
+                                newCount = r.id === selectedRoomIdRef.current ? 0 : (data.roomUnreadMap[r.id] ?? 0);
+                            }
+
+                            const latestMsg = data.roomLatestMessages?.[r.id];
+                            
+                            const changedUnread = r.unreadCount !== newCount;
+                            const changedMsg = latestMsg && r.lastMessage?.id !== latestMsg.id;
+
+                            if (changedUnread || changedMsg) {
                                 hasChanged = true;
-                                return { ...r, unreadCount: newCount };
+                                return {
+                                    ...r,
+                                    unreadCount: newCount,
+                                    ...(changedMsg && { lastMessage: latestMsg, updatedAt: new Date(latestMsg.createdAt) }),
+                                };
                             }
                             return r;
                         });
+                        
+                        if (hasChanged) {
+                            updated.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+                        }
+                        
                         return hasChanged ? updated : prev;
                     });
                 }

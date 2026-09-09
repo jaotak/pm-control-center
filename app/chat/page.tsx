@@ -103,8 +103,8 @@ export default function ChatPage() {
                     }
                 }
 
-                // Update unread counts and latest messages on rooms
-                if (data.roomUnreadMap || data.roomLatestMessages) {
+                // Update unread counts, latest messages, and member read statuses on rooms
+                if (data.roomUnreadMap || data.roomLatestMessages || data.roomMembersReadStatus) {
                     setRooms((prev) => {
                         let hasChanged = false;
                         const updated = prev.map((r) => {
@@ -118,11 +118,26 @@ export default function ChatPage() {
                             const changedUnread = r.unreadCount !== newCount;
                             const changedMsg = latestMsg && r.lastMessage?.id !== latestMsg.id;
 
-                            if (changedUnread || changedMsg) {
+                            // Update member read statuses for the active room
+                            let updatedMembers = r.members;
+                            let changedMembers = false;
+                            if (data.roomMembersReadStatus && r.id === selectedRoomIdRef.current) {
+                                updatedMembers = r.members.map((m) => {
+                                    const newReadStr = data.roomMembersReadStatus[m.userId];
+                                    if (newReadStr && new Date(newReadStr).getTime() !== new Date(m.lastReadAt).getTime()) {
+                                        changedMembers = true;
+                                        return { ...m, lastReadAt: new Date(newReadStr) };
+                                    }
+                                    return m;
+                                });
+                            }
+
+                            if (changedUnread || changedMsg || changedMembers) {
                                 hasChanged = true;
                                 return {
                                     ...r,
                                     unreadCount: newCount,
+                                    members: updatedMembers,
                                     ...(changedMsg && { lastMessage: latestMsg, updatedAt: new Date(latestMsg.createdAt) }),
                                 };
                             }

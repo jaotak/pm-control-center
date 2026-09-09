@@ -226,6 +226,9 @@ export default function ChatWindow({
                             !prevMsg ||
                             new Date(prevMsg.createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
 
+                        // Determine if message is read by anyone else
+                        const isReadBySomeone = otherMembers.some(m => new Date(m.lastReadAt) >= new Date(msg.createdAt));
+
                         return (
                             <React.Fragment key={msg.id}>
                                 {showDateHeader && (
@@ -304,7 +307,13 @@ export default function ChatWindow({
                                             }`}
                                         >
                                             <span>{formatMessageTime(msg.createdAt)}</span>
-                                            {isMe && <Check size={13} className="text-indigo-200" />}
+                                            {isMe && (
+                                                isReadBySomeone ? (
+                                                    <CheckCheck size={14} className="text-blue-500 drop-shadow-sm" title="อ่านแล้ว" />
+                                                ) : (
+                                                    <Check size={13} className="text-slate-400" title="ส่งแล้ว" />
+                                                )
+                                            )}
                                         </div>
                                     </div>
                                 </div>

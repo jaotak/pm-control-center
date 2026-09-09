@@ -88,10 +88,21 @@ export async function GET(req: NextRequest) {
 
                     // 2. Fetch new messages for the currently open chat room if specified
                     let newMessages: any[] = [];
+                    let roomMembersReadStatus: Record<string, string> = {};
+
                     if (activeRoomId) {
                         // Ensure user is member
                         const isMember = memberships.some((m) => m.chatRoomId === activeRoomId);
                         if (isMember) {
+                            // Fetch read status of all members in the active room
+                            const activeMembers = await prisma.chatMember.findMany({
+                                where: { chatRoomId: activeRoomId },
+                                select: { userId: true, lastReadAt: true }
+                            });
+                            for (const m of activeMembers) {
+                                roomMembersReadStatus[m.userId] = m.lastReadAt.toISOString();
+                            }
+
                             newMessages = await prisma.chatMessage.findMany({
                                 where: {
                                     chatRoomId: activeRoomId,
@@ -121,6 +132,7 @@ export async function GET(req: NextRequest) {
                         totalUnread,
                         roomUnreadMap,
                         roomLatestMessages,
+                        roomMembersReadStatus,
                         activeRoomId: activeRoomId || null,
                         newMessages,
                         timestamp: Date.now(),

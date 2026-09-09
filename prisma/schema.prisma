@@ -1,0 +1,275 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String    @unique
+  name             String
+  password         String
+  role             String    // "ADMIN", "PM", "DEV"
+  isActive         Boolean   @default(true)
+  isApproved       Boolean   @default(false)   // false until admin approves registration
+  theme            String    @default("light")
+  avatarUrl        String?                     // profile picture URL
+  department       String?                     // "Engineering", "QA", "Design", "Management", "Other"
+  phone            String?                     // contact phone number
+  pinnedProjectIds String    @default("[]") // JSON array of project IDs
+
+  projectsOwned    Project[] @relation("ProjectOwner")
+  projectsAssigned Project[] @relation("ProjectDevelopers")
+
+  createdAt        DateTime  @default(now())
+  assignedReqs     Requirement[] @relation("ReqAssignee")
+  assignedUATs     UATCase[]     @relation("UATAssignee")
+  assignedIssues   Issue[]       @relation("IssueAssignee")
+  assignedTasks    Task[]        @relation("TaskAssignee")
+  notifications    Notification[]
+  activityLogs     ActivityLog[]
+  comments         Comment[]
+  chatMemberships  ChatMember[]
+  sentChatMessages ChatMessage[]
+}
+
+model Project {
+  id          String       @id @default(uuid())
+  code        String
+  name        String
+  customer    String
+  stage       String       @default("REQUIREMENT")
+  progress    Int          @default(0)
+  deadline    DateTime?
+
+  ownerId     String?
+  owner       User?        @relation("ProjectOwner", fields: [ownerId], references: [id])
+
+  developers  User[]       @relation("ProjectDevelopers")
+
+  requirements Requirement[]
+  uatCases     UATCase[]
+  issues       Issue[]
+  tasks        Task[]
+  labels       Label[]
+  milestones   Milestone[]
+  attachments  Attachment[]
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  activityLogs ActivityLog[]
+}
+
+model Requirement {
+  id            String    @id @default(uuid())
+  reqCode       String
+  title         String
+  status        String    @default("Draft")
+  priority      String    @default("Normal")
+  dueDate       DateTime?
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id])
+  uatCases      UATCase[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  assigneeId    String?
+  assignee      User?    @relation("ReqAssignee", fields: [assigneeId], references: [id])
+  description   String?
+  milestoneId   String?
+  milestone     Milestone? @relation(fields: [milestoneId], references: [id])
+  labels        Label[]   @relation("LabelToRequirement")
+  attachmentUrls String   @default("[]")
+}
+
+model UATCase {
+  id            String    @id @default(uuid())
+  uatCode       String
+  title         String
+  isMandatory   Boolean
+  status        String    @default("Pending")
+  priority      String    @default("Normal")
+  dueDate       DateTime?
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id])
+  requirementId String?
+  requirement   Requirement? @relation(fields: [requirementId], references: [id])
+  issues        Issue[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  assigneeId    String?
+  assignee      User?    @relation("UATAssignee", fields: [assigneeId], references: [id])
+  expectedResult String?
+  milestoneId   String?
+  milestone     Milestone? @relation(fields: [milestoneId], references: [id])
+  labels        Label[]   @relation("LabelToUATCase")
+  attachmentUrls String   @default("[]")
+}
+
+model Issue {
+  id               String    @id @default(uuid())
+  issueCode        String
+  title            String
+  severity         String
+  status           String    @default("Open")
+  priority         String    @default("Normal")
+  dueDate          DateTime?
+  projectId        String
+  project          Project   @relation(fields: [projectId], references: [id])
+  uatCaseId        String?
+  uatCase          UATCase?  @relation(fields: [uatCaseId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  assigneeId       String?
+  assignee         User?    @relation("IssueAssignee", fields: [assigneeId], references: [id])
+  stepsToReproduce String?
+  milestoneId      String?
+  milestone        Milestone? @relation(fields: [milestoneId], references: [id])
+  labels           Label[]   @relation("LabelToIssue")
+  attachmentUrls   String   @default("[]")
+}
+
+model Task {
+  id              String    @id @default(uuid())
+  title           String
+  description     String?
+  isCompleted     Boolean   @default(false)
+  dueDate         DateTime?
+  estimatedHours  Float?
+  loggedHours     Float?    @default(0)
+  projectId       String?
+  project         Project?  @relation(fields: [projectId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  assigneeId      String?
+  assignee        User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  milestoneId     String?
+  milestone       Milestone? @relation(fields: [milestoneId], references: [id])
+  labels          Label[]   @relation("LabelToTask")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  action      String
+  beforeState String?
+  afterState  String?
+  isHidden    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  body      String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  itemType  String   // "req" | "uat" | "issue" | "task"
+  itemId    String
+  parentId  String?
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Label {
+  id           String        @id @default(uuid())
+  name         String
+  color        String        @default("#6366f1")
+  projectId    String
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirements Requirement[] @relation("LabelToRequirement")
+  uatCases     UATCase[]     @relation("LabelToUATCase")
+  issues       Issue[]       @relation("LabelToIssue")
+  tasks        Task[]        @relation("LabelToTask")
+}
+
+model Milestone {
+  id           String        @id @default(uuid())
+  name         String
+  status       String        @default("Active")
+  startDate    DateTime?
+  endDate      DateTime?
+  projectId    String
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requirements Requirement[]
+  uatCases     UATCase[]
+  issues       Issue[]
+  tasks        Task[]
+  createdAt    DateTime      @default(now())
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model AdminLog {
+  id        String   @id @default(uuid())
+  adminId   String
+  action    String
+  targetId  String?
+  metadata  String?
+  createdAt DateTime @default(now())
+}
+
+model ChatRoom {
+  id        String        @id @default(uuid())
+  name      String?
+  type      String        @default("direct") // "direct" | "group"
+  members   ChatMember[]
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ChatMember {
+  id         String    @id @default(uuid())
+  chatRoomId String
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt   DateTime  @default(now())
+  lastReadAt DateTime  @default(now())
+
+  @@unique([chatRoomId, userId])
+}
+
+model ChatMessage {
+  id             String    @id @default(uuid())
+  body           String
+  attachmentUrl  String?
+  attachmentName String?
+  attachmentType String?
+  attachmentSize Int?
+  senderId       String
+  sender     User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  chatRoomId String
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+}

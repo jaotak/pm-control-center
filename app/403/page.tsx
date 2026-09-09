@@ -14,7 +14,7 @@ export default function ForbiddenPage() {
             </p>
             <Link
                 href="/"
-                className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md shadow-indigo-500/20 hover:scale-105 transition-all"
+                className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md shadow-emerald-500/20 hover:scale-105 transition-all"
             >
                 <ArrowLeft size={16} />
                 กลับไปหน้าหลัก

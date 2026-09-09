@@ -19,7 +19,7 @@ export default function ProjectActivityLog({ logs }: { logs: Log[] }) {
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <h2 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <History size={20} className="text-blue-600" />
+                <History size={20} className="text-green-600" />
                 Activity Log (ประวัติการเปลี่ยนแปลง)
             </h2>
 
@@ -33,7 +33,7 @@ export default function ProjectActivityLog({ logs }: { logs: Log[] }) {
                         <details key={userName} className="group border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                             <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors font-bold text-gray-800 list-none select-none [&::-webkit-details-marker]:hidden">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 overflow-hidden border border-blue-200">
+                                    <div className="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0 overflow-hidden border border-green-200">
                                         {userLogs[0].user.avatarUrl ? (
                                             <img src={userLogs[0].user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
@@ -57,7 +57,7 @@ export default function ProjectActivityLog({ logs }: { logs: Log[] }) {
                                     {userLogs.map((log) => (
                                         <div key={log.id} className="flex justify-between items-start text-sm pb-4 border-b border-gray-200/60 last:border-0 last:pb-0">
                                             <div className="text-gray-600 pr-4">
-                                                <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 mb-0.5"></span>
+                                                <span className="inline-block w-1.5 h-1.5 bg-green-400 rounded-full mr-2 mb-0.5"></span>
                                                 {log.action}
                                             </div>
                                             <div className="text-[10px] text-gray-400 whitespace-nowrap bg-white px-2 py-1 rounded border border-gray-200 shadow-xs shrink-0 font-medium">

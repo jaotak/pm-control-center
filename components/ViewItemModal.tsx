@@ -26,7 +26,7 @@ export default function ViewItemModal({ type, item }: ViewModalProps) {
 
     const getBadgeColor = () => {
         if (type === 'issue') return "bg-rose-50 text-rose-700 border-rose-200";
-        if (type === 'uat') return "bg-purple-50 text-purple-700 border-purple-200";
+        if (type === 'uat') return "bg-teal-50 text-teal-700 border-teal-200";
         return "bg-emerald-50 text-emerald-700 border-emerald-200";
     };
 
@@ -43,7 +43,7 @@ export default function ViewItemModal({ type, item }: ViewModalProps) {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg transition-colors"
+                className="text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg transition-colors"
                 title="ดูรายละเอียด"
             >
                 <Eye size={16} />
@@ -97,11 +97,11 @@ export default function ViewItemModal({ type, item }: ViewModalProps) {
                                         {attachments.map((file: any, idx: number) => {
                                             const isImage = file.type?.startsWith('image/');
                                             return (
-                                                <a key={idx} href={file.url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-indigo-300 transition-all overflow-hidden w-24 h-24">
+                                                <a key={idx} href={file.url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-emerald-300 transition-all overflow-hidden w-24 h-24">
                                                     {isImage ? (
                                                         <img src={file.url} alt={file.name} className="object-cover w-full h-full rounded-lg" />
                                                     ) : (
-                                                        <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-indigo-500">
+                                                        <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-emerald-500">
                                                             <Download size={24} />
                                                             <span className="text-[10px] truncate w-full text-center mt-1 px-1">{file.name}</span>
                                                         </div>

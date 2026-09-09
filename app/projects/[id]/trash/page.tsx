@@ -34,8 +34,8 @@ export default async function TrashPage({ params }: { params: Promise<{ id: stri
     const totalItems = deletedReqs.length + deletedUATs.length + deletedIssues.length + deletedTasks.length;
 
     const sections = [
-        { label: "Requirements", type: "req" as const, items: deletedReqs.map(r => ({ id: r.id, code: r.reqCode, title: r.title, deletedAt: r.deletedAt! })), color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
-        { label: "UAT Cases",    type: "uat" as const, items: deletedUATs.map(u => ({ id: u.id, code: u.uatCode, title: u.title, deletedAt: u.deletedAt! })), color: "text-purple-600 bg-purple-50 border-purple-200" },
+        { label: "Requirements", type: "req" as const, items: deletedReqs.map(r => ({ id: r.id, code: r.reqCode, title: r.title, deletedAt: r.deletedAt! })), color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+        { label: "UAT Cases",    type: "uat" as const, items: deletedUATs.map(u => ({ id: u.id, code: u.uatCode, title: u.title, deletedAt: u.deletedAt! })), color: "text-teal-600 bg-teal-50 border-teal-200" },
         { label: "Issues",       type: "issue" as const, items: deletedIssues.map(i => ({ id: i.id, code: i.issueCode, title: i.title, deletedAt: i.deletedAt! })), color: "text-rose-600 bg-rose-50 border-rose-200" },
         { label: "Tasks",        type: "task" as const, items: deletedTasks.map(t => ({ id: t.id, code: "TASK", title: t.title, deletedAt: t.deletedAt! })), color: "text-amber-600 bg-amber-50 border-amber-200" },
     ];

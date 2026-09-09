@@ -46,7 +46,7 @@ export default function ProjectStageSelect({
     if (userRole === "DEV") {
         return (
             <span className="px-4 py-2 bg-gray-100 text-gray-700 font-medium text-sm rounded-lg border border-gray-200 flex items-center gap-2">
-                <Activity size={16} className="text-blue-500" /> {currentStage}
+                <Activity size={16} className="text-green-500" /> {currentStage}
             </span>
         );
     }
@@ -55,7 +55,7 @@ export default function ProjectStageSelect({
     return (
         <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Activity size={16} className={isPending ? "text-gray-400 animate-spin" : "text-blue-500"} />
+                <Activity size={16} className={isPending ? "text-gray-400 animate-spin" : "text-green-500"} />
             </div>
             <select
                 value={localStage}
@@ -63,7 +63,7 @@ export default function ProjectStageSelect({
                 disabled={isPending}
                 className={`appearance-none pl-9 pr-8 py-2 bg-white font-medium text-sm rounded-lg border focus:ring-2 focus:outline-none transition-colors cursor-pointer ${localStage === 'Delivery' || localStage === 'Completed'
                         ? 'border-green-300 text-green-700 bg-green-50 focus:ring-green-500'
-                        : 'border-blue-300 text-blue-700 bg-blue-50 focus:ring-blue-500'
+                        : 'border-green-300 text-green-700 bg-green-50 focus:ring-green-500'
                     }`}
             >
                 {STAGES.map(stage => (

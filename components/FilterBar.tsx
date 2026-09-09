@@ -51,7 +51,7 @@ export default function FilterBar({ statusOptions, teamMembers, currentUserId }:
             <select
                 value={filterStatus}
                 onChange={(e) => updateFilter("filterStatus", e.target.value)}
-                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
             >
                 <option value="">All Statuses</option>
                 {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
@@ -60,7 +60,7 @@ export default function FilterBar({ statusOptions, teamMembers, currentUserId }:
             <select
                 value={filterPriority}
                 onChange={(e) => updateFilter("filterPriority", e.target.value)}
-                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
             >
                 <option value="">All Priorities</option>
                 {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
@@ -69,7 +69,7 @@ export default function FilterBar({ statusOptions, teamMembers, currentUserId }:
             <select
                 value={filterAssignee}
                 onChange={(e) => updateFilter("filterAssignee", e.target.value)}
-                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
             >
                 <option value="">All Assignees</option>
                 <option value={currentUserId}>My Items</option>
@@ -79,7 +79,7 @@ export default function FilterBar({ statusOptions, teamMembers, currentUserId }:
             <select
                 value={filterDue}
                 onChange={(e) => updateFilter("filterDue", e.target.value)}
-                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-slate-700 outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
             >
                 <option value="">Any Due Date</option>
                 <option value="overdue">Overdue</option>
@@ -98,7 +98,7 @@ export default function FilterBar({ statusOptions, teamMembers, currentUserId }:
             )}
 
             {hasFilters && (
-                <span className="ml-auto text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg">
+                <span className="ml-auto text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
                     Filters active
                 </span>
             )}

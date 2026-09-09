@@ -18,7 +18,7 @@ const ROLES = ["ADMIN", "PM", "DEV"];
 
 const roleColors: Record<string, string> = {
     ADMIN: "bg-rose-50 text-rose-700 border-rose-200",
-    PM: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    PM: "bg-emerald-50 text-emerald-700 border-emerald-200",
     DEV: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
@@ -84,7 +84,7 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
             <div className="flex justify-end">
                 <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-indigo-500/20 hover:scale-105 transition-all"
+                    className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md shadow-emerald-500/20 hover:scale-105 transition-all"
                 >
                     <Plus size={15} /> Create User
                 </button>
@@ -106,7 +106,7 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                             <tr key={u.id} className={`hover:bg-slate-50/60 transition-colors ${!u.isActive ? "opacity-50" : ""}`}>
                                 <td className="px-5 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0">
+                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0">
                                             {u.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div>
@@ -120,14 +120,14 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                                         value={u.role}
                                         onChange={(e) => handleRoleChange(u.id, e.target.value)}
                                         disabled={isPending}
-                                        className={`text-xs font-extrabold px-2.5 py-1.5 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer ${roleColors[u.role] || "bg-slate-50 text-slate-600 border-slate-200"}`}
+                                        className={`text-xs font-extrabold px-2.5 py-1.5 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer ${roleColors[u.role] || "bg-slate-50 text-slate-600 border-slate-200"}`}
                                     >
                                         {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                                     </select>
                                 </td>
                                 <td className="px-5 py-4 text-center">
                                     <div className="text-xs font-bold text-slate-700">
-                                        <span className="text-indigo-600">{u._count.projectsOwned}</span> PM
+                                        <span className="text-emerald-600">{u._count.projectsOwned}</span> PM
                                         <span className="text-slate-400 mx-1">·</span>
                                         <span className="text-emerald-600">{u._count.projectsAssigned}</span> DEV
                                     </div>
@@ -185,7 +185,7 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                 <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200/80 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center px-5 py-4 border-b border-slate-100">
-                            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Plus size={16} className="text-indigo-600" /> Create New User</h3>
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2"><Plus size={16} className="text-emerald-600" /> Create New User</h3>
                             <button onClick={() => setShowCreate(false)}><X size={17} className="text-slate-400" /></button>
                         </div>
                         <div className="p-5 space-y-3">
@@ -196,7 +196,7 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                                         type={field === "password" ? "password" : "text"}
                                         value={createForm[field]}
                                         onChange={e => setCreateForm(f => ({ ...f, [field]: e.target.value }))}
-                                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-400"
                                     />
                                 </div>
                             ))}
@@ -205,7 +205,7 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                                 <select
                                     value={createForm.role}
                                     onChange={e => setCreateForm(f => ({ ...f, role: e.target.value }))}
-                                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-400"
+                                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-400"
                                 >
                                     {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                                 </select>
@@ -213,7 +213,7 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                         </div>
                         <div className="px-5 py-3.5 border-t border-slate-100 flex gap-2 justify-end">
                             <button onClick={() => setShowCreate(false)} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">ยกเลิก</button>
-                            <button onClick={handleCreateUser} disabled={isPending} className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl flex items-center gap-1.5 shadow-xs disabled:opacity-50">
+                            <button onClick={handleCreateUser} disabled={isPending} className="px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-green-600 rounded-xl flex items-center gap-1.5 shadow-xs disabled:opacity-50">
                                 <Plus size={14} /> Create
                             </button>
                         </div>

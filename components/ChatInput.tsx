@@ -116,7 +116,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                 <div className="mb-3 flex items-center gap-3 p-3 bg-slate-100/80 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl max-w-sm animate-in fade-in slide-in-from-bottom-2">
                     <div className="w-10 h-10 rounded-lg bg-white dark:bg-slate-700 flex items-center justify-center shadow-sm shrink-0">
                         {selectedFile.type.startsWith("image/") ? (
-                            <ImageIcon size={20} className="text-indigo-500" />
+                            <ImageIcon size={20} className="text-emerald-500" />
                         ) : (
                             <File size={20} className="text-slate-500" />
                         )}
@@ -139,7 +139,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                 </div>
             )}
 
-            <div className="flex items-end gap-2 bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/70 rounded-2xl p-1.5 focus-within:ring-2 focus-within:ring-indigo-500/30 focus-within:border-indigo-500 transition-all shadow-2xs">
+            <div className="flex items-end gap-2 bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/70 rounded-2xl p-1.5 focus-within:ring-2 focus-within:ring-emerald-500/30 focus-within:border-emerald-500 transition-all shadow-2xs">
                 
                 {/* Hidden File Input */}
                 <input 
@@ -153,7 +153,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                 <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 rounded-xl transition-colors shrink-0 mb-0.5"
+                    className="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 rounded-xl transition-colors shrink-0 mb-0.5"
                     title="แนบไฟล์"
                 >
                     <Paperclip size={20} />
@@ -163,7 +163,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                 <button
                     type="button"
                     onClick={() => setShowEmojiPicker((prev) => !prev)}
-                    className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 rounded-xl transition-colors shrink-0 mb-0.5"
+                    className="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 rounded-xl transition-colors shrink-0 mb-0.5"
                     title="แทรกอิโมจิ"
                 >
                     <Smile size={20} />
@@ -186,7 +186,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                     type="button"
                     onClick={handleSend}
                     disabled={(!text.trim() && !selectedFile) || isSending || disabled}
-                    className="p-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-medium shadow-md shadow-indigo-500/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:scale-105 active:scale-95 transition-all shrink-0 mb-0.5"
+                    className="p-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-medium shadow-md shadow-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none hover:scale-105 active:scale-95 transition-all shrink-0 mb-0.5"
                     title="ส่งข้อความ"
                 >
                     {isSending ? (

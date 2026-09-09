@@ -66,7 +66,7 @@ export default function ChatSidebar({
             {/* Top Header */}
             <div className="p-4 border-b border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-xs">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-600 flex items-center justify-center text-white shadow-xs">
                         <MessageSquare size={17} />
                     </div>
                     <div>
@@ -84,7 +84,7 @@ export default function ChatSidebar({
                 <button
                     type="button"
                     onClick={() => setIsModalOpen(true)}
-                    className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-xl transition-all flex items-center gap-1 text-xs font-semibold"
+                    className="p-2 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded-xl transition-all flex items-center gap-1 text-xs font-semibold"
                     title="เริ่มแชทใหม่"
                 >
                     <Plus size={18} />
@@ -101,7 +101,7 @@ export default function ChatSidebar({
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="ค้นหาบทสนทนา..."
-                        className="w-full pl-9 pr-3 py-1.5 bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+                        className="w-full pl-9 pr-3 py-1.5 bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all"
                     />
                 </div>
             </div>
@@ -122,7 +122,7 @@ export default function ChatSidebar({
                         <button
                             type="button"
                             onClick={() => setIsModalOpen(true)}
-                            className="mt-4 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-xs transition-all"
+                            className="mt-4 px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-xs transition-all"
                         >
                             เริ่มสนทนาใหม่
                         </button>
@@ -140,14 +140,14 @@ export default function ChatSidebar({
                                 onClick={() => onSelectRoom(room.id)}
                                 className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left group ${
                                     isSelected
-                                        ? "bg-gradient-to-r from-indigo-500/15 to-blue-500/10 dark:from-indigo-900/40 dark:to-blue-900/30 border border-indigo-200/80 dark:border-indigo-700/50 shadow-xs"
+                                        ? "bg-gradient-to-r from-emerald-500/15 to-green-500/10 dark:from-emerald-900/40 dark:to-green-900/30 border border-emerald-200/80 dark:border-emerald-700/50 shadow-xs"
                                         : "hover:bg-slate-100/70 dark:hover:bg-slate-800/50 border border-transparent"
                                 }`}
                             >
                                 {/* Avatar */}
                                 <div className="relative shrink-0">
                                     {room.type === "group" ? (
-                                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
+                                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-xs">
                                             <Users size={19} />
                                         </div>
                                     ) : room.displayAvatar ? (
@@ -157,7 +157,7 @@ export default function ChatSidebar({
                                             className="w-11 h-11 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                                         />
                                     ) : (
-                                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
+                                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
                                             {room.displayName.charAt(0).toUpperCase()}
                                         </div>
                                     )}
@@ -174,8 +174,8 @@ export default function ChatSidebar({
                                         <h4
                                             className={`text-sm font-semibold truncate ${
                                                 isSelected
-                                                    ? "text-indigo-600 dark:text-indigo-400"
-                                                    : "text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                                                    ? "text-emerald-600 dark:text-emerald-400"
+                                                    : "text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400"
                                             }`}
                                         >
                                             {room.displayName}
@@ -212,7 +212,7 @@ export default function ChatSidebar({
                                         </p>
 
                                         {room.unreadCount > 0 && (
-                                            <span className="min-w-[18px] h-[18px] px-1.5 flex items-center justify-center rounded-full bg-indigo-600 text-white text-[10px] font-extrabold shrink-0">
+                                            <span className="min-w-[18px] h-[18px] px-1.5 flex items-center justify-center rounded-full bg-emerald-600 text-white text-[10px] font-extrabold shrink-0">
                                                 {room.unreadCount}
                                             </span>
                                         )}

@@ -130,7 +130,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                 />
             </div>
 
@@ -141,7 +141,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                 />
             </div>
 
@@ -152,7 +152,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                     <select
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all appearance-none cursor-pointer"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all appearance-none cursor-pointer"
                     >
                         <option value="">-- ไม่ระบุ --</option>
                         {DEPARTMENTS.map((d) => (
@@ -167,7 +167,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="08x-xxx-xxxx"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                     />
                 </div>
             </div>
@@ -183,7 +183,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="กรอกรหัสผ่านปัจจุบัน"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                     />
                 </div>
 
@@ -194,7 +194,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)"
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                     />
                     <PasswordStrength password={newPassword} />
                 </div>
@@ -204,7 +204,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl flex items-center gap-2 shadow-md shadow-indigo-500/20 disabled:opacity-50 transition-all hover:scale-105"
+                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl flex items-center gap-2 shadow-md shadow-emerald-500/20 disabled:opacity-50 transition-all hover:scale-105"
                 >
                     <Save size={16} /> {isPending ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
                 </button>

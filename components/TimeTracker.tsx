@@ -36,7 +36,7 @@ export default function TimeTracker({ taskId, taskTitle, estimatedHours, loggedH
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 text-slate-500 transition-all"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 text-slate-500 transition-all"
                 title="Log Time"
             >
                 <Clock size={13} />
@@ -48,7 +48,7 @@ export default function TimeTracker({ taskId, taskTitle, estimatedHours, loggedH
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200/80 animate-in zoom-in-95 duration-200">
                         <div className="flex justify-between items-center px-5 py-4 border-b border-slate-100">
                             <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                                <Clock size={16} className="text-indigo-600" />
+                                <Clock size={16} className="text-emerald-600" />
                                 Log Time — {taskTitle}
                             </h3>
                             <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-700 p-1 rounded-lg transition-colors">
@@ -61,13 +61,13 @@ export default function TimeTracker({ taskId, taskTitle, estimatedHours, loggedH
                                 <div>
                                     <div className="flex justify-between text-xs font-bold mb-1.5">
                                         <span className="text-slate-600">Progress</span>
-                                        <span className={isOverBudget ? "text-rose-600" : "text-indigo-600"}>
+                                        <span className={isOverBudget ? "text-rose-600" : "text-emerald-600"}>
                                             {logged.toFixed(1)}h / {estimated}h
                                         </span>
                                     </div>
                                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                                         <div
-                                            className={`h-2 rounded-full transition-all duration-300 ${isOverBudget ? "bg-rose-500" : "bg-gradient-to-r from-indigo-500 to-blue-600"}`}
+                                            className={`h-2 rounded-full transition-all duration-300 ${isOverBudget ? "bg-rose-500" : "bg-gradient-to-r from-emerald-500 to-green-600"}`}
                                             style={{ width: `${percent}%` }}
                                         />
                                     </div>
@@ -87,7 +87,7 @@ export default function TimeTracker({ taskId, taskTitle, estimatedHours, loggedH
                                     min="0.25"
                                     value={hours}
                                     onChange={(e) => setHours(e.target.value)}
-                                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm font-semibold transition-all"
+                                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm font-semibold transition-all"
                                 />
                             </div>
                         </div>
@@ -99,7 +99,7 @@ export default function TimeTracker({ taskId, taskTitle, estimatedHours, loggedH
                             <button
                                 onClick={handleLog}
                                 disabled={isPending}
-                                className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 rounded-xl flex items-center gap-1.5 shadow-xs disabled:opacity-50 transition-all"
+                                className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-emerald-600 to-green-600 rounded-xl flex items-center gap-1.5 shadow-xs disabled:opacity-50 transition-all"
                             >
                                 {saved ? <><CheckCircle2 size={14} /> บันทึกแล้ว!</> : isPending ? "กำลังบันทึก..." : <><Clock size={14} /> บันทึกเวลา</>}
                             </button>

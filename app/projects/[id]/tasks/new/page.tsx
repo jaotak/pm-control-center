@@ -76,7 +76,7 @@ export default async function NewTaskPage({
                             name="title"
                             placeholder="เช่น รวบรวมเอกสาร, เตรียมประชุม..."
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                         />
                     </div>
 
@@ -87,7 +87,7 @@ export default async function NewTaskPage({
                                 type="date"
                                 id="dueDate"
                                 name="dueDate"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white"
                             />
                         </div>
 
@@ -96,7 +96,7 @@ export default async function NewTaskPage({
                             <select
                                 id="assigneeId"
                                 name="assigneeId"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white"
                             >
                                 <option value="">-- ไม่ระบุ --</option>
                                 {team.map(member => (
@@ -110,7 +110,7 @@ export default async function NewTaskPage({
 
                     <div className="flex justify-end gap-3 pt-2">
                         <Link href={`/projects/${id}?tab=tasks`} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">ยกเลิก</Link>
-                        <button type="submit" className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        <button type="submit" className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
                             <CheckSquare size={18} /> บันทึก Task
                         </button>
                     </div>

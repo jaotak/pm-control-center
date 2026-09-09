@@ -54,10 +54,10 @@ export default function RegisterPage() {
 
     if (success) {
         return (
-            <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 z-[100]">
+            <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 z-[100]">
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
-                    <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
                 </div>
                 <div className="relative bg-white/95 backdrop-blur-xl p-10 rounded-3xl shadow-2xl w-full max-w-md border border-white/20 text-center">
                     <div className="w-16 h-16 mx-auto mb-5 bg-emerald-100 rounded-2xl flex items-center justify-center">
@@ -70,7 +70,7 @@ export default function RegisterPage() {
                     </p>
                     <Link
                         href="/login"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-105"
                     >
                         กลับสู่หน้าเข้าสู่ระบบ <ArrowRight size={16} />
                     </Link>
@@ -80,18 +80,18 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 z-[100]">
+        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 z-[100]">
             {/* Animated background blobs */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
+                <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-500/5 rounded-full blur-3xl" />
             </div>
 
             <div className="relative bg-white/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-lg border border-white/20 max-h-[90vh] overflow-y-auto custom-scrollbar">
                 {/* Header */}
                 <div className="flex flex-col items-center mb-7">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white mb-4 shadow-lg shadow-indigo-500/25">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 via-green-600 to-emerald-700 flex items-center justify-center text-white mb-4 shadow-lg shadow-emerald-500/25">
                         <FolderKanban size={28} />
                     </div>
                     <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">สมัครสมาชิก</h1>
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                             value={form.name}
                             onChange={(e) => update("name", e.target.value)}
                             placeholder="เช่น สมชาย ใจดี"
-                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                         />
                     </div>
 
@@ -132,7 +132,7 @@ export default function RegisterPage() {
                             value={form.email}
                             onChange={(e) => update("email", e.target.value)}
                             placeholder="email@example.com"
-                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                         />
                     </div>
 
@@ -148,7 +148,7 @@ export default function RegisterPage() {
                                 value={form.password}
                                 onChange={(e) => update("password", e.target.value)}
                                 placeholder="อย่างน้อย 6 ตัวอักษร"
-                                className="w-full px-4 py-2.5 pr-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                                className="w-full px-4 py-2.5 pr-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                             />
                             <button
                                 type="button"
@@ -172,7 +172,7 @@ export default function RegisterPage() {
                             value={form.confirmPassword}
                             onChange={(e) => update("confirmPassword", e.target.value)}
                             placeholder="กรอกรหัสผ่านอีกครั้ง"
-                            className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all ${
+                            className={`w-full px-4 py-2.5 bg-slate-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all ${
                                 form.confirmPassword && form.confirmPassword !== form.password
                                     ? "border-rose-300 bg-rose-50/30"
                                     : "border-slate-200"
@@ -192,7 +192,7 @@ export default function RegisterPage() {
                             <select
                                 value={form.department}
                                 onChange={(e) => update("department", e.target.value)}
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all appearance-none cursor-pointer"
+                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all appearance-none cursor-pointer"
                             >
                                 <option value="">-- เลือก --</option>
                                 {DEPARTMENTS.map((d) => (
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                                 value={form.phone}
                                 onChange={(e) => update("phone", e.target.value)}
                                 placeholder="08x-xxx-xxxx"
-                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                             />
                         </div>
                     </div>
@@ -218,7 +218,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2"
                     >
                         {isPending ? (
                             <><Loader2 size={16} className="animate-spin" /> กำลังสร้างบัญชี...</>
@@ -232,7 +232,7 @@ export default function RegisterPage() {
                 <div className="text-center mt-6 pt-5 border-t border-slate-100">
                     <p className="text-sm text-slate-500">
                         มีบัญชีอยู่แล้ว?{" "}
-                        <Link href="/login" className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-colors">
+                        <Link href="/login" className="text-emerald-600 font-bold hover:text-emerald-700 hover:underline transition-colors">
                             เข้าสู่ระบบ
                         </Link>
                     </p>

@@ -45,13 +45,13 @@ export default function NotificationList({ initialNotifications }: { initialNoti
                     className={`p-4 border rounded-2xl flex items-start justify-between gap-4 transition-all ${
                         notification.isRead 
                             ? "bg-slate-50 border-slate-100 opacity-70" 
-                            : "bg-white border-indigo-100 shadow-sm shadow-indigo-500/5 ring-1 ring-indigo-50"
+                            : "bg-white border-emerald-100 shadow-sm shadow-emerald-500/5 ring-1 ring-emerald-50"
                     }`}
                 >
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             {!notification.isRead && (
-                                <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 shadow-xs shadow-indigo-500/40 animate-pulse"></span>
+                                <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0 shadow-xs shadow-emerald-500/40 animate-pulse"></span>
                             )}
                             <h3 className={`text-sm font-bold truncate ${notification.isRead ? "text-slate-600" : "text-slate-800"}`}>
                                 {notification.title}
@@ -69,7 +69,7 @@ export default function NotificationList({ initialNotifications }: { initialNoti
                             {notification.link && (
                                 <Link 
                                     href={notification.link}
-                                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors"
+                                    className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
                                 >
                                     ดูรายละเอียด <ExternalLink size={12} />
                                 </Link>

@@ -75,7 +75,7 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                         <div className="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-2">
                             <span>การแจ้งเตือน</span>
                             {notifications.length > 0 && (
-                                <span className="bg-indigo-100 text-indigo-700 text-[11px] px-2 py-0.5 rounded-full font-bold">
+                                <span className="bg-emerald-100 text-emerald-700 text-[11px] px-2 py-0.5 rounded-full font-bold">
                                     {notifications.length}
                                 </span>
                             )}
@@ -85,7 +85,7 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                     <div className="max-h-[340px] overflow-y-auto custom-scrollbar divide-y divide-slate-100">
                         {notifications.length === 0 ? (
                             <div className="py-10 px-6 text-center text-slate-400 flex flex-col items-center gap-2">
-                                <Inbox size={36} className="opacity-30 text-indigo-400" />
+                                <Inbox size={36} className="opacity-30 text-emerald-400" />
                                 <p className="text-sm font-medium text-slate-600">ไม่มีการแจ้งเตือนใหม่</p>
                                 <span className="text-xs text-slate-400">คุณอัปเดตงานครบถ้วนแล้ว 🎉</span>
                             </div>
@@ -93,11 +93,11 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                             notifications.map((notif) => (
                                 <div
                                     key={notif.id}
-                                    className="p-3.5 hover:bg-indigo-50/50 transition-colors flex justify-between items-start gap-2.5 group cursor-pointer"
+                                    className="p-3.5 hover:bg-emerald-50/50 transition-colors flex justify-between items-start gap-2.5 group cursor-pointer"
                                     onClick={() => handleMarkAsRead(notif.id, notif.link)}
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-bold text-slate-800 group-hover:text-indigo-700 transition-colors truncate">
+                                        <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors truncate">
                                             {notif.title}
                                         </div>
                                         <div className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">

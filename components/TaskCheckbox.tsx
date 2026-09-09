@@ -37,7 +37,7 @@ export default function TaskCheckbox({
                 checked={isCompleted}
                 onChange={handleChange}
                 disabled={isPending}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
+                className="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer disabled:opacity-50"
             />
             <span
                 className={`font-medium transition-all duration-300 ${isCompleted ? "line-through text-gray-400" : "text-gray-800"

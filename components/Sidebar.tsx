@@ -70,11 +70,11 @@ export default function Sidebar() {
                 {/* Logo Header */}
                 <div className="h-16 flex items-center px-6 border-b border-slate-800/80 bg-slate-950/50">
                     <Link href="/" onClick={closeSidebar} className="flex items-center gap-3 group">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 via-green-600 to-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                         <ShieldCheck size={20} className="text-white" />
                     </div>
                     <div>
-                        <h1 className="text-base font-bold text-white tracking-tight leading-none group-hover:text-blue-400 transition-colors">
+                        <h1 className="text-base font-bold text-white tracking-tight leading-none group-hover:text-green-400 transition-colors">
                             PM Control
                         </h1>
                         <span className="text-[11px] font-semibold text-slate-400 tracking-wider uppercase">Center</span>
@@ -99,14 +99,14 @@ export default function Sidebar() {
                             onClick={closeSidebar}
                             className={`group flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 ${
                                 active
-                                    ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold shadow-md shadow-indigo-500/25'
+                                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold shadow-md shadow-emerald-500/25'
                                     : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80 font-medium'
                             }`}
                         >
                             <Icon size={19} className={active ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'} />
                             <span className="text-sm">{item.name}</span>
                             {item.href === '/chat' && chatUnreadCount > 0 && (
-                                <span className="ml-auto text-[10px] font-extrabold bg-indigo-500 text-white px-2 py-0.5 rounded-full min-w-[20px] text-center pulse-badge">
+                                <span className="ml-auto text-[10px] font-extrabold bg-emerald-500 text-white px-2 py-0.5 rounded-full min-w-[20px] text-center pulse-badge">
                                     {chatUnreadCount}
                                 </span>
                             )}
@@ -122,7 +122,7 @@ export default function Sidebar() {
                     onClick={closeSidebar}
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200 ${
                         isActive('/settings')
-                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold shadow-md shadow-indigo-500/25'
+                            ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold shadow-md shadow-emerald-500/25'
                             : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/80 font-medium'
                     }`}
                 >

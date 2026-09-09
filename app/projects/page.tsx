@@ -43,8 +43,8 @@ export default async function ProjectList({
 
     const getStageStyle = (stage: string) => {
         if (stage === 'DONE') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
-        if (stage === 'UAT') return 'bg-purple-50 text-purple-700 border-purple-200/80';
-        if (stage === 'DEVELOPMENT') return 'bg-indigo-50 text-indigo-700 border-indigo-200/80';
+        if (stage === 'UAT') return 'bg-teal-50 text-teal-700 border-teal-200/80';
+        if (stage === 'DEVELOPMENT') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
         return 'bg-amber-50 text-amber-700 border-amber-200/80';
     };
 
@@ -54,12 +54,12 @@ export default async function ProjectList({
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
                 <div>
                     <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2.5">
-                        <FolderKanban className="text-indigo-600" size={26} />
+                        <FolderKanban className="text-emerald-600" size={26} />
                         Projects Directory
                     </h1>
                     <p className="text-xs text-slate-500 mt-1 flex items-center gap-2">
                         <span>สิทธิ์การใช้งานปัจจุบัน:</span>
-                        <span className="inline-flex items-center gap-1 font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                        <span className="inline-flex items-center gap-1 font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
                             <Shield size={12} /> {role}
                         </span>
                     </p>
@@ -68,7 +68,7 @@ export default async function ProjectList({
                 {role !== "DEV" && (
                     <Link
                         href="/projects/new"
-                        className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs shadow-md shadow-indigo-500/20 transition-all hover:scale-105"
+                        className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105"
                     >
                         <Plus size={17} />
                         สร้างโครงการใหม่
@@ -80,7 +80,7 @@ export default async function ProjectList({
             <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                 <SearchProject />
                 <div className="text-xs font-bold text-slate-500 hidden sm:block">
-                    พบทั้งหมด <strong className="text-indigo-600 font-extrabold text-sm">{projects.length}</strong> โครงการ
+                    พบทั้งหมด <strong className="text-emerald-600 font-extrabold text-sm">{projects.length}</strong> โครงการ
                 </div>
             </div>
 
@@ -101,20 +101,20 @@ export default async function ProjectList({
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {projects.map((prj) => (
-                                <tr key={prj.id} className="hover:bg-indigo-50/30 transition-all group">
-                                    <td className="px-6 py-4 font-bold text-indigo-600">
+                                <tr key={prj.id} className="hover:bg-emerald-50/30 transition-all group">
+                                    <td className="px-6 py-4 font-bold text-emerald-600">
                                         <Link href={`/projects/${prj.id}`} className="hover:underline flex items-center gap-1.5">
                                             {prj.code}
                                         </Link>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="font-bold text-slate-800 group-hover:text-indigo-700 transition-colors">{prj.name}</div>
+                                        <div className="font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">{prj.name}</div>
                                         <div className="text-xs text-slate-400 mt-0.5">{prj.customer}</div>
                                     </td>
                                     <td className="px-6 py-4 text-slate-700">
                                         {prj.owner ? (
                                             <span className="flex items-center gap-1.5 font-medium text-xs text-slate-700">
-                                                <UserCheck size={14} className="text-indigo-500" />
+                                                <UserCheck size={14} className="text-emerald-500" />
                                                 {prj.owner.name}
                                             </span>
                                         ) : (
@@ -140,17 +140,17 @@ export default async function ProjectList({
                                         <div className="flex items-center gap-2">
                                             <div className="w-full bg-slate-100 rounded-full h-2 min-w-[70px] overflow-hidden border border-slate-200/50">
                                                 <div
-                                                    className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-blue-600 transition-all duration-300"
+                                                    className="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-green-600 transition-all duration-300"
                                                     style={{ width: `${prj.progress}%` }}
                                                 ></div>
                                             </div>
-                                            <span className="text-xs font-bold text-indigo-600 min-w-[32px]">{prj.progress}%</span>
+                                            <span className="text-xs font-bold text-emerald-600 min-w-[32px]">{prj.progress}%</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <Link
                                             href={`/projects/${prj.id}`}
-                                            className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-all"
+                                            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-all"
                                         >
                                             เข้าชม <ArrowRight size={13} />
                                         </Link>
@@ -161,7 +161,7 @@ export default async function ProjectList({
                             {projects.length === 0 && (
                                 <tr>
                                     <td colSpan={7} className="px-6 py-16 text-center text-slate-400">
-                                        <div className="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mx-auto mb-3">
+                                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-3">
                                             <FolderKanban size={32} />
                                         </div>
                                         <p className="text-base font-bold text-slate-700">ไม่พบโปรเจกต์ที่คุณมีสิทธิ์เข้าถึง</p>

@@ -28,7 +28,7 @@ export default function TeamManagement({
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-6">
             <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                <Shield size={20} className="text-blue-600" />
+                <Shield size={20} className="text-green-600" />
                 การจัดการทีมและผู้รับผิดชอบ (Team & Roles)
             </h2>
 
@@ -72,7 +72,7 @@ export default function TeamManagement({
                                     setSelectedDevId("");
                                 }
                             }}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center sm:justify-start gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center sm:justify-start gap-1.5 transition-colors whitespace-nowrap shrink-0"
                         >
                             <UserPlus size={16} /> ดึงตัวเข้าทีม
                         </button>

@@ -42,7 +42,7 @@ export default function BulkActionBar({ type, projectId, selectedIds, onClear }:
     };
 
     return (
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/30 animate-in slide-in-from-bottom-2 duration-200">
+        <div className="flex items-center gap-3 px-4 py-2.5 bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/30 animate-in slide-in-from-bottom-2 duration-200">
             <CheckSquare size={16} className="shrink-0" />
             <span className="text-xs font-bold">{selectedIds.length} รายการที่เลือก</span>
 
@@ -64,7 +64,7 @@ export default function BulkActionBar({ type, projectId, selectedIds, onClear }:
                 <button
                     onClick={applyBulk}
                     disabled={!status || isPending}
-                    className="px-3 py-1.5 bg-white text-indigo-700 text-xs font-bold rounded-lg hover:bg-indigo-50 disabled:opacity-60 transition-all flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-white text-emerald-700 text-xs font-bold rounded-lg hover:bg-emerald-50 disabled:opacity-60 transition-all flex items-center gap-1.5"
                 >
                     {isPending ? <Loader2 size={12} className="animate-spin" /> : null}
                     {success ? "✓ สำเร็จ!" : "บันทึก"}

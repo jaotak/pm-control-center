@@ -82,7 +82,7 @@ export default async function CreateProjectPage() {
                                 name="code"
                                 placeholder="เช่น PRJ-002"
                                 required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
                             />
                         </div>
 
@@ -97,7 +97,7 @@ export default async function CreateProjectPage() {
                                 name="customer"
                                 placeholder="เช่น บริษัท ABC จำกัด"
                                 required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
                             />
                         </div>
                     </div>
@@ -113,7 +113,7 @@ export default async function CreateProjectPage() {
                             name="name"
                             placeholder="เช่น ระบบ E-Commerce สำหรับค้าปลีก"
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
                         />
                     </div>
 
@@ -137,7 +137,7 @@ export default async function CreateProjectPage() {
                         </Link>
                         <button
                             type="submit"
-                            className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors"
+                            className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors"
                         >
                             <Save size={18} />
                             บันทึกโครงการ

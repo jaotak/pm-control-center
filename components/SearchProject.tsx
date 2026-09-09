@@ -26,7 +26,7 @@ export default function SearchProject() {
     };
 
     return (
-        <div className={`flex items-center bg-gray-100 px-3 py-2 rounded-lg w-full md:w-80 border transition-all ${isPending ? 'opacity-70' : 'opacity-100'} focus-within:border-blue-500 focus-within:bg-white`}>
+        <div className={`flex items-center bg-gray-100 px-3 py-2 rounded-lg w-full md:w-80 border transition-all ${isPending ? 'opacity-70' : 'opacity-100'} focus-within:border-green-500 focus-within:bg-white`}>
             <Search size={18} className="text-gray-400" />
             <input
                 type="text"

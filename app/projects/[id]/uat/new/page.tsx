@@ -42,7 +42,7 @@ export default async function NewUATPage({ params }: { params: Promise<{ id: str
                     <label className="block text-sm font-bold text-gray-700 mb-1">หัวข้อทดสอบ (Title) *</label>
                     <input
                         type="text" name="title" required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-green-500"
                         placeholder="เช่น สามารถล็อกอินด้วย Google Account ได้"
                     />
                 </div>
@@ -57,7 +57,7 @@ export default async function NewUATPage({ params }: { params: Promise<{ id: str
                         id="attachments"
                         name="attachments"
                         multiple
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
                     />
                     <p className="text-xs text-gray-500 mt-1">สามารถเลือกได้หลายไฟล์ (ขนาดไม่เกิน 10MB/ไฟล์)</p>
                 </div>
@@ -65,7 +65,7 @@ export default async function NewUATPage({ params }: { params: Promise<{ id: str
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">อ้างอิง Requirement (ไม่บังคับ)</label>
-                        <select name="requirementId" className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <select name="requirementId" className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-green-500 bg-white">
                             <option value="">-- ไม่ระบุ --</option>
                             {project.requirements.map(req => (
                                 <option key={req.id} value={req.id}>[{req.reqCode}] {req.title}</option>
@@ -75,7 +75,7 @@ export default async function NewUATPage({ params }: { params: Promise<{ id: str
 
                     <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">ผู้รับผิดชอบการทดสอบ</label>
-                        <select name="assigneeId" className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <select name="assigneeId" className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-green-500 bg-white">
                             <option value="">-- ไม่ระบุ --</option>
                             {team.map(member => (
                                 <option key={member.id} value={member.id}>{member.name}</option>
@@ -93,7 +93,7 @@ export default async function NewUATPage({ params }: { params: Promise<{ id: str
                 </div>
 
                 <div className="pt-4 border-t border-gray-100 flex justify-end">
-                    <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg flex items-center gap-2">
+                    <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2.5 rounded-lg flex items-center gap-2">
                         <Save size={18} /> บันทึก Test Case
                     </button>
                 </div>

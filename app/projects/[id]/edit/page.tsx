@@ -48,17 +48,17 @@ export default async function EditProjectPage({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">รหัสโครงการ</label>
-                            <input type="text" name="code" defaultValue={project.code} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                            <input type="text" name="code" defaultValue={project.code} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">ชื่อลูกค้า</label>
-                            <input type="text" name="customer" defaultValue={project.customer} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                            <input type="text" name="customer" defaultValue={project.customer} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                         </div>
                     </div>
 
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">ชื่อโครงการ</label>
-                        <input type="text" name="name" defaultValue={project.name} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                        <input type="text" name="name" defaultValue={project.name} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
                     </div>
 
 
@@ -67,7 +67,7 @@ export default async function EditProjectPage({
 
                     <div className="flex justify-end gap-3 pt-2">
                         <Link href={`/projects/${id}`} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">ยกเลิก</Link>
-                        <button type="submit" className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        <button type="submit" className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
                             <Save size={18} /> บันทึกการเปลี่ยนแปลง
                         </button>
                     </div>

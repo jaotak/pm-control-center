@@ -40,7 +40,7 @@ export default function EditItemModal({ type, item, projectId }: EditModalProps)
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-lg transition-colors mr-1"
+                className="text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg transition-colors mr-1"
                 title="แก้ไขข้อมูล"
             >
                 <Edit size={16} />
@@ -68,7 +68,7 @@ export default function EditItemModal({ type, item, projectId }: EditModalProps)
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
                                         required
-                                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                                     />
                                 </div>
 
@@ -78,7 +78,7 @@ export default function EditItemModal({ type, item, projectId }: EditModalProps)
                                         <select
                                             value={priority}
                                             onChange={(e) => setPriority(e.target.value)}
-                                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-800 font-medium transition-all"
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm text-slate-800 font-medium transition-all"
                                         >
                                             {PRIORITIES.map(p => <option key={p} value={p}>{p}</option>)}
                                         </select>
@@ -89,7 +89,7 @@ export default function EditItemModal({ type, item, projectId }: EditModalProps)
                                             type="date"
                                             value={dueDate}
                                             onChange={(e) => setDueDate(e.target.value)}
-                                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-800 font-medium transition-all"
+                                            className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 text-sm text-slate-800 font-medium transition-all"
                                         />
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@ export default function EditItemModal({ type, item, projectId }: EditModalProps)
                                         onChange={(e) => setDetail(e.target.value)}
                                         rows={5}
                                         placeholder="ใส่รายละเอียดเพิ่มเติมที่นี่..."
-                                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 resize-none transition-all"
+                                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 resize-none transition-all"
                                     />
                                 </div>
                             </div>
@@ -117,7 +117,7 @@ export default function EditItemModal({ type, item, projectId }: EditModalProps)
                                 <button
                                     type="submit"
                                     disabled={isPending}
-                                    className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 rounded-xl flex items-center gap-1.5 shadow-xs disabled:opacity-50 transition-all"
+                                    className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 rounded-xl flex items-center gap-1.5 shadow-xs disabled:opacity-50 transition-all"
                                 >
                                     <Save size={15} /> {isPending ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
                                 </button>

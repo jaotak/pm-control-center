@@ -28,7 +28,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     return (
         <div className="max-w-4xl mx-auto space-y-6 pb-12">
             <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-8 flex items-center gap-4">
-                <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100/80 shadow-2xs">
+                <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/80 shadow-2xs">
                     <SettingsIcon size={28} />
                 </div>
                 <div>
@@ -40,10 +40,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Left Side Menu */}
                 <div className="space-y-1.5">
-                    <Link href="/settings?tab=profile" className={`w-full flex items-center gap-3 px-4 py-3 font-semibold text-xs rounded-2xl transition-all ${currentTab === "profile" ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold shadow-md shadow-indigo-500/20" : "text-slate-600 hover:bg-slate-100/80"}`}>
+                    <Link href="/settings?tab=profile" className={`w-full flex items-center gap-3 px-4 py-3 font-semibold text-xs rounded-2xl transition-all ${currentTab === "profile" ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold shadow-md shadow-emerald-500/20" : "text-slate-600 hover:bg-slate-100/80"}`}>
                         <User size={17} /> ข้อมูลส่วนตัว
                     </Link>
-                    <Link href="/settings?tab=notifications" className={`w-full flex items-center gap-3 px-4 py-3 font-semibold text-xs rounded-2xl transition-all ${currentTab === "notifications" ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold shadow-md shadow-indigo-500/20" : "text-slate-600 hover:bg-slate-100/80"}`}>
+                    <Link href="/settings?tab=notifications" className={`w-full flex items-center gap-3 px-4 py-3 font-semibold text-xs rounded-2xl transition-all ${currentTab === "notifications" ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold shadow-md shadow-emerald-500/20" : "text-slate-600 hover:bg-slate-100/80"}`}>
                         <Bell size={17} /> การแจ้งเตือน
                     </Link>
                     {user.role === "ADMIN" && (
@@ -59,7 +59,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         {currentTab === "profile" && (
                             <>
                                 <h2 className="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
-                                    <User size={18} className="text-indigo-600" />
+                                    <User size={18} className="text-emerald-600" />
                                     ข้อมูลโปรไฟล์ส่วนตัว (Profile Information)
                                 </h2>
                                 <ProfileForm user={{
@@ -75,7 +75,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
                         {currentTab === "notifications" && (
                             <>
                                 <h2 className="text-base font-extrabold text-slate-800 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
-                                    <Bell size={18} className="text-indigo-600" />
+                                    <Bell size={18} className="text-emerald-600" />
                                     การแจ้งเตือนทั้งหมดของคุณ (Notifications)
                                 </h2>
                                 <NotificationList initialNotifications={notifications} />

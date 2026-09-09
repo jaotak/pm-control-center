@@ -81,11 +81,11 @@ export default async function DashboardPage() {
     <div className="max-w-7xl mx-auto space-y-7 pb-10">
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-900 via-slate-900 to-blue-950 p-6 md:p-8 rounded-3xl shadow-xl text-white border border-slate-800">
-        <div className="absolute right-0 top-0 -mt-8 -mr-8 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="relative overflow-hidden bg-gradient-to-r from-emerald-900 via-slate-900 to-green-950 p-6 md:p-8 rounded-3xl shadow-xl text-white border border-slate-800">
+        <div className="absolute right-0 top-0 -mt-8 -mr-8 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold mb-3">
               <Sparkles size={14} /> Overview &amp; Performance
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">Dashboard</h1>
@@ -96,7 +96,7 @@ export default async function DashboardPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/projects"
-              className="px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105"
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-semibold text-xs rounded-xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-105"
             >
               + ดูโครงการทั้งหมด
             </Link>
@@ -109,12 +109,12 @@ export default async function DashboardPage() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs hover-lift flex items-center justify-between group">
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">โครงการของคุณ</div>
-            <div className="text-3xl font-extrabold text-slate-800 group-hover:text-indigo-600 transition-colors">{totalProjects}</div>
+            <div className="text-3xl font-extrabold text-slate-800 group-hover:text-emerald-600 transition-colors">{totalProjects}</div>
             <div className="text-xs text-slate-500 mt-1 flex items-center gap-1 font-medium">
               <TrendingUp size={13} className="text-emerald-500" /> Active Projects
             </div>
           </div>
-          <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center border border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-xs">
+          <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center border border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white transition-all shadow-xs">
             <FolderKanban size={26} />
           </div>
         </div>
@@ -153,10 +153,10 @@ export default async function DashboardPage() {
         <div className="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden flex flex-col">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
             <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
-              <FolderKanban size={19} className="text-indigo-600" />
+              <FolderKanban size={19} className="text-emerald-600" />
               โปรเจกต์ที่ใช้งานล่าสุด
             </h2>
-            <Link href="/projects" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 group">
+            <Link href="/projects" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 group">
               ดูทั้งหมด <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -166,10 +166,10 @@ export default async function DashboardPage() {
               <Link
                 key={prj.id}
                 href={`/projects/${prj.id}`}
-                className="flex items-center justify-between p-3.5 hover:bg-indigo-50/40 rounded-xl transition-all group"
+                className="flex items-center justify-between p-3.5 hover:bg-emerald-50/40 rounded-xl transition-all group"
               >
                 <div className="min-w-0 flex-1 pr-4">
-                  <div className="font-bold text-slate-800 text-sm group-hover:text-indigo-600 transition-colors truncate">
+                  <div className="font-bold text-slate-800 text-sm group-hover:text-emerald-600 transition-colors truncate">
                     {prj.name} <span className="text-xs font-semibold text-slate-400 ml-1">({prj.code})</span>
                   </div>
                   <div className="text-xs text-slate-500 mt-1 flex items-center gap-2">
@@ -181,10 +181,10 @@ export default async function DashboardPage() {
                     {prj.stage}
                   </span>
                   <div className="w-16">
-                    <div className="flex justify-end text-[11px] font-bold text-indigo-600 mb-1">{prj.progress}%</div>
+                    <div className="flex justify-end text-[11px] font-bold text-emerald-600 mb-1">{prj.progress}%</div>
                     <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-indigo-500 to-blue-600 h-1.5 rounded-full transition-all duration-300"
+                        className="bg-gradient-to-r from-emerald-500 to-green-600 h-1.5 rounded-full transition-all duration-300"
                         style={{ width: `${prj.progress}%` }}
                       ></div>
                     </div>
@@ -208,7 +208,7 @@ export default async function DashboardPage() {
         <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden flex flex-col">
           <div className="p-5 border-b border-slate-100 bg-slate-50/50">
             <h2 className="font-bold text-slate-800 text-base flex items-center gap-2">
-              <TestTube size={19} className="text-purple-600" />
+              <TestTube size={19} className="text-teal-600" />
               UAT Pass Rate
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">ภาพรวม Test Cases ทั้งหมด</p>
@@ -245,7 +245,7 @@ export default async function DashboardPage() {
             <Clock size={19} className="text-amber-500" />
             งานของคุณ (Upcoming Tasks)
           </h2>
-          <Link href="/tasks" className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 group">
+          <Link href="/tasks" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 group">
             ดูทั้งหมด <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -259,9 +259,9 @@ export default async function DashboardPage() {
                 <TaskCheckbox taskId={task.id} initialCompleted={task.isCompleted} title={task.title} />
                 <div className="text-xs text-slate-500 mt-1.5 ml-8">
                   {task.project ? (
-                    <>โครงการ: <Link href={`/projects/${task.projectId}?tab=tasks`} className="text-indigo-600 hover:underline font-semibold">{task.project.code}</Link></>
+                    <>โครงการ: <Link href={`/projects/${task.projectId}?tab=tasks`} className="text-emerald-600 hover:underline font-semibold">{task.project.code}</Link></>
                   ) : (
-                    <span className="text-purple-600 font-semibold">🎯 งานทั่วไป</span>
+                    <span className="text-teal-600 font-semibold">🎯 งานทั่วไป</span>
                   )}
                 </div>
               </div>

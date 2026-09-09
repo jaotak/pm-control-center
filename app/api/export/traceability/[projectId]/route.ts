@@ -106,7 +106,7 @@ async function buildXlsxResponse(project: any) {
 
     const headerFill = {
         type: 'pattern' as const, pattern: 'solid' as const,
-        fgColor: { argb: 'FF4F46E5' }  // indigo-600
+        fgColor: { argb: 'FF4F46E5' }  // emerald-600
     };
     const headerFont = { color: { argb: 'FFFFFFFF' }, bold: true, size: 11 };
 

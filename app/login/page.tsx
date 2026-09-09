@@ -41,18 +41,18 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 z-[100]">
+        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 z-[100]">
             {/* Animated background blobs */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
-                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
+                <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
+                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-green-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-500/5 rounded-full blur-3xl" />
             </div>
 
             <div className="relative bg-white/95 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/20">
                 {/* Header */}
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-indigo-700 flex items-center justify-center text-white mb-4 shadow-lg shadow-indigo-500/25 hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 via-green-600 to-emerald-700 flex items-center justify-center text-white mb-4 shadow-lg shadow-emerald-500/25 hover:scale-110 transition-transform">
                         <FolderKanban size={28} />
                     </div>
                     <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">PM Control Center</h1>
@@ -83,7 +83,7 @@ export default function LoginPage() {
                             value={username}
                             onChange={e => setUsername(e.target.value)}
                             placeholder="กรอกอีเมลหรือ username"
-                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                         />
                     </div>
                     <div>
@@ -97,7 +97,7 @@ export default function LoginPage() {
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 placeholder="กรอกรหัสผ่าน"
-                                className="w-full px-4 py-2.5 pr-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
+                                className="w-full px-4 py-2.5 pr-11 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm text-slate-800 font-medium transition-all"
                             />
                             <button
                                 type="button"
@@ -112,7 +112,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2"
+                        className="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2"
                     >
                         {isLoading ? (
                             <><Loader2 size={16} className="animate-spin" /> กำลังตรวจสอบ...</>
@@ -126,7 +126,7 @@ export default function LoginPage() {
                 <div className="text-center mt-6 pt-5 border-t border-slate-100">
                     <p className="text-sm text-slate-500">
                         ยังไม่มีบัญชี?{" "}
-                        <Link href="/register" className="text-indigo-600 font-bold hover:text-indigo-700 hover:underline transition-colors">
+                        <Link href="/register" className="text-emerald-600 font-bold hover:text-emerald-700 hover:underline transition-colors">
                             สมัครสมาชิก
                         </Link>
                     </p>

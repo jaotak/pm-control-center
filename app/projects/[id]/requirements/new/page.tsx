@@ -88,7 +88,7 @@ export default async function NewRequirementPage({
                                 name="reqCode"
                                 placeholder="เช่น REQ-001"
                                 required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                             />
                         </div>
 
@@ -99,7 +99,7 @@ export default async function NewRequirementPage({
                             <select
                                 id="assigneeId"
                                 name="assigneeId"
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none bg-white"
                             >
                                 <option value="">-- ไม่ระบุ --</option>
                                 {team.map(member => (
@@ -119,7 +119,7 @@ export default async function NewRequirementPage({
                             rows={3}
                             placeholder="ระบุความต้องการของระบบอย่างย่อ..."
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
                         ></textarea>
                     </div>
 
@@ -133,7 +133,7 @@ export default async function NewRequirementPage({
                             id="attachments"
                             name="attachments"
                             multiple
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
                         />
                         <p className="text-xs text-gray-500 mt-1">สามารถเลือกได้หลายไฟล์ (ขนาดไม่เกิน 10MB/ไฟล์)</p>
                     </div>
@@ -149,7 +149,7 @@ export default async function NewRequirementPage({
                         </Link>
                         <button
                             type="submit"
-                            className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                            className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
                         >
                             <Save size={18} />
                             บันทึก Requirement

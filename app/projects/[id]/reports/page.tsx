@@ -80,7 +80,7 @@ export default async function ProjectReportsPage({ params }: { params: Promise<{
                 <Link href={`/projects/${id}`} className="p-2.5 hover:bg-slate-100 rounded-2xl text-slate-500 border border-slate-200/60">
                     <ArrowLeft size={18} />
                 </Link>
-                <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100/80">
+                <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/80">
                     <BarChart3 size={26} />
                 </div>
                 <div>
@@ -92,10 +92,10 @@ export default async function ProjectReportsPage({ params }: { params: Promise<{
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: "Progress",      value: `${project.progress}%`, sub: "Overall completion",                    color: "text-indigo-600",  bg: "bg-indigo-50" },
+                    { label: "Progress",      value: `${project.progress}%`, sub: "Overall completion",                    color: "text-emerald-600",  bg: "bg-emerald-50" },
                     { label: "Tasks Done",    value: `${completedTasks}/${totalTasks}`, sub: "Tasks completed",            color: "text-emerald-600", bg: "bg-emerald-50" },
                     { label: "Open Issues",   value: openIssues, sub: "Unresolved issues",                                  color: "text-rose-600",    bg: "bg-rose-50" },
-                    { label: "UAT Pass Rate", value: `${passRate}%`, sub: `${uatStats.Passed} / ${project.uatCases.length} passed`, color: "text-purple-600", bg: "bg-purple-50" },
+                    { label: "UAT Pass Rate", value: `${passRate}%`, sub: `${uatStats.Passed} / ${project.uatCases.length} passed`, color: "text-teal-600", bg: "bg-teal-50" },
                 ].map(c => (
                     <div key={c.label} className="bg-white border border-slate-200/80 rounded-2xl shadow-xs p-5">
                         <div className={`text-3xl font-extrabold ${c.color} mb-1`}>{c.value}</div>
@@ -138,11 +138,11 @@ export default async function ProjectReportsPage({ params }: { params: Promise<{
             <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6">
                 <div className="flex items-center justify-between mb-1">
                     <h2 className="text-base font-extrabold text-slate-800 flex items-center gap-2">
-                        <Clock size={18} className="text-indigo-500" /> Time Tracking — Burn-down
+                        <Clock size={18} className="text-emerald-500" /> Time Tracking — Burn-down
                     </h2>
                     <div className="flex gap-4 text-xs font-bold">
                         <span className="text-slate-500">Estimated: <span className="text-amber-600">{totalEstimated.toFixed(1)}h</span></span>
-                        <span className="text-slate-500">Logged: <span className={totalLogged > totalEstimated ? "text-rose-600" : "text-indigo-600"}>{totalLogged.toFixed(1)}h</span></span>
+                        <span className="text-slate-500">Logged: <span className={totalLogged > totalEstimated ? "text-rose-600" : "text-emerald-600"}>{totalLogged.toFixed(1)}h</span></span>
                         <span className="text-slate-500">Remaining: <span className="text-emerald-600">{Math.max(0, totalEstimated - totalLogged).toFixed(1)}h</span></span>
                     </div>
                 </div>
@@ -169,7 +169,7 @@ export default async function ProjectReportsPage({ params }: { params: Promise<{
                 <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
                     {project.activityLogs.slice(-15).reverse().map(log => (
                         <div key={log.id} className="flex items-start gap-3 text-xs py-2 border-b border-slate-100 last:border-0">
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[9px] font-extrabold text-white shrink-0 mt-0.5">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-[9px] font-extrabold text-white shrink-0 mt-0.5">
                                 {log.user.name.charAt(0).toUpperCase()}
                             </div>
                             <div>

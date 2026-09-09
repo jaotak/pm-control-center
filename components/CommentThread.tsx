@@ -70,7 +70,7 @@ export default function CommentThread({ itemType, itemId, projectId, currentUser
                 ) : (
                     comments.map(c => (
                         <div key={c.id} className="flex gap-3 group">
-                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[10px] font-extrabold text-white shrink-0 mt-0.5">
+                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-[10px] font-extrabold text-white shrink-0 mt-0.5">
                                 {getInitials(c.author.name)}
                             </div>
                             <div className="flex-1 bg-slate-50 rounded-xl px-3.5 py-2.5 border border-slate-200/60">
@@ -102,12 +102,12 @@ export default function CommentThread({ itemType, itemId, projectId, currentUser
                     onChange={(e) => setBody(e.target.value)}
                     placeholder="เขียน comment..."
                     rows={2}
-                    className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-xs text-slate-800 resize-none transition-all"
+                    className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-xs text-slate-800 resize-none transition-all"
                 />
                 <button
                     type="submit"
                     disabled={isPending || !body.trim()}
-                    className="p-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl shadow-xs disabled:opacity-50 hover:scale-105 transition-all shrink-0"
+                    className="p-2.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl shadow-xs disabled:opacity-50 hover:scale-105 transition-all shrink-0"
                 >
                     <Send size={16} />
                 </button>

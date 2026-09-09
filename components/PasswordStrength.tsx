@@ -16,7 +16,7 @@ function getStrength(password: string): { score: number; label: string; color: s
 
     if (score <= 1) return { score: 1, label: "อ่อน (Weak)", color: "text-rose-600", bgColor: "bg-rose-500" };
     if (score <= 2) return { score: 2, label: "พอใช้ (Fair)", color: "text-amber-600", bgColor: "bg-amber-500" };
-    if (score <= 3) return { score: 3, label: "ดี (Good)", color: "text-blue-600", bgColor: "bg-blue-500" };
+    if (score <= 3) return { score: 3, label: "ดี (Good)", color: "text-green-600", bgColor: "bg-green-500" };
     return { score: 4, label: "แข็งแรงมาก (Strong)", color: "text-emerald-600", bgColor: "bg-emerald-500" };
 }
 

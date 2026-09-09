@@ -19,7 +19,7 @@ export default async function AdminUsersPage() {
                 <Link href="/admin" className="p-2.5 hover:bg-slate-100 rounded-2xl text-slate-500 hover:text-slate-800 transition-colors border border-slate-200/60">
                     <ArrowLeft size={18} />
                 </Link>
-                <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100/80">
+                <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/80">
                     <Users size={26} />
                 </div>
                 <div>

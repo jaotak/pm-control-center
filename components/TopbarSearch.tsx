@@ -19,7 +19,7 @@ export default function TopbarSearch() {
     };
 
     return (
-        <div className="flex items-center bg-gray-100 px-3 py-2 rounded-lg w-full md:w-96 focus-within:ring-2 focus-within:ring-blue-500 transition-shadow">
+        <div className="flex items-center bg-gray-100 px-3 py-2 rounded-lg w-full md:w-96 focus-within:ring-2 focus-within:ring-green-500 transition-shadow">
             <Search size={18} className="text-gray-400" />
             <input
                 type="text"

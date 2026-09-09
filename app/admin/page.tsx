@@ -30,8 +30,8 @@ export default async function AdminPage() {
     const userMap = Object.fromEntries(adminUsers.map(u => [u.id, u.name]));
 
     const statCards = [
-        { label: "Total Projects",      value: stats.totalProjects,  icon: FolderKanban, color: "from-indigo-500 to-blue-600", bg: "bg-indigo-50",  text: "text-indigo-700" },
-        { label: "Total Users",          value: stats.totalUsers,     icon: Users,         color: "from-violet-500 to-purple-600", bg: "bg-violet-50", text: "text-violet-700" },
+        { label: "Total Projects",      value: stats.totalProjects,  icon: FolderKanban, color: "from-emerald-500 to-green-600", bg: "bg-emerald-50",  text: "text-emerald-700" },
+        { label: "Total Users",          value: stats.totalUsers,     icon: Users,         color: "from-violet-500 to-teal-600", bg: "bg-violet-50", text: "text-violet-700" },
         { label: "Pending Approvals",    value: pendingApprovals,     icon: UserCheck,     color: "from-amber-500 to-orange-500", bg: "bg-amber-50",  text: "text-amber-700" },
         { label: "Open Issues",          value: stats.openIssues,     icon: AlertCircle,   color: "from-rose-500 to-red-600", bg: "bg-rose-50",    text: "text-rose-700" },
         { label: "Pending Tasks",        value: stats.pendingTasks,   icon: CheckSquare,   color: "from-amber-500 to-orange-500", bg: "bg-amber-50",  text: "text-amber-700" },
@@ -70,9 +70,9 @@ export default async function AdminPage() {
             <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6">
                 <h2 className="text-base font-extrabold text-slate-800 mb-4 border-b border-slate-100 pb-3">Admin Tools</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Link href="/admin/users" className="flex items-center gap-3 p-4 border border-slate-200/80 rounded-2xl hover:border-indigo-300 hover:bg-indigo-50/60 transition-all group">
-                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
-                            <Users size={20} className="text-indigo-600" />
+                    <Link href="/admin/users" className="flex items-center gap-3 p-4 border border-slate-200/80 rounded-2xl hover:border-emerald-300 hover:bg-emerald-50/60 transition-all group">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                            <Users size={20} className="text-emerald-600" />
                         </div>
                         <div>
                             <div className="text-sm font-bold text-slate-800">User Management</div>
@@ -129,7 +129,7 @@ export default async function AdminPage() {
                             const badge = ACTION_LABELS[log.action] ?? { label: log.action, color: "bg-slate-100 text-slate-600" };
                             return (
                                 <div key={log.id} className="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100">
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-indigo-600 flex items-center justify-center text-[9px] font-extrabold text-white shrink-0 mt-0.5">
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-emerald-600 flex items-center justify-center text-[9px] font-extrabold text-white shrink-0 mt-0.5">
                                         {(userMap[log.adminId] ?? "?").charAt(0).toUpperCase()}
                                     </div>
                                     <div className="flex-1 min-w-0">

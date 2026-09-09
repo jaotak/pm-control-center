@@ -51,17 +51,17 @@ export default function GlobalSearchModal({ isOpen, onClose }: { isOpen: boolean
     if (!isOpen) return null;
 
     const renderIcon = (type: string) => {
-        if (type === 'Project') return <Folder size={16} className="text-indigo-600" />;
+        if (type === 'Project') return <Folder size={16} className="text-emerald-600" />;
         if (type === 'Requirement') return <ListTodo size={16} className="text-emerald-600" />;
-        if (type === 'UAT') return <TestTube size={16} className="text-purple-600" />;
+        if (type === 'UAT') return <TestTube size={16} className="text-teal-600" />;
         if (type === 'Issue') return <AlertCircle size={16} className="text-rose-600" />;
         return <CheckSquare size={16} className="text-amber-600" />;
     };
 
     const getTypeBadgeStyle = (type: string) => {
-        if (type === 'Project') return 'bg-indigo-50 text-indigo-700 border-indigo-200/60';
+        if (type === 'Project') return 'bg-emerald-50 text-emerald-700 border-emerald-200/60';
         if (type === 'Requirement') return 'bg-emerald-50 text-emerald-700 border-emerald-200/60';
-        if (type === 'UAT') return 'bg-purple-50 text-purple-700 border-purple-200/60';
+        if (type === 'UAT') return 'bg-teal-50 text-teal-700 border-teal-200/60';
         if (type === 'Issue') return 'bg-rose-50 text-rose-700 border-rose-200/60';
         return 'bg-amber-50 text-amber-700 border-amber-200/60';
     };
@@ -93,7 +93,7 @@ export default function GlobalSearchModal({ isOpen, onClose }: { isOpen: boolean
                 <div className="overflow-y-auto p-3 bg-slate-50/30 flex-1 min-h-[280px] custom-scrollbar">
                     {isLoading && (
                         <div className="text-center py-12 text-slate-400 text-sm flex items-center justify-center gap-2">
-                            <Sparkles size={18} className="animate-spin text-indigo-500" />
+                            <Sparkles size={18} className="animate-spin text-emerald-500" />
                             <span>กำลังค้นหาข้อมูล...</span>
                         </div>
                     )}
@@ -111,13 +111,13 @@ export default function GlobalSearchModal({ isOpen, onClose }: { isOpen: boolean
                                     key={`${item.type}-${item.id}`}
                                     href={item.link}
                                     onClick={onClose}
-                                    className="flex items-center gap-3.5 p-3 bg-white hover:bg-indigo-50/60 border border-slate-100 hover:border-indigo-200/80 rounded-xl transition-all group shadow-2xs hover:shadow-xs"
+                                    className="flex items-center gap-3.5 p-3 bg-white hover:bg-emerald-50/60 border border-slate-100 hover:border-emerald-200/80 rounded-xl transition-all group shadow-2xs hover:shadow-xs"
                                 >
                                     <div className="w-9 h-9 bg-slate-50 group-hover:bg-white rounded-xl flex items-center justify-center shrink-0 border border-slate-100 shadow-2xs">
                                         {renderIcon(item.type)}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-bold text-slate-800 group-hover:text-indigo-700 transition-colors truncate">
+                                        <div className="text-sm font-bold text-slate-800 group-hover:text-emerald-700 transition-colors truncate">
                                             {item.title}
                                         </div>
                                         <div className="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
@@ -135,7 +135,7 @@ export default function GlobalSearchModal({ isOpen, onClose }: { isOpen: boolean
 
                     {!isLoading && query.length < 2 && (
                         <div className="text-center py-12 text-slate-400 text-sm flex flex-col items-center gap-2.5">
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
                                 <Search size={22} />
                             </div>
                             <p className="font-medium text-slate-600">พิมพ์คำค้นหาที่คุณต้องการ</p>

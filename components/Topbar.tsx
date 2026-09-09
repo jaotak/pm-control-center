@@ -41,7 +41,7 @@ export default function Topbar() {
 
     const getRoleStyle = (roleName: string) => {
         if (roleName === 'ADMIN') return 'bg-rose-50 text-rose-700 border-rose-200/80';
-        if (roleName === 'PM') return 'bg-indigo-50 text-indigo-700 border-indigo-200/80';
+        if (roleName === 'PM') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
         return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
     };
 
@@ -62,7 +62,7 @@ export default function Topbar() {
                         onClick={() => setIsSearchOpen(true)}
                         className="flex items-center bg-slate-100/90 hover:bg-slate-200/80 cursor-pointer px-3 md:px-3.5 py-2 rounded-xl w-full md:w-96 transition-all border border-slate-200/60 hover:border-slate-300 group min-w-0"
                     >
-                        <Search size={17} className="text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0" />
+                        <Search size={17} className="text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0" />
                         <span className="ml-2.5 text-sm text-slate-500 font-normal truncate">ค้นหาด่วน...</span>
                         <kbd className="ml-auto hidden md:inline-flex items-center text-[10px] font-bold bg-white border border-slate-200 text-slate-400 px-1.5 py-0.5 rounded-md shadow-2xs group-hover:border-slate-300 shrink-0">
                             Ctrl+K
@@ -85,7 +85,7 @@ export default function Topbar() {
 
                     {/* Profile Section */}
                     <div className="flex items-center gap-3 border-l border-slate-200 pl-4">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-indigo-500/20 ring-2 ring-white overflow-hidden">
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-emerald-500/20 ring-2 ring-white overflow-hidden">
                             {(session?.user as any)?.avatarUrl ? (
                                 <img src={(session?.user as any)?.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                             ) : (

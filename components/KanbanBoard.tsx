@@ -19,7 +19,7 @@ type Issue = {
 const COLUMNS = [
     { id: "Open",        label: "Open",        color: "bg-rose-50 border-rose-200",       header: "text-rose-700" },
     { id: "In Progress", label: "In Progress", color: "bg-amber-50 border-amber-200",     header: "text-amber-700" },
-    { id: "Testing",     label: "Testing",     color: "bg-purple-50 border-purple-200",   header: "text-purple-700" },
+    { id: "Testing",     label: "Testing",     color: "bg-teal-50 border-teal-200",   header: "text-teal-700" },
     { id: "Resolved",    label: "Resolved",    color: "bg-emerald-50 border-emerald-200", header: "text-emerald-700" },
     { id: "Closed",      label: "Closed",      color: "bg-slate-50 border-slate-200",     header: "text-slate-500" },
 ];
@@ -98,10 +98,10 @@ export default function KanbanBoard({ initialIssues, projectId }: { initialIssue
                                                             ref={provided.innerRef}
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
-                                                            className={`bg-white rounded-xl border border-slate-200/80 p-3 shadow-2xs transition-all ${snapshot.isDragging ? "shadow-lg rotate-1 scale-105" : "hover:shadow-sm hover:border-indigo-200"}`}
+                                                            className={`bg-white rounded-xl border border-slate-200/80 p-3 shadow-2xs transition-all ${snapshot.isDragging ? "shadow-lg rotate-1 scale-105" : "hover:shadow-sm hover:border-emerald-200"}`}
                                                         >
                                                             <div className="flex justify-between items-start gap-1 mb-2">
-                                                                <span className="text-[11px] font-extrabold text-indigo-600">{issue.issueCode}</span>
+                                                                <span className="text-[11px] font-extrabold text-emerald-600">{issue.issueCode}</span>
                                                                 <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${SEVERITY_COLOR[issue.severity] || "bg-slate-100 text-slate-600"}`}>
                                                                     {issue.severity}
                                                                 </span>
@@ -111,7 +111,7 @@ export default function KanbanBoard({ initialIssues, projectId }: { initialIssue
                                                                 <PriorityBadge priority={issue.priority} />
                                                                 {issue.assignee && (
                                                                     <div
-                                                                        className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[8px] font-extrabold text-white"
+                                                                        className="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-[8px] font-extrabold text-white"
                                                                         title={issue.assignee.name}
                                                                     >
                                                                         {issue.assignee.name.charAt(0).toUpperCase()}

@@ -134,7 +134,7 @@ export default async function ProjectDetailPage({
                         <div>
                             <div className="flex items-center gap-3 flex-wrap">
                                 <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">{project.name}</h1>
-                                <span className="px-3 py-1 bg-indigo-50 text-indigo-700 font-extrabold text-xs rounded-xl border border-indigo-200/60">
+                                <span className="px-3 py-1 bg-emerald-50 text-emerald-700 font-extrabold text-xs rounded-xl border border-emerald-200/60">
                                     {project.code}
                                 </span>
                             </div>
@@ -142,7 +142,7 @@ export default async function ProjectDetailPage({
                                 <span>ลูกค้า: <strong className="text-slate-700 font-semibold">{project.customer}</strong></span>
                                 <span>•</span>
                                 <span className="flex items-center gap-1">
-                                    PM ผู้ดูแล: <UserCheck size={14} className="text-indigo-500 ml-0.5" />
+                                    PM ผู้ดูแล: <UserCheck size={14} className="text-emerald-500 ml-0.5" />
                                     <strong className="text-slate-700 font-semibold">{project.owner?.name || "ยังไม่ระบุ PM"}</strong>
                                 </span>
                             </p>
@@ -172,7 +172,7 @@ export default async function ProjectDetailPage({
                                     className={`
                                         whitespace-nowrap flex items-center gap-2 py-3 px-4 rounded-xl font-bold text-xs transition-all border
                                         ${isActive
-                                            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white border-transparent shadow-md shadow-indigo-500/20'
+                                            ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white border-transparent shadow-md shadow-emerald-500/20'
                                             : 'bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/60 border-transparent'
                                         }
                                     `}
@@ -206,13 +206,13 @@ export default async function ProjectDetailPage({
                             <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs">
                                 <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-base font-bold text-slate-800">ความก้าวหน้าโครงการ (Project Progress)</h2>
-                                    <span className="text-sm font-extrabold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100">
+                                    <span className="text-sm font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-100">
                                         {project.progress}% Complete
                                     </span>
                                 </div>
                                 <div className="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden border border-slate-200/50 p-0.5">
                                     <div
-                                        className="bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-600 h-2.5 rounded-full transition-all duration-500 shadow-2xs"
+                                        className="bg-gradient-to-r from-emerald-500 via-green-600 to-emerald-600 h-2.5 rounded-full transition-all duration-500 shadow-2xs"
                                         style={{ width: `${project.progress}%` }}
                                     ></div>
                                 </div>
@@ -240,7 +240,7 @@ export default async function ProjectDetailPage({
                             {userRole !== "DEV" && (
                                 <Link
                                     href={`/projects/${id}/requirements/new`}
-                                    className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5"
+                                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
                                 >
                                     <Plus size={16} /> เพิ่ม Requirement
                                 </Link>
@@ -250,7 +250,7 @@ export default async function ProjectDetailPage({
                         {/* FilterBar placeholder — replace with client component if needed */}
                         <div className="mb-4 flex flex-wrap gap-2">
                             {[filterStatus, filterPriority, filterAssignee, filterDue].some(Boolean) && (
-                                <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-200/60">
+                                <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200/60">
                                     Filters active — <Link href={`/projects/${id}?tab=requirements`} className="text-rose-600 hover:underline">Clear</Link>
                                 </div>
                             )}
@@ -273,7 +273,7 @@ export default async function ProjectDetailPage({
                                     <tbody className="divide-y divide-slate-100">
                                         {project.requirements.map((req) => (
                                             <tr key={req.id} className="hover:bg-slate-50/60 transition-colors">
-                                                <td className="px-5 py-3.5 font-bold text-indigo-600">{req.reqCode}</td>
+                                                <td className="px-5 py-3.5 font-bold text-emerald-600">{req.reqCode}</td>
                                                 <td className="px-5 py-3.5 font-semibold text-slate-800">{req.title}</td>
                                                 <td className="px-5 py-3.5"><PriorityBadge priority={req.priority} /></td>
                                                 <td className="px-5 py-3.5"><DueDateBadge dueDate={req.dueDate} /></td>
@@ -309,7 +309,7 @@ export default async function ProjectDetailPage({
                             </div>
                         ) : (
                             <div className="p-12 text-center text-slate-400 border-2 border-dashed border-slate-200/80 rounded-2xl">
-                                <ListTodo size={36} className="mx-auto mb-2 opacity-30 text-indigo-500" />
+                                <ListTodo size={36} className="mx-auto mb-2 opacity-30 text-emerald-500" />
                                 <p className="text-sm font-semibold text-slate-600">ยังไม่มี Requirement ในโครงการนี้</p>
                             </div>
                         )}
@@ -327,7 +327,7 @@ export default async function ProjectDetailPage({
                             {userRole !== "DEV" && (
                                 <Link
                                     href={`/projects/${id}/uat/new`}
-                                    className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5"
+                                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
                                 >
                                     <Plus size={16} /> เพิ่ม Test Case
                                 </Link>
@@ -352,7 +352,7 @@ export default async function ProjectDetailPage({
                                     <tbody className="divide-y divide-slate-100">
                                         {project.uatCases.map((uat) => (
                                             <tr key={uat.id} className="hover:bg-slate-50/60 transition-colors">
-                                                <td className="px-5 py-3.5 font-bold text-purple-600">{uat.uatCode}</td>
+                                                <td className="px-5 py-3.5 font-bold text-teal-600">{uat.uatCode}</td>
                                                 <td className="px-5 py-3.5 font-semibold text-slate-800">{uat.title}</td>
                                                 <td className="px-5 py-3.5 text-center">
                                                     <UATMandatoryToggle
@@ -403,7 +403,7 @@ export default async function ProjectDetailPage({
                             </div>
                         ) : (
                             <div className="p-12 text-center text-slate-400 border-2 border-dashed border-slate-200/80 rounded-2xl">
-                                <TestTube size={36} className="mx-auto mb-2 opacity-30 text-purple-500" />
+                                <TestTube size={36} className="mx-auto mb-2 opacity-30 text-teal-500" />
                                 <p className="text-sm font-semibold text-slate-600">ยังไม่มี UAT Case ในโครงการนี้</p>
                             </div>
                         )}
@@ -532,7 +532,7 @@ export default async function ProjectDetailPage({
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <div>
                                 <h2 className="text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                                    <GitMerge size={20} className="text-indigo-600" />
+                                    <GitMerge size={20} className="text-emerald-600" />
                                     Full Traceability Matrix
                                 </h2>
                                 <p className="text-xs text-slate-500 mt-0.5">เชื่อมโยง Requirement ➔ UAT Test Case ➔ Related Issues</p>
@@ -549,7 +549,7 @@ export default async function ProjectDetailPage({
                                 <a
                                     href={`/api/export/traceability/${project.id}?format=xlsx`}
                                     download
-                                    className="flex items-center gap-2 bg-indigo-50 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-100 px-4 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-2xs"
+                                    className="flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100 px-4 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-2xs"
                                 >
                                     <Download size={15} />
                                     Export Excel
@@ -561,9 +561,9 @@ export default async function ProjectDetailPage({
                         <div className="overflow-x-auto border border-slate-200/80 rounded-2xl">
                             <table className="w-full text-left border-collapse text-sm">
                                 <thead>
-                                    <tr className="bg-indigo-50/80 text-indigo-900 border-b border-indigo-200/80 text-xs font-extrabold uppercase">
-                                        <th className="px-5 py-3.5 w-1/3 border-r border-indigo-200/60">1. Requirement</th>
-                                        <th className="px-5 py-3.5 w-1/3 border-r border-indigo-200/60">2. UAT Cases</th>
+                                    <tr className="bg-emerald-50/80 text-emerald-900 border-b border-emerald-200/80 text-xs font-extrabold uppercase">
+                                        <th className="px-5 py-3.5 w-1/3 border-r border-emerald-200/60">1. Requirement</th>
+                                        <th className="px-5 py-3.5 w-1/3 border-r border-emerald-200/60">2. UAT Cases</th>
                                         <th className="px-5 py-3.5 w-1/3">3. Related Issues (Bugs)</th>
                                     </tr>
                                 </thead>
@@ -571,7 +571,7 @@ export default async function ProjectDetailPage({
                                     {project.requirements.map((req) => (
                                         <tr key={req.id} className="hover:bg-slate-50/40 align-top">
                                             <td className="px-5 py-4 border-r border-slate-200/80 bg-white">
-                                                <div className="font-extrabold text-indigo-600">{req.reqCode}</div>
+                                                <div className="font-extrabold text-emerald-600">{req.reqCode}</div>
                                                 <div className="text-slate-800 font-semibold mt-1 mb-2 text-xs">{req.title}</div>
                                                 <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-md text-slate-700">
                                                     {req.status}
@@ -584,7 +584,7 @@ export default async function ProjectDetailPage({
                                                             <div key={uat.id} className={`flex w-full ${index !== 0 ? 'border-t border-slate-200/80' : ''}`}>
                                                                 <div className="w-1/2 px-4 py-4 border-r border-slate-200/80 hover:bg-slate-50 transition-colors">
                                                                     <div className="flex items-center gap-2 mb-1">
-                                                                        <span className="font-bold text-purple-600 text-xs">{uat.uatCode}</span>
+                                                                        <span className="font-bold text-teal-600 text-xs">{uat.uatCode}</span>
                                                                         {uat.status === 'Passed' && <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-2xs"></span>}
                                                                         {uat.status === 'Failed' && <span className="w-2 h-2 rounded-full bg-rose-500 shadow-2xs"></span>}
                                                                     </div>
@@ -639,7 +639,7 @@ export default async function ProjectDetailPage({
                             {userRole !== "DEV" && (
                                 <Link
                                     href={`/projects/${id}/tasks/new`}
-                                    className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5"
+                                    className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
                                 >
                                     <Plus size={16} /> เพิ่ม Task
                                 </Link>
@@ -682,7 +682,7 @@ export default async function ProjectDetailPage({
                             </div>
                         ) : (
                             <div className="p-12 text-center text-slate-400 border-2 border-dashed border-slate-200/80 rounded-2xl">
-                                <CheckSquare size={36} className="mx-auto mb-2 opacity-30 text-indigo-500" />
+                                <CheckSquare size={36} className="mx-auto mb-2 opacity-30 text-emerald-500" />
                                 <p className="text-sm font-semibold text-slate-600">ยังไม่มีรายการงานในโครงการนี้</p>
                             </div>
                         )}
@@ -693,7 +693,7 @@ export default async function ProjectDetailPage({
                     <div className="flex items-center justify-center py-16">
                         <Link
                             href={`/projects/${id}/reports`}
-                            className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md shadow-indigo-500/20 hover:scale-105 transition-all"
+                            className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold text-sm px-6 py-3 rounded-2xl shadow-md shadow-emerald-500/20 hover:scale-105 transition-all"
                         >
                             <BarChart3 size={18} /> Open Full Reports Page
                         </Link>

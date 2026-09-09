@@ -83,7 +83,7 @@ export default function ChatWindow({
     if (!room) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-slate-50/50 dark:bg-slate-950/40">
-                <div className="w-16 h-16 rounded-3xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-4 shadow-inner">
+                <div className="w-16 h-16 rounded-3xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 shadow-inner">
                     <Users size={32} />
                 </div>
                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
@@ -116,7 +116,7 @@ export default function ChatWindow({
                     {/* Avatar */}
                     <div className="relative shrink-0">
                         {room.type === "group" ? (
-                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
+                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-xs">
                                 <Users size={18} />
                             </div>
                         ) : room.displayAvatar ? (
@@ -126,7 +126,7 @@ export default function ChatWindow({
                                 className="w-10 h-10 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                             />
                         ) : (
-                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
+                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
                                 {room.displayName.charAt(0).toUpperCase()}
                             </div>
                         )}
@@ -142,7 +142,7 @@ export default function ChatWindow({
                                 <button
                                     type="button"
                                     onClick={() => setShowMemberDetails((prev) => !prev)}
-                                    className="hover:underline flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-medium"
+                                    className="hover:underline flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium"
                                 >
                                     <span>{room.members.length} สมาชิก</span>
                                     <span>• ดูรายชื่อ</span>
@@ -180,7 +180,7 @@ export default function ChatWindow({
                                 {m.user.avatarUrl ? (
                                     <img src={m.user.avatarUrl} alt={m.user.name} className="w-7 h-7 rounded-full object-cover" />
                                 ) : (
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-[10px]">
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-[10px]">
                                         {m.user.name.charAt(0).toUpperCase()}
                                     </div>
                                 )}
@@ -206,7 +206,7 @@ export default function ChatWindow({
                     </div>
                 ) : messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
                             <Clock size={20} />
                         </div>
                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -250,7 +250,7 @@ export default function ChatWindow({
                                                     className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
                                                 />
                                             ) : (
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
                                                     {msg.sender.name.charAt(0).toUpperCase()}
                                                 </div>
                                             )}
@@ -275,7 +275,7 @@ export default function ChatWindow({
                                                     </a>
                                                 ) : (
                                                     <a href={msg.attachmentUrl} target="_blank" rel="noreferrer" download className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors w-full min-w-[200px]">
-                                                        <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 shrink-0">
+                                                        <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-500 shrink-0">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                                         </div>
                                                         <div className="flex-1 min-w-0">
@@ -292,7 +292,7 @@ export default function ChatWindow({
                                             <div
                                                 className={`px-4 py-2.5 shadow-2xs leading-relaxed text-sm whitespace-pre-wrap break-words ${
                                                     isMe
-                                                        ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-2xl rounded-br-xs font-normal"
+                                                        ? "bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-2xl rounded-br-xs font-normal"
                                                         : "bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200/80 dark:border-slate-700/60 rounded-2xl rounded-bl-xs"
                                                 }`}
                                             >
@@ -309,9 +309,9 @@ export default function ChatWindow({
                                             <span>{formatMessageTime(msg.createdAt)}</span>
                                             {isMe && (
                                                 isReadBySomeone ? (
-                                                    <CheckCheck size={14} className="text-blue-500 drop-shadow-sm" title="อ่านแล้ว" />
+                                                    <span title="อ่านแล้ว"><CheckCheck size={14} className="text-green-500 drop-shadow-sm" /></span>
                                                 ) : (
-                                                    <Check size={13} className="text-slate-400" title="ส่งแล้ว" />
+                                                    <span title="ส่งแล้ว"><Check size={13} className="text-slate-400" /></span>
                                                 )
                                             )}
                                         </div>

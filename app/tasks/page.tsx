@@ -54,7 +54,7 @@ export default async function MyTasksPage() {
         <div className="max-w-5xl mx-auto space-y-7 pb-12">
             {/* Title Banner Header */}
             <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-8 flex items-center gap-4">
-                <div className="p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100/80 shadow-2xs">
+                <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/80 shadow-2xs">
                     <CheckSquare size={28} />
                 </div>
                 <div>
@@ -68,7 +68,7 @@ export default async function MyTasksPage() {
                 <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-7">
                     <h2 className="text-base font-extrabold text-slate-800 mb-5 border-b border-slate-100 pb-3 flex items-center justify-between">
                         <span>โมดูลหลักที่ได้รับมอบหมาย (Assigned Modules)</span>
-                        <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-xl">
+                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-xl">
                             {assignedIssues.length + assignedUATs.length + assignedReqs.length} รายการ
                         </span>
                     </h2>
@@ -108,7 +108,7 @@ export default async function MyTasksPage() {
                         {/* UAT */}
                         {assignedUATs.length > 0 && (
                             <div className="space-y-2.5">
-                                <h3 className="text-xs font-extrabold uppercase tracking-wider text-purple-600 flex items-center gap-1.5">
+                                <h3 className="text-xs font-extrabold uppercase tracking-wider text-teal-600 flex items-center gap-1.5">
                                     <TestTube size={15} /> ทดสอบระบบ (UAT - {assignedUATs.length})
                                 </h3>
                                 <div className="space-y-2">
@@ -116,16 +116,16 @@ export default async function MyTasksPage() {
                                         <Link
                                             key={uat.id}
                                             href={`/projects/${uat.projectId}?tab=uat`}
-                                            className="block bg-purple-50/60 border border-purple-200/80 p-3.5 rounded-2xl hover:bg-purple-100/70 transition-all group shadow-2xs"
+                                            className="block bg-teal-50/60 border border-teal-200/80 p-3.5 rounded-2xl hover:bg-teal-100/70 transition-all group shadow-2xs"
                                         >
                                             <div className="flex justify-between items-start mb-1">
-                                                <span className="font-bold text-slate-800 text-xs leading-snug group-hover:text-purple-700 transition-colors">
+                                                <span className="font-bold text-slate-800 text-xs leading-snug group-hover:text-teal-700 transition-colors">
                                                     [{uat.uatCode}] {uat.title}
                                                 </span>
                                             </div>
                                             <div className="text-[11px] text-slate-500 flex justify-between mt-2 font-medium">
                                                 <span>โครงการ: <strong>{uat.project.code}</strong></span>
-                                                <span className="font-bold text-purple-600">{uat.status}</span>
+                                                <span className="font-bold text-teal-600">{uat.status}</span>
                                             </div>
                                         </Link>
                                     ))}
@@ -180,11 +180,11 @@ export default async function MyTasksPage() {
                                 <TaskCheckbox taskId={task.id} initialCompleted={task.isCompleted} title={task.title} />
                                 <div className="text-xs text-slate-500 mt-1.5 ml-8 font-medium">
                                     โครงการ: {task.project ? (
-                                        <Link href={`/projects/${task.projectId}?tab=tasks`} className="text-indigo-600 hover:underline font-bold">
+                                        <Link href={`/projects/${task.projectId}?tab=tasks`} className="text-emerald-600 hover:underline font-bold">
                                             {task.project.name}
                                         </Link>
                                     ) : (
-                                        <span className="text-purple-600 font-bold">🎯 งานทั่วไป (General)</span>
+                                        <span className="text-teal-600 font-bold">🎯 งานทั่วไป (General)</span>
                                     )}
                                 </div>
                             </div>

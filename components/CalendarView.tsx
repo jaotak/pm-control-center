@@ -104,67 +104,73 @@ export default function CalendarView({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/50 shrink-0">
-                    {weekDays.map((day, index) => (
-                        <div key={day} className={`text-center py-3 text-xs font-semibold ${index === 0 || index === 6 ? 'text-gray-400' : 'text-gray-600'}`}>{day}</div>
-                    ))}
-                </div>
+                <div className="flex-1 overflow-hidden flex flex-col">
+                    <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar flex flex-col">
+                        <div className="min-w-[800px] flex-1 flex flex-col">
+                            <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/50 shrink-0">
+                                {weekDays.map((day, index) => (
+                                    <div key={day} className={`text-center py-3 text-xs font-semibold ${index === 0 || index === 6 ? 'text-gray-400' : 'text-gray-600'}`}>{day}</div>
+                                ))}
+                            </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-200">
-                    <div className="grid grid-cols-7 gap-px auto-rows-[minmax(120px,_1fr)] min-h-full">
-                        {calendarDays.map((day, index) => {
-                            if (!day) return <div key={`empty-${index}`} className="bg-gray-50/50 min-h-[120px]"></div>;
+                            <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-200">
+                                <div className="grid grid-cols-7 gap-px auto-rows-[minmax(120px,_1fr)] min-h-full">
+                                    {calendarDays.map((day, index) => {
+                                        if (!day) return <div key={`empty-${index}`} className="bg-gray-50/50 min-h-[120px]"></div>;
 
-                            const dayString = formatDate(day);
-                            const isToday = formatDate(today) === dayString;
-                            const dayTasks = tasks.filter(t => t.dueDate && formatDate(t.dueDate) === dayString);
+                                        const dayString = formatDate(day);
+                                        const isToday = formatDate(today) === dayString;
+                                        const dayTasks = tasks.filter(t => t.dueDate && formatDate(t.dueDate) === dayString);
 
-                            return (
-                                <div key={dayString} className="bg-white p-1.5 hover:bg-gray-50 transition-colors flex flex-col group relative min-h-[120px]">
-                                    <div className="flex justify-between items-start mb-1 shrink-0">
-                                        <span className={`text-sm w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-red-500 text-white font-bold shadow-sm" : "text-gray-700 font-medium group-hover:text-blue-600"}`}>
-                                            {day.getDate()}
-                                        </span>
-                                        <button onClick={() => openAddModal(day)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded opacity-0 group-hover:opacity-100 transition-all">
-                                            <Plus size={16} />
-                                        </button>
-                                    </div>
-
-                                    <div className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
-                                        {dayTasks.map(task => (
-                                            /* 4. ครอบ Link ด้วย div group/task เพื่อจัดการแสดงผลปุ่มลบ */
-                                            <div key={task.id} className="relative group/task">
-                                                <Link
-                                                    href={task.project ? `/projects/${task.project.id}?tab=tasks` : '/tasks'}
-                                                    className={`block px-2 py-1.5 text-xs rounded border pr-6 ${task.isCompleted ? "bg-gray-100 text-gray-400 border-gray-200 line-through" : task.project ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100" : "bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100"}`}
-                                                >
-                                                    <div className="truncate font-medium">
-                                                        <span className="font-bold mr-1">{task.project ? task.project.code : '🎯 ทั่วไป'}</span>
-                                                        {task.title}
-                                                    </div>
-                                                    {task.assignee && (
-                                                        <div className="mt-0.5 text-[10px] opacity-75 flex items-center gap-1 truncate">
-                                                            👤 {task.assignee.name.split(' ')[0]}
-                                                        </div>
-                                                    )}
-                                                </Link>
-
-                                                {/* 5. ปุ่มกากบาทลบงาน (โผล่เฉพาะตอนเอาเมาส์ชี้ และต้องเป็นเจ้าของงาน หรือ Admin/PM) */}
-                                                {(task.assignee?.id === currentUserId || userRole !== "DEV") && (
-                                                    <button
-                                                        onClick={(e) => handleDeleteTask(e, task.id)}
-                                                        className="absolute top-1.5 right-1.5 p-0.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded opacity-0 group-hover/task:opacity-100 transition-opacity"
-                                                        title="ลบงานนี้"
-                                                    >
-                                                        <X size={12} strokeWidth={3} />
+                                        return (
+                                            <div key={dayString} className="bg-white p-1.5 hover:bg-gray-50 transition-colors flex flex-col group relative min-h-[120px]">
+                                                <div className="flex justify-between items-start mb-1 shrink-0">
+                                                    <span className={`text-sm w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-red-500 text-white font-bold shadow-sm" : "text-gray-700 font-medium group-hover:text-blue-600"}`}>
+                                                        {day.getDate()}
+                                                    </span>
+                                                    <button onClick={() => openAddModal(day)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded opacity-0 group-hover:opacity-100 transition-all">
+                                                        <Plus size={16} />
                                                     </button>
-                                                )}
+                                                </div>
+
+                                                <div className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
+                                                    {dayTasks.map(task => (
+                                                        /* 4. ครอบ Link ด้วย div group/task เพื่อจัดการแสดงผลปุ่มลบ */
+                                                        <div key={task.id} className="relative group/task">
+                                                            <Link
+                                                                href={task.project ? `/projects/${task.project.id}?tab=tasks` : '/tasks'}
+                                                                className={`block px-2 py-1.5 text-xs rounded border pr-6 ${task.isCompleted ? "bg-gray-100 text-gray-400 border-gray-200 line-through" : task.project ? "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100" : "bg-purple-50 text-purple-700 border-purple-100 hover:bg-purple-100"}`}
+                                                            >
+                                                                <div className="truncate font-medium">
+                                                                    <span className="font-bold mr-1">{task.project ? task.project.code : '🎯 ทั่วไป'}</span>
+                                                                    {task.title}
+                                                                </div>
+                                                                {task.assignee && (
+                                                                    <div className="mt-0.5 text-[10px] opacity-75 flex items-center gap-1 truncate">
+                                                                        👤 {task.assignee.name.split(' ')[0]}
+                                                                    </div>
+                                                                )}
+                                                            </Link>
+
+                                                            {/* 5. ปุ่มกากบาทลบงาน (โผล่เฉพาะตอนเอาเมาส์ชี้ และต้องเป็นเจ้าของงาน หรือ Admin/PM) */}
+                                                            {(task.assignee?.id === currentUserId || userRole !== "DEV") && (
+                                                                <button
+                                                                    onClick={(e) => handleDeleteTask(e, task.id)}
+                                                                    className="absolute top-1.5 right-1.5 p-0.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded opacity-0 group-hover/task:opacity-100 transition-opacity"
+                                                                    title="ลบงานนี้"
+                                                                >
+                                                                    <X size={12} strokeWidth={3} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                        );
+                                    })}
                                 </div>
-                            );
-                        })}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

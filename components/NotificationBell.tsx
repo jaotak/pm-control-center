@@ -33,6 +33,8 @@ function formatTimeAgo(dateStr?: string | Date | null): string {
     return date.toLocaleDateString("th-TH", { day: "numeric", month: "short" });
 }
 
+import { fetchBadges, subscribeBadgeUpdates, updateBadgeCache } from "@/lib/badgeService";
+
 export default function NotificationBell({ initialNotifications = [] }: { initialNotifications?: Notification[] }) {
     const { status } = useSession();
     const [isOpen, setIsOpen] = useState(false);
@@ -42,42 +44,36 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
     const router = useRouter();
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Fetch live notifications efficiently without persistent stream
+    // Synchronize with centralized badge store
+    useEffect(() => {
+        const unsubscribe = subscribeBadgeUpdates((data) => {
+            if (typeof data.unreadNotificationsCount === "number") {
+                setLiveCount(data.unreadNotificationsCount);
+            }
+            if (Array.isArray(data.unreadNotifications)) {
+                setNotifications(data.unreadNotifications);
+            }
+        });
+        return unsubscribe;
+    }, []);
+
+    // Efficient polling via shared badgeService (deduplicates with Sidebar)
     useEffect(() => {
         if (status !== "authenticated") return;
 
-        let isMounted = true;
-        const fetchNotifications = async () => {
-            if (document.hidden) return;
-            try {
-                const res = await fetch("/api/user/badges");
-                if (!res.ok) return;
-                const data = await res.json();
-                if (isMounted) {
-                    if (typeof data.unreadNotificationsCount === "number") {
-                        setLiveCount(data.unreadNotificationsCount);
-                    }
-                    if (Array.isArray(data.unreadNotifications)) {
-                        setNotifications(data.unreadNotifications);
-                    }
-                }
-            } catch { }
+        fetchBadges();
+
+        const handleRefresh = () => {
+            if (!document.hidden) fetchBadges();
         };
 
-        fetchNotifications();
-
-        const handleVisibilityChange = () => {
-            if (!document.hidden) fetchNotifications();
-        };
-
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        window.addEventListener("focus", fetchNotifications);
-        const interval = setInterval(fetchNotifications, 45000);
+        document.addEventListener("visibilitychange", handleRefresh);
+        window.addEventListener("focus", handleRefresh);
+        const interval = setInterval(handleRefresh, 45000);
 
         return () => {
-            isMounted = false;
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-            window.removeEventListener("focus", fetchNotifications);
+            document.removeEventListener("visibilitychange", handleRefresh);
+            window.removeEventListener("focus", handleRefresh);
             clearInterval(interval);
         };
     }, [status]);
@@ -99,8 +95,10 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
     // Immediate optimistic mark as read
     const handleMarkAsRead = (id: string, link: string | null) => {
         // 1. Optimistically update local state immediately
-        setNotifications(prev => prev.filter(n => n.id !== id));
-        setLiveCount(prev => Math.max(0, prev - 1));
+        const remaining = notifications.filter(n => n.id !== id);
+        setNotifications(remaining);
+        setLiveCount(remaining.length);
+        updateBadgeCache({ unreadNotificationsCount: remaining.length, unreadNotifications: remaining });
 
         if (link) {
             setIsOpen(false);
@@ -122,6 +120,7 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
         // Optimistic clear
         setNotifications([]);
         setLiveCount(0);
+        updateBadgeCache({ unreadNotificationsCount: 0, unreadNotifications: [] });
 
         startTransition(async () => {
             try {

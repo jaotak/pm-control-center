@@ -49,6 +49,8 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                 await update({ avatarUrl: result.avatarUrl });
                 setMessage("อัปโหลดรูปโปรไฟล์เรียบร้อยแล้ว");
                 setTimeout(() => setMessage(""), 4000);
+            } else if (result?.error) {
+                setError(result.error);
             }
         } catch (err: any) {
             setError(err?.message || "เกิดข้อผิดพลาดในการอัปโหลดรูป");
@@ -65,12 +67,17 @@ export default function ProfileForm({ user }: { user: UserProps }) {
 
         startTransition(async () => {
             try {
-                await updateProfile(name, email, department, phone);
+                const result = await updateProfile(name, email, department, phone);
+                if (result?.error) {
+                    setError(result.error);
+                    setIsPending(false);
+                    return;
+                }
 
                 if (currentPassword && newPassword) {
-                    const result = await changePassword(currentPassword, newPassword);
-                    if (result?.error) {
-                        setError(result.error);
+                    const passResult = await changePassword(currentPassword, newPassword);
+                    if (passResult?.error) {
+                        setError(passResult.error);
                         setIsPending(false);
                         return;
                     }

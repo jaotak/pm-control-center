@@ -6,25 +6,31 @@ import bcrypt from "bcryptjs";
 import { getAuthUser } from "@/lib/auth";
 
 export async function updateProfile(name: string, email: string, department?: string, phone?: string) {
-    const user = await getAuthUser();
-    if (!user) throw new Error("Unauthorized");
+    try {
+        const user = await getAuthUser();
+        if (!user) return { error: "Unauthorized" };
 
-    // Check email uniqueness (exclude current user)
-    if (email !== user.email) {
-        const existing = await prisma.user.findUnique({ where: { email } });
-        if (existing) throw new Error("อีเมลนี้ถูกใช้งานแล้ว");
-    }
-
-    await prisma.user.update({
-        where: { id: user.id },
-        data: {
-            name,
-            email,
-            department: department || null,
-            phone: phone || null,
+        // Check email uniqueness (exclude current user)
+        if (email !== user.email) {
+            const existing = await prisma.user.findUnique({ where: { email } });
+            if (existing) return { error: "อีเมลนี้ถูกใช้งานแล้ว" };
         }
-    });
-    revalidatePath("/settings");
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                name,
+                email,
+                department: department || null,
+                phone: phone || null,
+            }
+        });
+        revalidatePath("/settings");
+        return { success: true };
+    } catch (err: any) {
+        console.error("updateProfile error:", err);
+        return { error: "เกิดข้อผิดพลาดในการบันทึกข้อมูล" };
+    }
 }
 
 export async function changePassword(currentPassword: string, newPassword: string) {
@@ -67,38 +73,49 @@ import { writeFile } from "fs/promises";
 import path from "path";
 
 export async function uploadAvatar(formData: FormData) {
-    const user = await getAuthUser();
-    if (!user) throw new Error("Unauthorized");
+    try {
+        const user = await getAuthUser();
+        if (!user) return { error: "Unauthorized" };
 
-    const file = formData.get("file") as File;
-    if (!file) throw new Error("No file uploaded");
+        const file = formData.get("file") as File;
+        if (!file) return { error: "No file uploaded" };
 
-    // Check if it's an image
-    if (!file.type.startsWith("image/")) {
-        throw new Error("File is not an image");
+        // Check if it's an image
+        if (!file.type.startsWith("image/")) {
+            return { error: "File is not an image" };
+        }
+
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        // Generate unique filename
+        const ext = file.name.split(".").pop();
+        const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        const fileName = `${user.id}-${uniqueId}.${ext}`;
+        
+        // Vercel filesystem is read-only. This will fail on Vercel unless using external storage (like Supabase storage or S3).
+        const uploadDir = path.join(process.cwd(), "public", "uploads", "avatars");
+        const filePath = path.join(uploadDir, fileName);
+
+        try {
+            await writeFile(filePath, buffer);
+        } catch (e: any) {
+            console.error("Local file write failed:", e);
+            return { error: "ระบบไม่รองรับการอัปโหลดไฟล์บน Vercel (Read-only filesystem) กรุณาเชื่อมต่อ Supabase Storage หรือ S3" };
+        }
+
+        const avatarUrl = `/uploads/avatars/${fileName}`;
+
+        // Update user
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { avatarUrl }
+        });
+
+        revalidatePath("/settings");
+        return { avatarUrl };
+    } catch (err: any) {
+        console.error("uploadAvatar error:", err);
+        return { error: "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ" };
     }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Generate unique filename
-    const ext = file.name.split(".").pop();
-    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const fileName = `${user.id}-${uniqueId}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "avatars");
-    const filePath = path.join(uploadDir, fileName);
-
-    // Write file
-    await writeFile(filePath, buffer);
-
-    const avatarUrl = `/uploads/avatars/${fileName}`;
-
-    // Update user
-    await prisma.user.update({
-        where: { id: user.id },
-        data: { avatarUrl }
-    });
-
-    revalidatePath("/settings");
-    return { avatarUrl };
 }

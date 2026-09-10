@@ -3,25 +3,15 @@
 import { prisma } from "@/lib/prisma";
 
 export async function updateProjectProgress(projectId: string) {
-    // ดึงข้อมูลงานทั้งหมดในโปรเจกต์ (กรองงานที่ถูกลบ soft-delete ออก)
-    const project = await prisma.project.findUnique({
-        where: { id: projectId },
-        include: {
-            requirements: { where: { deletedAt: null } },
-            uatCases:     { where: { deletedAt: null } },
-            tasks:        { where: { deletedAt: null } },
-        }
-    });
-
-    if (!project) return;
-
-    // นับจำนวนงานทั้งหมด และงานที่ "เสร็จแล้ว"
-    const totalReqs       = project.requirements.length;
-    const doneReqs        = project.requirements.filter(r => r.status === 'Done').length;
-    const totalUATs       = project.uatCases.length;
-    const passedUATs      = project.uatCases.filter(u => u.status === 'Passed').length;
-    const totalTasks      = project.tasks.length;
-    const completedTasks  = project.tasks.filter(t => t.isCompleted).length;
+    // Use count queries instead of fetching all records into memory
+    const [totalReqs, doneReqs, totalUATs, passedUATs, totalTasks, completedTasks] = await Promise.all([
+        prisma.requirement.count({ where: { projectId, deletedAt: null } }),
+        prisma.requirement.count({ where: { projectId, deletedAt: null, status: 'Done' } }),
+        prisma.uATCase.count({ where: { projectId, deletedAt: null } }),
+        prisma.uATCase.count({ where: { projectId, deletedAt: null, status: 'Passed' } }),
+        prisma.task.count({ where: { projectId, deletedAt: null } }),
+        prisma.task.count({ where: { projectId, deletedAt: null, isCompleted: true } }),
+    ]);
 
     const totalItems = totalReqs + totalUATs + totalTasks;
     let newProgress = 0;

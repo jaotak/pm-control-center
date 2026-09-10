@@ -63,16 +63,31 @@ export async function GET(req: NextRequest) {
                     const roomUnreadMap: Record<string, number> = {};
                     const roomLatestMessages: Record<string, any> = {};
 
-                    for (const m of memberships) {
-                        const count = await prisma.chatMessage.count({
+                    // Bulk fetch unread counts (avoid N+1)
+                    if (memberships.length > 0) {
+                        const oldestRead = new Date(Math.min(...memberships.map(m => m.lastReadAt.getTime())));
+                        const recentMsgs = await prisma.chatMessage.findMany({
                             where: {
-                                chatRoomId: m.chatRoomId,
+                                chatRoomId: { in: memberships.map(m => m.chatRoomId) },
                                 senderId: { not: userId },
-                                createdAt: { gt: m.lastReadAt },
+                                createdAt: { gt: oldestRead }
                             },
+                            select: { chatRoomId: true, createdAt: true }
                         });
-                        roomUnreadMap[m.chatRoomId] = count;
-                        totalUnread += count;
+
+                        for (const msg of recentMsgs) {
+                            const membership = memberships.find(m => m.chatRoomId === msg.chatRoomId);
+                            if (membership && msg.createdAt > membership.lastReadAt) {
+                                roomUnreadMap[msg.chatRoomId] = (roomUnreadMap[msg.chatRoomId] || 0) + 1;
+                            }
+                        }
+                        for (const rid of Object.keys(roomUnreadMap)) {
+                            totalUnread += roomUnreadMap[rid];
+                        }
+                    }
+
+                    for (const m of memberships) {
+                        if (!roomUnreadMap[m.chatRoomId]) roomUnreadMap[m.chatRoomId] = 0;
 
                         if (m.chatRoom?.messages?.length > 0) {
                             const latestMsg = m.chatRoom.messages[0];

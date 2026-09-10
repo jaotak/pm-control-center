@@ -22,38 +22,44 @@ export async function deleteProject(projectId: string) {
         throw new Error("คุณไม่มีสิทธิ์ลบโปรเจกต์นี้");
     }
 
-    // Complete cascade delete — all child records in correct order
-    // First: delete items with deep dependencies
-    await prisma.comment.deleteMany({
-        where: {
-            OR: [
-                { itemType: "req",   itemId: { in: (await prisma.requirement.findMany({ where: { projectId }, select: { id: true } })).map(r => r.id) } },
-                { itemType: "uat",   itemId: { in: (await prisma.uATCase.findMany({ where: { projectId }, select: { id: true } })).map(u => u.id) } },
-                { itemType: "issue", itemId: { in: (await prisma.issue.findMany({ where: { projectId }, select: { id: true } })).map(i => i.id) } },
-                { itemType: "task",  itemId: { in: (await prisma.task.findMany({ where: { projectId }, select: { id: true } })).map(t => t.id) } },
-            ]
-        }
-    });
+    // Fetch all child IDs in parallel (instead of sequentially inside the deleteMany)
+    const [reqIds, uatIds, issueIds, taskIds] = await Promise.all([
+        prisma.requirement.findMany({ where: { projectId }, select: { id: true } }).then(r => r.map(x => x.id)),
+        prisma.uATCase.findMany({ where: { projectId }, select: { id: true } }).then(r => r.map(x => x.id)),
+        prisma.issue.findMany({ where: { projectId }, select: { id: true } }).then(r => r.map(x => x.id)),
+        prisma.task.findMany({ where: { projectId }, select: { id: true } }).then(r => r.map(x => x.id)),
+    ]);
 
-    // Then: delete child entities
-    await prisma.notification.deleteMany({
-        where: { link: { contains: projectId } }
-    });
-    await prisma.task.deleteMany({ where: { projectId } });
-    await prisma.issue.deleteMany({ where: { projectId } });
-    await prisma.uATCase.deleteMany({ where: { projectId } });
-    await prisma.requirement.deleteMany({ where: { projectId } });
+    const allItemIds = [...reqIds, ...uatIds, ...issueIds, ...taskIds];
 
-    // Models with onDelete: Cascade will auto-delete:
-    // - ActivityLog, Label, Milestone, Attachment
-    // But explicitly delete them to be safe with SQLite
-    await prisma.activityLog.deleteMany({ where: { projectId } });
-    await prisma.label.deleteMany({ where: { projectId } });
-    await prisma.milestone.deleteMany({ where: { projectId } });
-    await prisma.attachment.deleteMany({ where: { projectId } });
-
-    // Finally: delete the project
-    await prisma.project.delete({ where: { id: projectId } });
+    // Batch all deletes in a single transaction
+    await prisma.$transaction([
+        // Comments referencing any child entity
+        prisma.comment.deleteMany({
+            where: {
+                OR: [
+                    { itemType: "req",   itemId: { in: reqIds } },
+                    { itemType: "uat",   itemId: { in: uatIds } },
+                    { itemType: "issue", itemId: { in: issueIds } },
+                    { itemType: "task",  itemId: { in: taskIds } },
+                ]
+            }
+        }),
+        // Notifications
+        prisma.notification.deleteMany({ where: { link: { contains: projectId } } }),
+        // Child entities
+        prisma.task.deleteMany({ where: { projectId } }),
+        prisma.issue.deleteMany({ where: { projectId } }),
+        prisma.uATCase.deleteMany({ where: { projectId } }),
+        prisma.requirement.deleteMany({ where: { projectId } }),
+        // Cascade-safe models
+        prisma.activityLog.deleteMany({ where: { projectId } }),
+        prisma.label.deleteMany({ where: { projectId } }),
+        prisma.milestone.deleteMany({ where: { projectId } }),
+        prisma.attachment.deleteMany({ where: { projectId } }),
+        // The project itself
+        prisma.project.delete({ where: { id: projectId } }),
+    ]);
 
     revalidatePath("/");
     revalidatePath("/projects");

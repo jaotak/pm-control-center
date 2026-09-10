@@ -71,31 +71,68 @@ export default async function ProjectDetailPage({
         return w;
     };
 
-    const project = await prisma.project.findUnique({
-        where: { id: id },
+    const includeConfig: any = {
+        owner: true,
+        developers: true,
+        milestones: true,
+    };
+
+    if (currentTab === "overview") {
+        includeConfig.activityLogs = { where: { isHidden: false }, orderBy: { createdAt: 'desc' }, include: { user: true } };
+    } else if (currentTab === "requirements") {
+        includeConfig.requirements = {
+            where: { ...buildWhere(), deletedAt: null },
+            orderBy: { reqCode: 'asc' },
+            include: { uatCases: { where: { deletedAt: null }, include: { issues: { where: { deletedAt: null } } } }, assignee: true }
+        };
+    } else if (currentTab === "uat") {
+        includeConfig.uatCases = {
+            where: { ...buildWhere(), deletedAt: null },
+            orderBy: { uatCode: 'asc' },
+            include: { assignee: true }
+        };
+    } else if (currentTab === "issues") {
+        includeConfig.issues = {
+            where: { ...buildWhere(), deletedAt: null },
+            orderBy: { issueCode: 'asc' },
+            include: { assignee: true }
+        };
+    } else if (currentTab === "tasks") {
+        includeConfig.tasks = { where: { deletedAt: null }, orderBy: { createdAt: 'desc' }, include: { assignee: true } };
+    } else if (currentTab === "traceability") {
+        includeConfig.requirements = {
+            where: { deletedAt: null },
+            orderBy: { reqCode: 'asc' },
+            include: { uatCases: { where: { deletedAt: null }, include: { issues: { where: { deletedAt: null } } } } }
+        };
+    }
+
+    type ProjectWithRelations = import("@prisma/client").Prisma.ProjectGetPayload<{
         include: {
             owner: true,
             developers: true,
-            requirements: {
-                where: currentTab === "requirements" ? { ...buildWhere(), deletedAt: null } : { projectId: id, deletedAt: null },
-                orderBy: { reqCode: 'asc' },
-                include: { uatCases: { where: { deletedAt: null }, include: { issues: { where: { deletedAt: null } } } }, assignee: true }
-            },
-            uatCases: {
-                where: currentTab === "uat" ? { ...buildWhere(), deletedAt: null } : { projectId: id, deletedAt: null },
-                orderBy: { uatCode: 'asc' },
-                include: { assignee: true }
-            },
-            issues: {
-                where: currentTab === "issues" ? { ...buildWhere(), deletedAt: null } : { projectId: id, deletedAt: null },
-                orderBy: { issueCode: 'asc' },
-                include: { assignee: true }
-            },
-            tasks: { where: { deletedAt: null }, orderBy: { createdAt: 'desc' }, include: { assignee: true } },
-            activityLogs: { where: { isHidden: false }, orderBy: { createdAt: 'desc' }, include: { user: true } },
+            requirements: { include: { uatCases: { include: { issues: true } }, assignee: true } },
+            uatCases: { include: { assignee: true } },
+            issues: { include: { assignee: true } },
+            tasks: { include: { assignee: true } },
+            activityLogs: { include: { user: true } },
             milestones: true,
         }
-    });
+    }>;
+
+    const project = await prisma.project.findUnique({
+        where: { id: id },
+        include: includeConfig
+    }) as ProjectWithRelations | null;
+
+    if (project) {
+        // Fallback for undefined relations
+        project.requirements = project.requirements || [];
+        project.uatCases = project.uatCases || [];
+        project.issues = project.issues || [];
+        project.tasks = project.tasks || [];
+        project.activityLogs = project.activityLogs || [];
+    }
 
     if (!project) notFound();
 

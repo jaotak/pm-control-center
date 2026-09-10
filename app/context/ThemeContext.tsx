@@ -28,15 +28,15 @@ export function ThemeProvider({
     }, [initialTheme]);
 
     const toggle = () => {
-        setTheme(prev => {
-            const next: Theme = prev === "light" ? "dark" : "light";
-            localStorage.setItem("pm-theme", next);
-            document.documentElement.setAttribute("data-theme", next);
-            // Persist to DB (non-blocking)
-            startTransition(async () => {
-                await saveTheme(next);
-            });
-            return next;
+        const next: Theme = theme === "light" ? "dark" : "light";
+        setTheme(next);
+        
+        localStorage.setItem("pm-theme", next);
+        document.documentElement.setAttribute("data-theme", next);
+        
+        // Persist to DB (non-blocking)
+        startTransition(() => {
+            saveTheme(next);
         });
     };
 

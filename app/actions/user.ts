@@ -69,8 +69,7 @@ export async function changePassword(currentPassword: string, newPassword: strin
     return { success: true };
 }
 
-import { writeFile } from "fs/promises";
-import path from "path";
+import { supabase } from "@/lib/supabase";
 
 export async function uploadAvatar(formData: FormData) {
     try {
@@ -93,18 +92,25 @@ export async function uploadAvatar(formData: FormData) {
         const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
         const fileName = `${user.id}-${uniqueId}.${ext}`;
         
-        // Vercel filesystem is read-only. This will fail on Vercel unless using external storage (like Supabase storage or S3).
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "avatars");
-        const filePath = path.join(uploadDir, fileName);
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, buffer, {
+                contentType: file.type,
+                upsert: true
+            });
 
-        try {
-            await writeFile(filePath, buffer);
-        } catch (e: any) {
-            console.error("Local file write failed:", e);
-            return { error: "ระบบไม่รองรับการอัปโหลดไฟล์บน Vercel (Read-only filesystem) กรุณาเชื่อมต่อ Supabase Storage หรือ S3" };
+        if (error) {
+            console.error("Supabase storage error:", error);
+            return { error: "อัปโหลดรูปล้มเหลว ตรวจสอบว่าสร้าง Bucket 'avatars' แล้วหรือยัง" };
         }
 
-        const avatarUrl = `/uploads/avatars/${fileName}`;
+        // Get public URL
+        const { data: publicUrlData } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(fileName);
+
+        const avatarUrl = publicUrlData.publicUrl;
 
         // Update user
         await prisma.user.update({

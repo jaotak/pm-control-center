@@ -1,7 +1,6 @@
 "use server";
 
-import { writeFile } from "fs/promises";
-import path from "path";
+import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/auth";
 
 export async function uploadFile(file: File) {
@@ -17,12 +16,26 @@ export async function uploadFile(file: File) {
     const originalName = file.name;
     const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const fileName = `${uniqueId}.${ext}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "attachments");
-    const filePath = path.join(uploadDir, fileName);
+    
+    // Upload to Supabase
+    const { data, error } = await supabase.storage
+        .from('attachments')
+        .upload(fileName, buffer, {
+            contentType: file.type,
+            upsert: true
+        });
 
-    await writeFile(filePath, buffer);
+    if (error) {
+        console.error("Supabase upload error:", error);
+        throw new Error("อัปโหลดไฟล์ล้มเหลว กรุณาตรวจสอบว่าสร้าง Bucket 'attachments' แล้ว");
+    }
 
-    const url = `/uploads/attachments/${fileName}`;
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+        .from('attachments')
+        .getPublicUrl(fileName);
+
+    const url = publicUrlData.publicUrl;
 
     return {
         name: originalName,

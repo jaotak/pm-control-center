@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useTransition } from "react";
+import { createContext, useContext, useEffect, useState, startTransition } from "react";
 import { saveTheme } from "@/app/actions/theme";
 
 type Theme = "light" | "dark";
@@ -18,7 +18,6 @@ export function ThemeProvider({
     initialTheme?: Theme;
 }) {
     const [theme, setTheme] = useState<Theme>(initialTheme);
-    const [, startTransition] = useTransition();
 
     // On mount, prefer localStorage (instant) then fall back to server-provided initialTheme
     useEffect(() => {

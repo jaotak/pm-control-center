@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, startTransition } from "react";
 import { updateProfile, changePassword, uploadAvatar } from "@/app/actions/user";
 import { Save, CheckCircle2, AlertCircle, Camera, User } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -28,7 +28,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
     const [error, setError] = useState("");
     const [avatar, setAvatar] = useState(user.avatarUrl);
     const [isUploading, setIsUploading] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const [isPending, setIsPending] = useState(false);
     const { update } = useSession();
 
     const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +61,8 @@ export default function ProfileForm({ user }: { user: UserProps }) {
         e.preventDefault();
         setMessage("");
         setError("");
+        setIsPending(true);
+
         startTransition(async () => {
             try {
                 await updateProfile(name, email, department, phone);
@@ -69,6 +71,7 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                     const result = await changePassword(currentPassword, newPassword);
                     if (result?.error) {
                         setError(result.error);
+                        setIsPending(false);
                         return;
                     }
                 }
@@ -79,6 +82,8 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                 setTimeout(() => setMessage(""), 4000);
             } catch (err: any) {
                 setError(err?.message || "เกิดข้อผิดพลาด");
+            } finally {
+                setIsPending(false);
             }
         });
     };

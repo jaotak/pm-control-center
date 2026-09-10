@@ -97,8 +97,9 @@ export default function ChatPage() {
                         return [...prev, ...incoming];
                     });
 
-                    // Mark as read immediately since user is actively viewing this room
-                    if (selectedRoomIdRef.current) {
+                    // Only mark as read if incoming messages were sent by someone else
+                    const hasFromOthers = data.newMessages.some((m: any) => m.senderId !== currentUserId);
+                    if (hasFromOthers && selectedRoomIdRef.current) {
                         markAsRead(selectedRoomIdRef.current);
                     }
                 }
@@ -179,42 +180,68 @@ export default function ChatPage() {
     const handleSendMessage = async (body: string, attachment?: { url: string; name: string; type: string; size: number }) => {
         if (!selectedRoomId || !currentUserId) return;
 
-        // Call server action
-        const res = await sendMessage(selectedRoomId, body, attachment);
-        if (res.error) {
-            console.error("Failed to send message:", res.error);
-            alert("ไม่สามารถส่งข้อความได้: " + res.error);
-            throw new Error(res.error);
-        }
-        
-        if (res.message) {
-            const newMsg = res.message as any;
-            setMessages((prev) => {
-                if (prev.some((m) => m.id === newMsg.id)) return prev;
-                return [...prev, newMsg];
-            });
+        const tempId = `temp-${Date.now()}`;
+        const optimisticMsg: any = {
+            id: tempId,
+            body,
+            attachmentUrl: attachment?.url || null,
+            attachmentName: attachment?.name || null,
+            attachmentType: attachment?.type || null,
+            attachmentSize: attachment?.size || null,
+            senderId: currentUserId,
+            createdAt: new Date(),
+            sender: {
+                id: currentUserId,
+                name: (session?.user as any)?.name || "Me",
+                avatarUrl: (session?.user as any)?.avatarUrl || null,
+                email: (session?.user as any)?.email || "",
+                role: (session?.user as any)?.role || "DEV",
+            },
+        };
 
-            // Update room snippet and sort order in sidebar
-            setRooms((prev) => {
-                const currentRoom = prev.find((r) => r.id === selectedRoomId);
-                if (!currentRoom) return prev;
+        // 1. Instant UI update (0ms latency for user)
+        setMessages((prev) => [...prev, optimisticMsg]);
 
-                const updatedRoom: ChatRoomSummary = {
-                    ...currentRoom,
-                    updatedAt: new Date(),
-                    unreadCount: 0,
-                    lastMessage: {
-                        id: newMsg.id,
-                        body: newMsg.body || (newMsg.attachmentUrl ? "[ไฟล์แนบ]" : ""),
-                        senderId: newMsg.senderId,
-                        senderName: newMsg.sender.name,
-                        createdAt: new Date(newMsg.createdAt),
-                    },
-                };
+        // 2. Instant room snippet update in sidebar
+        setRooms((prev) => {
+            const currentRoom = prev.find((r) => r.id === selectedRoomId);
+            if (!currentRoom) return prev;
 
-                // Move updated room to top
-                return [updatedRoom, ...prev.filter((r) => r.id !== selectedRoomId)];
-            });
+            const updatedRoom: ChatRoomSummary = {
+                ...currentRoom,
+                updatedAt: new Date(),
+                unreadCount: 0,
+                lastMessage: {
+                    id: tempId,
+                    body: body || (attachment?.url ? "[ไฟล์แนบ]" : ""),
+                    senderId: currentUserId,
+                    senderName: (session?.user as any)?.name || "Me",
+                    createdAt: new Date(),
+                },
+            };
+
+            return [updatedRoom, ...prev.filter((r) => r.id !== selectedRoomId)];
+        });
+
+        // 3. Send message in background
+        try {
+            const res = await sendMessage(selectedRoomId, body, attachment);
+            if (res.error) {
+                console.error("Failed to send message:", res.error);
+                setMessages((prev) => prev.filter((m) => m.id !== tempId));
+                alert("ไม่สามารถส่งข้อความได้: " + res.error);
+                return;
+            }
+
+            if (res.message) {
+                const newMsg = res.message as any;
+                setMessages((prev) =>
+                    prev.map((m) => (m.id === tempId ? newMsg : m))
+                );
+            }
+        } catch (err: any) {
+            setMessages((prev) => prev.filter((m) => m.id !== tempId));
+            alert("ไม่สามารถส่งข้อความได้: " + (err?.message || "Error"));
         }
     };
 

@@ -1,65 +1,144 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
-import { Bell, Check, Inbox } from "lucide-react";
-import { markNotificationAsRead } from "@/app/actions/notification";
+import { useState, useEffect, useRef, useTransition } from "react";
+import { Bell, Check, Inbox, CheckCheck, Clock, ExternalLink } from "lucide-react";
+import { markNotificationAsRead, markAllNotificationsAsRead } from "@/app/actions/notification";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
-type Notification = { id: string; title: string; message: string; link: string | null };
+type Notification = {
+    id: string;
+    title: string;
+    message: string;
+    link: string | null;
+    createdAt?: string | Date;
+};
+
+function formatTimeAgo(dateStr?: string | Date | null): string {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.max(0, Math.floor(diffMs / 1000));
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHours = Math.floor(diffMin / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSec < 60) return "เมื่อสักครู่";
+    if (diffMin < 60) return `${diffMin} นาทีที่แล้ว`;
+    if (diffHours < 24) return `${diffHours} ชม. ที่แล้ว`;
+    if (diffDays === 1) return "เมื่อวานนี้";
+    if (diffDays < 7) return `${diffDays} วันที่แล้ว`;
+    return date.toLocaleDateString("th-TH", { day: "numeric", month: "short" });
+}
 
 export default function NotificationBell({ initialNotifications = [] }: { initialNotifications?: Notification[] }) {
     const { status } = useSession();
     const [isOpen, setIsOpen] = useState(false);
-    const [notifications, setNotifications] = useState(initialNotifications);
+    const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+    const [liveCount, setLiveCount] = useState(initialNotifications.length);
     const [, startTransition] = useTransition();
     const router = useRouter();
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const [liveCount, setLiveCount] = useState(initialNotifications.length);
-    const [prevInitial, setPrevInitial] = useState(initialNotifications);
-
-    if (initialNotifications !== prevInitial) {
-        setPrevInitial(initialNotifications);
-        setNotifications(initialNotifications);
-        setLiveCount(initialNotifications.length);
-    }
-
-    // SSE — real-time live notification stream
+    // Fetch live notifications efficiently without persistent stream
     useEffect(() => {
         if (status !== "authenticated") return;
 
-        const source = new EventSource("/api/notifications/stream");
-        source.onmessage = (event) => {
+        let isMounted = true;
+        const fetchNotifications = async () => {
+            if (document.hidden) return;
             try {
-                const data = JSON.parse(event.data);
-                setLiveCount(data.count);
-                setNotifications(data.notifications);
-            } catch {
-                // parse error — ignore
-            }
+                const res = await fetch("/api/user/badges");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (isMounted) {
+                    if (typeof data.unreadNotificationsCount === "number") {
+                        setLiveCount(data.unreadNotificationsCount);
+                    }
+                    if (Array.isArray(data.unreadNotifications)) {
+                        setNotifications(data.unreadNotifications);
+                    }
+                }
+            } catch { }
         };
-        source.onerror = () => {
-            source.close();
+
+        fetchNotifications();
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden) fetchNotifications();
         };
-        return () => source.close();
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("focus", fetchNotifications);
+        const interval = setInterval(fetchNotifications, 45000);
+
+        return () => {
+            isMounted = false;
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            window.removeEventListener("focus", fetchNotifications);
+            clearInterval(interval);
+        };
     }, [status]);
 
+    // Handle click outside to close dropdown
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
+    // Immediate optimistic mark as read
     const handleMarkAsRead = (id: string, link: string | null) => {
-        startTransition(async () => {
-            await markNotificationAsRead(id);
-            setNotifications(prev => prev.filter(n => n.id !== id));
-            setLiveCount(prev => Math.max(0, prev - 1));
+        // 1. Optimistically update local state immediately
+        setNotifications(prev => prev.filter(n => n.id !== id));
+        setLiveCount(prev => Math.max(0, prev - 1));
+
+        if (link) {
             setIsOpen(false);
-            if (link) router.push(link);
+            router.push(link);
+        }
+
+        // 2. Persist in background
+        startTransition(async () => {
+            try {
+                await markNotificationAsRead(id);
+            } catch (err) {
+                console.error("Failed to mark notification as read:", err);
+            }
+        });
+    };
+
+    // Mark all as read
+    const handleMarkAllAsRead = () => {
+        // Optimistic clear
+        setNotifications([]);
+        setLiveCount(0);
+
+        startTransition(async () => {
+            try {
+                await markAllNotificationsAsRead();
+            } catch (err) {
+                console.error("Failed to mark all as read:", err);
+            }
         });
     };
 
     return (
-        <div className="relative">
+        <div className="relative" ref={containerRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 rounded-xl transition-all border border-transparent hover:border-slate-200/60"
                 title="การแจ้งเตือน"
+                aria-label="การแจ้งเตือน"
             >
                 <Bell size={19} />
                 {liveCount > 0 && (
@@ -70,7 +149,7 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2.5 w-[calc(100vw-2.5rem)] sm:w-84 max-w-sm glass-dropdown rounded-2xl shadow-xl z-50 overflow-hidden border border-slate-200/80 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 mt-2.5 w-[calc(100vw-2.5rem)] sm:w-88 max-w-sm glass-dropdown rounded-2xl shadow-xl z-50 overflow-hidden border border-slate-200/80 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="p-3.5 border-b border-slate-100 bg-slate-50/70 flex justify-between items-center">
                         <div className="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-2">
                             <span>การแจ้งเตือน</span>
@@ -80,6 +159,16 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                                 </span>
                             )}
                         </div>
+                        {notifications.length > 0 && (
+                            <button
+                                onClick={handleMarkAllAsRead}
+                                className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded-lg transition-colors flex items-center gap-1"
+                                title="ทำเป็นอ่านแล้วทั้งหมด"
+                            >
+                                <CheckCheck size={13} />
+                                <span>อ่านทั้งหมด</span>
+                            </button>
+                        )}
                     </div>
 
                     <div className="max-h-[340px] overflow-y-auto custom-scrollbar divide-y divide-slate-100">
@@ -97,15 +186,26 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                                     onClick={() => handleMarkAsRead(notif.id, notif.link)}
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors truncate">
-                                            {notif.title}
+                                        <div className="flex items-center justify-between gap-1">
+                                            <div className="text-xs font-bold text-slate-800 group-hover:text-emerald-700 transition-colors truncate">
+                                                {notif.title}
+                                            </div>
+                                            {notif.createdAt && (
+                                                <span className="text-[10px] text-slate-400 shrink-0 flex items-center gap-0.5">
+                                                    <Clock size={10} />
+                                                    {formatTimeAgo(notif.createdAt)}
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
                                             {notif.message}
                                         </div>
                                     </div>
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); handleMarkAsRead(notif.id, null); }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleMarkAsRead(notif.id, null);
+                                        }}
                                         className="text-slate-300 hover:text-emerald-600 hover:bg-emerald-50 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all shrink-0"
                                         title="ทำเป็นอ่านแล้ว"
                                     >
@@ -114,6 +214,18 @@ export default function NotificationBell({ initialNotifications = [] }: { initia
                                 </div>
                             ))
                         )}
+                    </div>
+
+                    {/* Footer link to view all in settings */}
+                    <div className="p-2.5 border-t border-slate-100 bg-slate-50/50 text-center">
+                        <Link
+                            href="/settings?tab=notifications"
+                            onClick={() => setIsOpen(false)}
+                            className="text-[11px] font-semibold text-slate-500 hover:text-emerald-600 transition-colors inline-flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-slate-100"
+                        >
+                            ดูประวัติการแจ้งเตือนทั้งหมด
+                            <ExternalLink size={11} />
+                        </Link>
                     </div>
                 </div>
             )}

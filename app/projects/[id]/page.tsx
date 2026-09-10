@@ -120,10 +120,19 @@ export default async function ProjectDetailPage({
         }
     }>;
 
-    const project = await prisma.project.findUnique({
-        where: { id: id },
-        include: includeConfig
-    }) as ProjectWithRelations | null;
+    const [projectRaw, allUsers, session] = await Promise.all([
+        prisma.project.findUnique({
+            where: { id: id },
+            include: includeConfig
+        }),
+        prisma.user.findMany({
+            where: { isActive: true, isApproved: true },
+            select: { id: true, name: true, email: true, role: true }
+        }),
+        getServerSession(authOptions)
+    ]);
+
+    const project = projectRaw as ProjectWithRelations | null;
 
     if (project) {
         // Fallback for undefined relations
@@ -147,8 +156,6 @@ export default async function ProjectDetailPage({
     ];
     // Trash is a separate page link, not a tab
 
-    const allUsers = await prisma.user.findMany();
-    const session = await getServerSession(authOptions);
     const userRole = (session?.user as any)?.role || "";
 
     const projectTeam: { id: string, name: string }[] = [];

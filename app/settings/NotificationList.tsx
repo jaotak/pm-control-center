@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { markNotificationAsRead } from "@/app/actions/notification";
-import { CheckCircle2, Bell, ExternalLink, Clock } from "lucide-react";
+import { markNotificationAsRead, markAllNotificationsAsRead } from "@/app/actions/notification";
+import { CheckCircle2, Bell, ExternalLink, Clock, CheckCheck } from "lucide-react";
 import Link from "next/link";
 
 type Notification = {
@@ -27,6 +27,15 @@ export default function NotificationList({ initialNotifications }: { initialNoti
         });
     };
 
+    const handleMarkAllAsRead = () => {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        startTransition(async () => {
+            await markAllNotificationsAsRead();
+        });
+    };
+
+    const hasUnread = notifications.some(n => !n.isRead);
+
     if (notifications.length === 0) {
         return (
             <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-xl">
@@ -39,6 +48,18 @@ export default function NotificationList({ initialNotifications }: { initialNoti
 
     return (
         <div className="space-y-3">
+            {hasUnread && (
+                <div className="flex justify-end pb-1">
+                    <button
+                        onClick={handleMarkAllAsRead}
+                        disabled={isPending}
+                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200/80 transition-colors flex items-center gap-1.5"
+                    >
+                        <CheckCheck size={14} />
+                        <span>ทำเป็นอ่านแล้วทั้งหมด</span>
+                    </button>
+                </div>
+            )}
             {notifications.map(notification => (
                 <div 
                     key={notification.id} 

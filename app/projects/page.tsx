@@ -37,7 +37,16 @@ export default async function ProjectList({
                 }
             ]
         },
-        include: { owner: true, developers: true },
+        select: {
+            id: true,
+            code: true,
+            name: true,
+            customer: true,
+            stage: true,
+            progress: true,
+            owner: { select: { id: true, name: true } },
+            developers: { select: { id: true } },
+        },
         orderBy: { updatedAt: "desc" },
     });
 

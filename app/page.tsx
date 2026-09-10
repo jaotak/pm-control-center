@@ -55,13 +55,27 @@ export default async function DashboardPage() {
       where: projectCondition,
       orderBy: { updatedAt: 'desc' },
       take: 5,
-      include: { owner: true }
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        stage: true,
+        progress: true,
+        owner: { select: { id: true, name: true } }
+      }
     }),
     prisma.task.findMany({
       where: { isCompleted: false, deletedAt: null, ...myTaskCondition },
       orderBy: { dueDate: 'asc' },
       take: 5,
-      include: { project: true }
+      select: {
+        id: true,
+        title: true,
+        dueDate: true,
+        isCompleted: true,
+        projectId: true,
+        project: { select: { id: true, code: true } }
+      }
     }),
     // UAT data for the pass rate widget on the dashboard
     prisma.uATCase.findMany({

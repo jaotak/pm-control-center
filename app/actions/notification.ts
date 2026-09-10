@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { getAuthUser } from "@/lib/auth";
 
 export async function getUnreadNotifications(userId: string) {
     return await prisma.notification.findMany({
@@ -12,11 +12,21 @@ export async function getUnreadNotifications(userId: string) {
 }
 
 export async function markNotificationAsRead(id: string) {
-    await prisma.notification.update({
-        where: { id },
+    const user = await getAuthUser();
+    if (!user) return;
+    await prisma.notification.updateMany({
+        where: { id, userId: user.id },
         data: { isRead: true },
     });
-    revalidatePath("/");
+}
+
+export async function markAllNotificationsAsRead() {
+    const user = await getAuthUser();
+    if (!user) return;
+    await prisma.notification.updateMany({
+        where: { userId: user.id, isRead: false },
+        data: { isRead: true },
+    });
 }
 
 // ฟังก์ชันสำหรับยิงแจ้งเตือน (ไว้เรียกใช้ตอน Assign งานในอนาคต)

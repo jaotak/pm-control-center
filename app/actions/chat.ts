@@ -78,11 +78,20 @@ export async function getChatRooms() {
     try {
         const memberships = await prisma.chatMember.findMany({
             where: { userId: authUser.id },
-            include: {
+            select: {
+                chatRoomId: true,
+                lastReadAt: true,
                 chatRoom: {
-                    include: {
+                    select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                        updatedAt: true,
                         members: {
-                            include: {
+                            select: {
+                                id: true,
+                                userId: true,
+                                lastReadAt: true,
                                 user: {
                                     select: {
                                         id: true,
@@ -98,7 +107,12 @@ export async function getChatRooms() {
                         messages: {
                             orderBy: { createdAt: "desc" },
                             take: 1,
-                            include: {
+                            select: {
+                                id: true,
+                                body: true,
+                                senderId: true,
+                                createdAt: true,
+                                attachmentUrl: true,
                                 sender: {
                                     select: {
                                         id: true,
@@ -299,42 +313,72 @@ export async function sendMessage(
     try {
         const now = new Date();
 
-        // 1. Fetch room with members to verify membership AND check AI status
-        const room = await prisma.chatRoom.findUnique({
-            where: { id: chatRoomId },
-            include: { members: { include: { user: true } } }
+        // 1. Fast unique lookup to verify membership AND check room/AI status in 1 round-trip
+        const member = await prisma.chatMember.findUnique({
+            where: {
+                chatRoomId_userId: {
+                    chatRoomId,
+                    userId: authUser.id,
+                },
+            },
+            select: {
+                id: true,
+                chatRoom: {
+                    select: {
+                        type: true,
+                        members: {
+                            select: {
+                                user: {
+                                    select: { role: true, email: true }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         });
 
-        const member = room?.members.find(m => m.userId === authUser.id);
         if (!member) {
             return { error: "You are not a member of this chat room" };
         }
 
-        // 2. Execute writes in a single transaction to reduce latency
-        const [message] = await prisma.$transaction([
-            prisma.chatMessage.create({
-                data: {
-                    chatRoomId,
-                    senderId: authUser.id,
-                    body: trimmedBody,
-                    attachmentUrl: attachment?.url || null,
-                    attachmentName: attachment?.name || null,
-                    attachmentType: attachment?.type || null,
-                    attachmentSize: attachment?.size || null,
-                    createdAt: now,
-                },
-                include: {
-                    sender: {
-                        select: {
-                            id: true,
-                            name: true,
-                            avatarUrl: true,
-                            email: true,
-                            role: true,
-                        },
+        const room = member.chatRoom;
+
+        // 2. Create message and return immediately
+        const message = await prisma.chatMessage.create({
+            data: {
+                chatRoomId,
+                senderId: authUser.id,
+                body: trimmedBody,
+                attachmentUrl: attachment?.url || null,
+                attachmentName: attachment?.name || null,
+                attachmentType: attachment?.type || null,
+                attachmentSize: attachment?.size || null,
+                createdAt: now,
+            },
+            select: {
+                id: true,
+                body: true,
+                attachmentUrl: true,
+                attachmentName: true,
+                attachmentType: true,
+                attachmentSize: true,
+                senderId: true,
+                createdAt: true,
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatarUrl: true,
+                        email: true,
+                        role: true,
                     },
                 },
-            }),
+            },
+        });
+
+        // 3. Update room updatedAt and sender lastReadAt concurrently in background
+        Promise.all([
             prisma.chatRoom.update({
                 where: { id: chatRoomId },
                 data: { updatedAt: now },
@@ -347,11 +391,10 @@ export async function sendMessage(
                     },
                 },
                 data: { lastReadAt: now },
-            })
-        ]);
+            }),
+        ]).catch(err => console.error("Error updating room timestamps:", err));
 
-        // 3. Trigger AI processing if @AI is mentioned or if it's a direct chat with AI
-        // Use regex to ensure @ai is a standalone word, not part of an email or other handle (e.g. @airasia)
+        // 4. Trigger AI processing if @AI is mentioned or if it's a direct chat with AI
         const isAiMentioned = /(?:^|\s)@ai(?:\s|$|[.,!?:;"'])/i.test(trimmedBody);
         const isDirectWithAi = room?.type === "direct" && 
                                room.members.length === 2 && 
@@ -359,7 +402,6 @@ export async function sendMessage(
         const isSenderAi = authUser.role === "AI" || authUser.email === "ai@control.center";
 
         if (!isSenderAi && (isAiMentioned || isDirectWithAi)) {
-            // Run in background without awaiting to not block the request
             processAIChatMessage(message.id).catch(err => {
                 console.error("Failed to process AI chat:", err);
             });
@@ -373,32 +415,33 @@ export async function sendMessage(
 }
 
 /**
- * Get messages for a chat room
+ * Get messages for a chat room in a single optimized query
  */
 export async function getChatMessages(chatRoomId: string, limit = 60) {
     const authUser = await getAuthUser();
     if (!authUser) return { error: "Unauthorized" };
 
     try {
-        // Verify user is a member
-        const member = await prisma.chatMember.findUnique({
-            where: {
-                chatRoomId_userId: {
-                    chatRoomId,
-                    userId: authUser.id,
-                },
-            },
-        });
-
-        if (!member) {
-            return { error: "You are not a member of this chat room" };
-        }
-
         const messages = await prisma.chatMessage.findMany({
-            where: { chatRoomId },
+            where: {
+                chatRoomId,
+                chatRoom: {
+                    members: {
+                        some: { userId: authUser.id }
+                    }
+                }
+            },
             orderBy: { createdAt: "asc" },
             take: limit,
-            include: {
+            select: {
+                id: true,
+                body: true,
+                attachmentUrl: true,
+                attachmentName: true,
+                attachmentType: true,
+                attachmentSize: true,
+                senderId: true,
+                createdAt: true,
                 sender: {
                     select: {
                         id: true,
@@ -419,17 +462,19 @@ export async function getChatMessages(chatRoomId: string, limit = 60) {
 }
 
 /**
- * Mark a chat room as read for current user
+ * Mark a chat room as read for current user using primary/unique index
  */
 export async function markAsRead(chatRoomId: string) {
     const authUser = await getAuthUser();
     if (!authUser) return { error: "Unauthorized" };
 
     try {
-        await prisma.chatMember.updateMany({
+        await prisma.chatMember.update({
             where: {
-                chatRoomId,
-                userId: authUser.id,
+                chatRoomId_userId: {
+                    chatRoomId,
+                    userId: authUser.id,
+                },
             },
             data: {
                 lastReadAt: new Date(),

@@ -11,19 +11,29 @@ export async function GET(request: Request) {
     // ใช้ Promise.all เพื่อดึงข้อมูล 5 ตารางพร้อมกัน (ทำให้ค้นหาได้เร็วมาก)
     const [projects, reqs, uats, issues, tasks] = await Promise.all([
         prisma.project.findMany({
-            where: { OR: [{ name: { contains: q } }, { code: { contains: q } }] }, take: 5
+            where: { OR: [{ name: { contains: q, mode: 'insensitive' } }, { code: { contains: q, mode: 'insensitive' } }] },
+            select: { id: true, name: true, code: true },
+            take: 5
         }),
         prisma.requirement.findMany({
-            where: { OR: [{ title: { contains: q } }, { reqCode: { contains: q } }] }, take: 5
+            where: { deletedAt: null, OR: [{ title: { contains: q, mode: 'insensitive' } }, { reqCode: { contains: q, mode: 'insensitive' } }] },
+            select: { id: true, title: true, reqCode: true, projectId: true },
+            take: 5
         }),
         prisma.uATCase.findMany({
-            where: { OR: [{ title: { contains: q } }, { uatCode: { contains: q } }] }, take: 5
+            where: { deletedAt: null, OR: [{ title: { contains: q, mode: 'insensitive' } }, { uatCode: { contains: q, mode: 'insensitive' } }] },
+            select: { id: true, title: true, uatCode: true, projectId: true },
+            take: 5
         }),
         prisma.issue.findMany({
-            where: { OR: [{ title: { contains: q } }, { issueCode: { contains: q } }] }, take: 5
+            where: { deletedAt: null, OR: [{ title: { contains: q, mode: 'insensitive' } }, { issueCode: { contains: q, mode: 'insensitive' } }] },
+            select: { id: true, title: true, issueCode: true, projectId: true },
+            take: 5
         }),
         prisma.task.findMany({
-            where: { title: { contains: q } }, take: 5
+            where: { deletedAt: null, title: { contains: q, mode: 'insensitive' } },
+            select: { id: true, title: true, projectId: true },
+            take: 5
         }),
     ]);
 

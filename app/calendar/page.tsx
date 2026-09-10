@@ -8,26 +8,23 @@ export default async function CalendarPage() {
     const role = (session?.user as any)?.role || "USER";
     const userId = (session?.user as any)?.id;
 
-    // 1. กรองงาน (Tasks) ตามสิทธิ์
-    let taskCondition: any = {};
+    // 1. กรองงาน (Tasks) ตามสิทธิ์ (เฉพาะที่ยังไม่ถูกลบ และมีกำหนดวันส่ง)
+    let roleTaskCondition: any = {};
     if (role === "DEV") {
-        taskCondition = { assigneeId: userId }; // DEV เห็นเฉพาะงานตัวเอง
+        roleTaskCondition = { assigneeId: userId }; // DEV เห็นเฉพาะงานตัวเอง
     } else if (role === "PM") {
-        taskCondition = {
+        roleTaskCondition = {
             OR: [
                 { assigneeId: userId },             // งานส่วนตัว & งานที่ได้รับมอบหมาย
                 { project: { ownerId: userId } }    // งานของทุกคนในโปรเจกต์ที่ตัวเองเป็นเจ้าของ
             ]
         };
-    } // ADMIN เห็นทั้งหมด
+    }
 
-    const tasks = await prisma.task.findMany({
-        where: taskCondition,
-        include: {
-            project: true,
-            assignee: true // ดึงชื่อคนรับผิดชอบมาแสดงในปฏิทินด้วย
-        }
-    });
+    const taskCondition = {
+        deletedAt: null,
+        ...roleTaskCondition
+    };
 
     // 2. กรองโปรเจกต์สำหรับ Dropdown สร้างงาน
     let projectCondition: any = {};
@@ -37,10 +34,33 @@ export default async function CalendarPage() {
         projectCondition = { ownerId: userId };
     }
 
-    const projects = await prisma.project.findMany({
-        where: projectCondition,
-        orderBy: { name: 'asc' }
-    });
+    // Parallel fetch tasks and projects concurrently in a single round-trip
+    const [tasks, projects] = await Promise.all([
+        prisma.task.findMany({
+            where: taskCondition,
+            select: {
+                id: true,
+                title: true,
+                dueDate: true,
+                isCompleted: true,
+                project: {
+                    select: { id: true, name: true, code: true }
+                },
+                assignee: {
+                    select: { id: true, name: true }
+                }
+            }
+        }),
+        prisma.project.findMany({
+            where: projectCondition,
+            select: {
+                id: true,
+                name: true,
+                code: true
+            },
+            orderBy: { name: 'asc' }
+        })
+    ]);
 
     return (
         <div className="max-w-7xl mx-auto space-y-6 h-full flex flex-col">

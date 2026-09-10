@@ -35,11 +35,12 @@ export async function updateItemAssignee(
 
     // Send notification to new assignee if it's not the current user
     if (val && val !== user?.id) {
+        const tabName = type === 'req' ? 'requirements' : type === 'issue' ? 'issues' : type === 'task' ? 'tasks' : 'uat';
         await sendNotification(
             val,
             "คุณได้รับมอบหมายงานใหม่",
             `คุณถูกกำหนดให้รับผิดชอบ: ${itemName}`,
-            `/projects/${projectId}?tab=${type === 'req' ? 'requirements' : type === 'issue' ? 'issues' : type}`
+            `/projects/${projectId}?tab=${tabName}`
         );
     }
 

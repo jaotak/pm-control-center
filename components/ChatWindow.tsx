@@ -325,7 +325,7 @@ export default function ChatWindow({
             </div>
 
             {/* Input Footer */}
-            <ChatInput onSend={onSendMessage} />
+            <ChatInput onSend={onSendMessage} roomId={room.id} />
         </section>
     );
 }

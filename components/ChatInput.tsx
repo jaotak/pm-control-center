@@ -5,6 +5,7 @@ import { Send, Smile, Paperclip, X, File, Image as ImageIcon } from "lucide-reac
 import { uploadItemAttachment } from "@/app/actions/upload";
 
 interface ChatInputProps {
+    roomId?: string;
     onSend: (message: string, attachment?: { url: string; name: string; type: string; size: number }) => Promise<boolean | void>;
     disabled?: boolean;
     placeholder?: string;
@@ -12,13 +13,25 @@ interface ChatInputProps {
 
 const QUICK_EMOJIS = ["👍", "❤️", "😊", "🎉", "🔥", "🙏", "🚀", "✅"];
 
-export default function ChatInput({ onSend, disabled = false, placeholder = "พิมพ์ข้อความ... (Enter เพื่อส่ง, Shift+Enter ขึ้นบรรทัดใหม่)" }: ChatInputProps) {
+export default function ChatInput({
+    roomId,
+    onSend,
+    disabled = false,
+    placeholder = "พิมพ์ข้อความ... (Enter เพื่อส่ง, Shift+Enter ขึ้นบรรทัดใหม่)"
+}: ChatInputProps) {
     const [text, setText] = useState("");
     const [isSending, setIsSending] = useState(false);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Auto-focus textarea on desktop mount or when switching rooms
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.innerWidth >= 768) {
+            textareaRef.current?.focus();
+        }
+    }, [roomId]);
 
     // Auto-resize textarea height
     useEffect(() => {
@@ -33,31 +46,34 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
         if ((!trimmed && !selectedFile) || isSending || disabled) return;
 
         setIsSending(true);
+
+        // Clear input immediately so user can start typing their next message right away
+        setText("");
+        setSelectedFile(null);
+        setShowEmojiPicker(false);
+        if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+            textareaRef.current.focus();
+        }
+
         try {
             let attachmentData = undefined;
 
             if (selectedFile) {
                 const formData = new FormData();
                 formData.append("file", selectedFile);
-                // Call the upload action and await the result
                 const res = await uploadItemAttachment(formData);
-                attachmentData = res as any; // Cast as it matches the needed type
+                attachmentData = res as any;
             }
 
             await onSend(trimmed, attachmentData);
-            
-            setText("");
-            setSelectedFile(null);
-            setShowEmojiPicker(false);
-            if (textareaRef.current) {
-                textareaRef.current.style.height = "auto";
-                textareaRef.current.focus();
-            }
         } catch (error) {
             console.error("Upload or send failed:", error);
             alert("ไม่สามารถส่งไฟล์ได้ ขนาดไฟล์ต้องไม่เกิน 10MB");
         } finally {
             setIsSending(false);
+            // Retain focus in all scenarios
+            textareaRef.current?.focus();
         }
     };
 
@@ -83,6 +99,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                 return;
             }
             setSelectedFile(file);
+            setTimeout(() => textareaRef.current?.focus(), 0);
         }
     };
 
@@ -91,6 +108,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
+        textareaRef.current?.focus();
     };
 
     return (
@@ -176,7 +194,7 @@ export default function ChatInput({ onSend, disabled = false, placeholder = "พ
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    disabled={disabled || isSending}
+                    disabled={disabled}
                     placeholder={selectedFile ? "พิมพ์ข้อความอธิบายไฟล์... (Enter เพื่อส่ง)" : placeholder}
                     className="flex-1 max-h-[140px] py-2 px-2 bg-transparent text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none resize-none custom-scrollbar leading-relaxed"
                 />

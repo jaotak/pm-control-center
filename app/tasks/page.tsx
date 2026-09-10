@@ -23,32 +23,48 @@ export default async function MyTasksPage() {
         };
     }
 
-    const tasks = await prisma.task.findMany({
-        where: taskCondition,
-        orderBy: [
-            { isCompleted: 'asc' },
-            { dueDate: 'asc' }
-        ],
-        include: { project: true }
-    });
+    // Parallel fetch all 4 categories in a single round-trip
+    const [tasks, assignedIssues, assignedUATs, assignedReqs] = await Promise.all([
+        prisma.task.findMany({
+            where: { deletedAt: null, ...taskCondition },
+            orderBy: [
+                { isCompleted: 'asc' },
+                { dueDate: 'asc' }
+            ],
+            include: {
+                project: {
+                    select: { id: true, name: true, code: true }
+                }
+            }
+        }),
+        prisma.issue.findMany({
+            where: { assigneeId: userId, deletedAt: null, status: { notIn: ["Resolved", "Closed"] } },
+            include: {
+                project: {
+                    select: { id: true, name: true, code: true }
+                }
+            }
+        }),
+        prisma.uATCase.findMany({
+            where: { assigneeId: userId, deletedAt: null, status: { notIn: ["Passed"] } },
+            include: {
+                project: {
+                    select: { id: true, name: true, code: true }
+                }
+            }
+        }),
+        prisma.requirement.findMany({
+            where: { assigneeId: userId, deletedAt: null, status: { notIn: ["Done"] } },
+            include: {
+                project: {
+                    select: { id: true, name: true, code: true }
+                }
+            }
+        })
+    ]);
 
     const pendingTasks = tasks.filter(t => !t.isCompleted);
     const completedTasks = tasks.filter(t => t.isCompleted);
-
-    const assignedIssues = await prisma.issue.findMany({
-        where: { assigneeId: userId, status: { notIn: ["Resolved", "Closed"] } },
-        include: { project: true }
-    });
-
-    const assignedUATs = await prisma.uATCase.findMany({
-        where: { assigneeId: userId, status: { notIn: ["Passed"] } },
-        include: { project: true }
-    });
-
-    const assignedReqs = await prisma.requirement.findMany({
-        where: { assigneeId: userId, status: { notIn: ["Done"] } },
-        include: { project: true }
-    });
 
     return (
         <div className="max-w-5xl mx-auto space-y-7 pb-12">

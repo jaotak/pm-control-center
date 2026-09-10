@@ -5,25 +5,13 @@ import { useState, useEffect } from 'react';
 import { useSession, signOut } from "next-auth/react";
 import NotificationBell from './NotificationBell';
 import GlobalSearchModal from './GlobalSearchModal';
-import { getUnreadNotifications } from '@/app/actions/notification';
 import ThemeToggle from './ThemeToggle';
 import { useSidebar } from '@/app/context/SidebarContext';
 
 export default function Topbar() {
     const { data: session } = useSession();
-    const [unreadNotifications, setUnreadNotifications] = useState<any[]>([]);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const { toggleSidebar } = useSidebar();
-
-    const userId = (session?.user as any)?.id;
-
-    useEffect(() => {
-        if (userId) {
-            getUnreadNotifications(userId).then((data) => {
-                setUnreadNotifications(data);
-            });
-        }
-    }, [userId]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -78,7 +66,7 @@ export default function Topbar() {
                     </div>
 
                     {/* Notification Bell Dropdown */}
-                    <NotificationBell initialNotifications={unreadNotifications} />
+                    <NotificationBell />
 
                     {/* Theme Toggle */}
                     <ThemeToggle />

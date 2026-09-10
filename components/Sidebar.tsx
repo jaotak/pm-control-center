@@ -28,33 +28,45 @@ export default function Sidebar() {
         return pathname.startsWith(href);
     };
 
-    // Fetch pending approval count for admins
-    useEffect(() => {
-        if (role === "ADMIN") {
-            fetch("/api/admin/pending-count")
-                .then(res => res.json())
-                .then(data => setPendingCount(data.count ?? 0))
-                .catch(() => { });
-        }
-    }, [role, pathname]);
-
-    // Real-time unread chat badge
+    // Unified badge fetch for chat and admin approvals in 1 single lightweight request
     useEffect(() => {
         if (!session?.user) return;
-        const es = new EventSource("/api/chat/stream");
-        es.onmessage = (event) => {
+
+        let isMounted = true;
+        const fetchBadges = async () => {
+            if (document.hidden) return;
             try {
-                const data = JSON.parse(event.data);
-                if (typeof data.totalUnread === "number") {
-                    setChatUnreadCount(data.totalUnread);
+                const res = await fetch("/api/user/badges");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (isMounted) {
+                    if (typeof data.unreadChatCount === "number") {
+                        setChatUnreadCount(data.unreadChatCount);
+                    }
+                    if (typeof data.pendingApprovalsCount === "number") {
+                        setPendingCount(data.pendingApprovalsCount);
+                    }
                 }
             } catch { }
         };
-        es.onerror = () => {
-            es.close();
+
+        fetchBadges();
+
+        const handleVisibilityChange = () => {
+            if (!document.hidden) fetchBadges();
         };
-        return () => es.close();
-    }, [session?.user]);
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("focus", fetchBadges);
+        const interval = setInterval(fetchBadges, 45000);
+
+        return () => {
+            isMounted = false;
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            window.removeEventListener("focus", fetchBadges);
+            clearInterval(interval);
+        };
+    }, [session?.user, pathname]);
 
     return (
         <>

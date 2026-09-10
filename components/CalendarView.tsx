@@ -104,18 +104,17 @@ export default function CalendarView({
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex flex-col">
-                    <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar flex flex-col">
-                        <div className="min-w-[800px] flex-1 flex flex-col">
-                            <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/50 shrink-0">
+                <div className="flex-1 overflow-hidden flex flex-col relative">
+                    <div className="flex-1 overflow-auto custom-scrollbar bg-gray-200">
+                        <div className="min-w-[800px] flex flex-col min-h-full">
+                            <div className="grid grid-cols-7 border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm shrink-0">
                                 {weekDays.map((day, index) => (
-                                    <div key={day} className={`text-center py-3 text-xs font-semibold ${index === 0 || index === 6 ? 'text-gray-400' : 'text-gray-600'}`}>{day}</div>
+                                    <div key={day} className={`text-center py-3 text-xs font-semibold ${index === 0 || index === 6 ? 'text-red-500' : 'text-gray-600'}`}>{day}</div>
                                 ))}
                             </div>
 
-                            <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-200">
-                                <div className="grid grid-cols-7 gap-px auto-rows-[minmax(120px,_1fr)] min-h-full">
-                                    {calendarDays.map((day, index) => {
+                            <div className="grid grid-cols-7 gap-px auto-rows-[minmax(120px,_1fr)] flex-1">
+                                {calendarDays.map((day, index) => {
                                         if (!day) return <div key={`empty-${index}`} className="bg-gray-50/50 min-h-[120px]"></div>;
 
                                         const dayString = formatDate(day);
@@ -172,7 +171,6 @@ export default function CalendarView({
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
 
             {isModalOpen && selectedDate && (

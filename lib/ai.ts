@@ -18,7 +18,7 @@ export async function processAIChatMessage(messageId: string) {
         });
         if (!message) return;
 
-        const { chatRoomId, senderId: userId, body: messageBody, attachmentUrl, attachmentType } = message;
+        const { chatRoomId, senderId: userId } = message;
 
         if (!process.env.GEMINI_API_KEY) {
             await sendAIResponse(chatRoomId, "ขออภัยค่ะ ระบบ AI ยังไม่ได้ตั้งค่า GEMINI_API_KEY (หรือลืม Restart Server)");
@@ -48,18 +48,9 @@ export async function processAIChatMessage(messageId: string) {
             parameters: {
                 type: Type.OBJECT,
                 properties: {
-                    projectId: {
-                        type: Type.STRING,
-                        description: "ID ของโปรเจกต์ที่จะสร้าง Issue"
-                    },
-                    title: {
-                        type: Type.STRING,
-                        description: "รายละเอียดของปัญหา หรือบั๊กที่พบ"
-                    },
-                    severity: {
-                        type: Type.STRING,
-                        description: "ความรุนแรงของปัญหา (Low, Medium, High)"
-                    }
+                    projectId: { type: Type.STRING, description: "ID ของโปรเจกต์ที่จะสร้าง Issue" },
+                    title: { type: Type.STRING, description: "รายละเอียดของปัญหา หรือบั๊กที่พบ" },
+                    severity: { type: Type.STRING, description: "ความรุนแรงของปัญหา (Low, Medium, High)" }
                 },
                 required: ["projectId", "title", "severity"]
             }
@@ -71,18 +62,9 @@ export async function processAIChatMessage(messageId: string) {
             parameters: {
                 type: Type.OBJECT,
                 properties: {
-                    projectId: {
-                        type: Type.STRING,
-                        description: "ID ของโปรเจกต์ที่จะสร้าง Task"
-                    },
-                    title: {
-                        type: Type.STRING,
-                        description: "ชื่องาน หรือสิ่งที่ต้องทำ"
-                    },
-                    estimatedHours: {
-                        type: Type.NUMBER,
-                        description: "เวลาที่คาดว่าจะใช้ทำ (ชั่วโมง) เป็นตัวเลข"
-                    }
+                    projectId: { type: Type.STRING, description: "ID ของโปรเจกต์ที่จะสร้าง Task" },
+                    title: { type: Type.STRING, description: "ชื่องาน หรือสิ่งที่ต้องทำ" },
+                    estimatedHours: { type: Type.NUMBER, description: "เวลาที่คาดว่าจะใช้ทำ (ชั่วโมง) เป็นตัวเลข" }
                 },
                 required: ["projectId", "title"]
             }
@@ -98,26 +80,57 @@ ${projectContext || "ไม่มีโปรเจกต์"}
 ถ้าผู้ใช้ไม่ได้ระบุว่าโปรเจกต์ไหน ให้ถามกลับก่อนเสมอเพื่อขอ Project ID หรือชื่อโปรเจกต์
 ตอบกลับเป็นภาษาไทยอย่างเป็นมิตร`;
 
-        // 4. Load attachment if exists
-        let inlineData = undefined;
-        if (attachmentUrl) {
-            try {
-                // Remove leading slash if exists
-                const cleanUrl = attachmentUrl.startsWith('/') ? attachmentUrl.slice(1) : attachmentUrl;
-                const filePath = path.join(process.cwd(), 'public', cleanUrl);
-                const fileData = await fs.readFile(filePath);
-                inlineData = {
-                    data: fileData.toString("base64"),
-                    mimeType: attachmentType || "application/octet-stream"
-                };
-            } catch (err) {
-                console.error("Error reading attachment:", err);
-                await sendAIResponse(chatRoomId, "ขออภัยค่ะ AI ไม่สามารถอ่านไฟล์แนบนี้ได้ หรือไฟล์อาจไม่มีอยู่ในระบบแล้ว");
-                return;
+        // 4. Fetch history for context (last 5 messages)
+        const history = await prisma.chatMessage.findMany({
+            where: { chatRoomId },
+            orderBy: { createdAt: "desc" },
+            take: 5,
+            include: { sender: true }
+        });
+        history.reverse(); // oldest to newest
+
+        const contentsInput: any[] = [];
+
+        for (const msg of history) {
+            const role = (msg.sender.role === "AI" || msg.sender.email === "ai@control.center") ? "model" : "user";
+            const parts: any[] = [];
+            
+            // Try to download attachment if it exists and is public
+            if (msg.attachmentUrl) {
+                try {
+                    // if it's a relative url, assume it's local (fallback) or prepend localhost for fetch. But Supabase URLs are absolute https://
+                    let fetchUrl = msg.attachmentUrl;
+                    if (fetchUrl.startsWith("/")) {
+                        // local fallback (shouldn't happen with supabase usually, but just in case)
+                        fetchUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}${fetchUrl}`;
+                    }
+                    
+                    const res = await fetch(fetchUrl);
+                    if (res.ok) {
+                        const arrayBuffer = await res.arrayBuffer();
+                        const buffer = Buffer.from(arrayBuffer);
+                        parts.push({
+                            inlineData: {
+                                data: buffer.toString("base64"),
+                                mimeType: msg.attachmentType || "application/octet-stream"
+                            }
+                        });
+                    } else {
+                        console.error("Failed to fetch attachment from URL:", fetchUrl, res.status);
+                    }
+                } catch (err) {
+                    console.error("Error downloading attachment:", err);
+                }
+            }
+
+            if (msg.body) {
+                parts.push({ text: msg.body });
+            }
+
+            if (parts.length > 0) {
+                contentsInput.push({ role, parts });
             }
         }
-
-        const contentsInput = inlineData ? [{ inlineData }, messageBody] : messageBody;
 
         // 5. Call Gemini
         const response = await ai.models.generateContent({

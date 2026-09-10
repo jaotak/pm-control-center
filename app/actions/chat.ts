@@ -353,7 +353,9 @@ export async function sendMessage(
         // 3. Trigger AI processing if @AI is mentioned or if it's a direct chat with AI
         // Use regex to ensure @ai is a standalone word, not part of an email or other handle (e.g. @airasia)
         const isAiMentioned = /(?:^|\s)@ai(?:\s|$|[.,!?:;"'])/i.test(trimmedBody);
-        const isDirectWithAi = room?.type === "direct" && room.members.some(m => m.user.role === "AI" || m.user.email === "ai@control.center");
+        const isDirectWithAi = room?.type === "direct" && 
+                               room.members.length === 2 && 
+                               room.members.some(m => m.user.role === "AI" || m.user.email === "ai@control.center");
         const isSenderAi = authUser.role === "AI" || authUser.email === "ai@control.center";
 
         if (!isSenderAi && (isAiMentioned || isDirectWithAi)) {

@@ -21,8 +21,11 @@ export default function ChatPage() {
     const [messages, setMessages] = useState<ChatMessageItem[]>([]);
     const [isLoadingRooms, setIsLoadingRooms] = useState(true);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+    const [isAiTyping, setIsAiTyping] = useState(false);
     const [mobileView, setMobileView] = useState<"sidebar" | "window">("sidebar");
 
+    // Client-side instant message cache: Map<roomId, ChatMessageItem[]>
+    const messagesCacheRef = useRef<Map<string, ChatMessageItem[]>>(new Map());
     const selectedRoomIdRef = useRef<string | null>(null);
     selectedRoomIdRef.current = selectedRoomId;
 
@@ -44,29 +47,49 @@ export default function ChatPage() {
             // Default select the first room on desktop if available
             if (loadedRooms.length > 0 && !selectedRoomIdRef.current) {
                 if (window.innerWidth >= 768) {
-                    setSelectedRoomId(loadedRooms[0].id);
+                    const firstId = loadedRooms[0].id;
+                    setSelectedRoomId(firstId);
                 }
             }
         });
     }, [currentUserId, fetchRooms]);
 
-    // Load messages when selectedRoomId changes
+    // Instant room switching using Client-Side Cache (Stale-While-Revalidate)
     useEffect(() => {
         if (!selectedRoomId) {
             setMessages([]);
+            setIsAiTyping(false);
             return;
         }
 
-        setIsLoadingMessages(true);
+        setIsAiTyping(false);
+
+        // 1. Instant 0ms cache display if room was previously viewed
+        const cached = messagesCacheRef.current.get(selectedRoomId);
+        if (cached && cached.length > 0) {
+            setMessages(cached);
+            setIsLoadingMessages(false);
+        } else {
+            setIsLoadingMessages(true);
+        }
+
+        // 2. Fetch fresh messages in background (Stale-While-Revalidate)
         getChatMessages(selectedRoomId)
             .then((res) => {
                 if (res.messages) {
-                    setMessages(res.messages as any);
+                    messagesCacheRef.current.set(selectedRoomId, res.messages as any);
+                    if (selectedRoomIdRef.current === selectedRoomId) {
+                        setMessages(res.messages as any);
+                    }
                 }
             })
-            .finally(() => setIsLoadingMessages(false));
+            .finally(() => {
+                if (selectedRoomIdRef.current === selectedRoomId) {
+                    setIsLoadingMessages(false);
+                }
+            });
 
-        // Mark room as read
+        // 3. Mark room as read
         markAsRead(selectedRoomId).then(() => {
             setRooms((prev) =>
                 prev.map((r) => (r.id === selectedRoomId ? { ...r, unreadCount: 0 } : r))
@@ -74,38 +97,47 @@ export default function ChatPage() {
         });
     }, [selectedRoomId]);
 
-    // Setup SSE stream for real-time updates
+    // Single Persistent SSE stream: connected ONCE, does NOT disconnect on room switch!
     useEffect(() => {
         if (!currentUserId) return;
 
-        const sseUrl = selectedRoomId
-            ? `/api/chat/stream?roomId=${encodeURIComponent(selectedRoomId)}`
-            : `/api/chat/stream`;
-
-        const eventSource = new EventSource(sseUrl);
+        const eventSource = new EventSource("/api/chat/stream");
 
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
 
-                // If new messages came in for the currently viewed room
-                if (data.newMessages && data.newMessages.length > 0 && data.activeRoomId === selectedRoomIdRef.current) {
-                    setMessages((prev) => {
-                        const existingIds = new Set(prev.map((m) => m.id));
-                        const incoming = data.newMessages.filter((m: any) => !existingIds.has(m.id));
-                        if (incoming.length === 0) return prev;
-                        return [...prev, ...incoming];
-                    });
+                // 1. Process new incoming messages across any user room
+                if (data.newMessages && data.newMessages.length > 0) {
+                    for (const msg of data.newMessages) {
+                        // Update cache for this message's room
+                        const roomCached = messagesCacheRef.current.get(msg.chatRoomId) || [];
+                        if (!roomCached.some((m) => m.id === msg.id)) {
+                            messagesCacheRef.current.set(msg.chatRoomId, [...roomCached, msg]);
+                        }
 
-                    // Only mark as read if incoming messages were sent by someone else
-                    const hasFromOthers = data.newMessages.some((m: any) => m.senderId !== currentUserId);
-                    if (hasFromOthers && selectedRoomIdRef.current) {
-                        markAsRead(selectedRoomIdRef.current);
+                        // If message belongs to currently open room, update UI
+                        if (msg.chatRoomId === selectedRoomIdRef.current) {
+                            setMessages((prev) => {
+                                if (prev.some((m) => m.id === msg.id)) return prev;
+                                return [...prev, msg];
+                            });
+
+                            // Clear AI typing when AI response arrives
+                            if (msg.sender?.role === "AI" || msg.sender?.email === "ai@control.center") {
+                                setIsAiTyping(false);
+                            }
+
+                            // Mark as read if from someone else
+                            if (msg.senderId !== currentUserId) {
+                                markAsRead(msg.chatRoomId);
+                            }
+                        }
                     }
                 }
 
-                // Update unread counts, latest messages, and member read statuses on rooms
-                if (data.roomUnreadMap || data.roomLatestMessages || data.roomMembersReadStatus) {
+                // 2. Update unread counts and latest messages snippet in sidebar
+                if (data.roomUnreadMap || data.roomLatestMessages) {
                     setRooms((prev) => {
                         let hasChanged = false;
                         const updated = prev.map((r) => {
@@ -115,44 +147,31 @@ export default function ChatPage() {
                             }
 
                             const latestMsg = data.roomLatestMessages?.[r.id];
-                            
                             const changedUnread = r.unreadCount !== newCount;
                             const changedMsg = latestMsg && r.lastMessage?.id !== latestMsg.id;
 
-                            // Update member read statuses for the active room
-                            let updatedMembers = r.members;
-                            let changedMembers = false;
-                            if (data.roomMembersReadStatus && r.id === selectedRoomIdRef.current) {
-                                updatedMembers = r.members.map((m) => {
-                                    const newReadStr = data.roomMembersReadStatus[m.userId];
-                                    if (newReadStr && new Date(newReadStr).getTime() !== new Date(m.lastReadAt).getTime()) {
-                                        changedMembers = true;
-                                        return { ...m, lastReadAt: new Date(newReadStr) };
-                                    }
-                                    return m;
-                                });
-                            }
-
-                            if (changedUnread || changedMsg || changedMembers) {
+                            if (changedUnread || changedMsg) {
                                 hasChanged = true;
                                 return {
                                     ...r,
                                     unreadCount: newCount,
-                                    members: updatedMembers,
-                                    ...(changedMsg && { lastMessage: latestMsg, updatedAt: new Date(latestMsg.createdAt) }),
+                                    ...(changedMsg && {
+                                        lastMessage: latestMsg,
+                                        updatedAt: new Date(latestMsg.createdAt),
+                                    }),
                                 };
                             }
                             return r;
                         });
-                        
+
                         if (hasChanged) {
                             updated.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
                         }
-                        
+
                         return hasChanged ? updated : prev;
                     });
                 }
-            } catch (err) {
+            } catch {
                 // Ignore parse errors
             }
         };
@@ -164,18 +183,27 @@ export default function ChatPage() {
         return () => {
             eventSource.close();
         };
-    }, [currentUserId, selectedRoomId]);
+    }, [currentUserId]);
 
     const handleSelectRoom = (roomId: string) => {
         setSelectedRoomId(roomId);
         setMobileView("window");
+
+        // Immediate cache populate for 0ms transition
+        const cached = messagesCacheRef.current.get(roomId);
+        if (cached && cached.length > 0) {
+            setMessages(cached);
+            setIsLoadingMessages(false);
+        }
     };
 
     const handleRoomCreated = async (roomId: string) => {
-        await fetchRooms();
         setSelectedRoomId(roomId);
         setMobileView("window");
+        await fetchRooms();
     };
+
+    const currentRoom = rooms.find((r) => r.id === selectedRoomId) || null;
 
     const handleSendMessage = async (body: string, attachment?: { url: string; name: string; type: string; size: number }) => {
         if (!selectedRoomId || !currentUserId) return;
@@ -199,16 +227,32 @@ export default function ChatPage() {
             },
         };
 
+        // Check if message should trigger AI typing indicator
+        const isAiTrigger =
+            /(?:^|\s)@ai(?:\s|$|[.,!?:;"'])/i.test(body) ||
+            (currentRoom?.type === "direct" &&
+                currentRoom?.members.some(
+                    (m) => m.user.role === "AI" || m.user.email === "ai@control.center"
+                ));
+
+        if (isAiTrigger) {
+            setIsAiTyping(true);
+        }
+
         // 1. Instant UI update (0ms latency for user)
         setMessages((prev) => [...prev, optimisticMsg]);
 
-        // 2. Instant room snippet update in sidebar
+        // 2. Instant cache update
+        const roomCached = messagesCacheRef.current.get(selectedRoomId) || [];
+        messagesCacheRef.current.set(selectedRoomId, [...roomCached, optimisticMsg]);
+
+        // 3. Instant room snippet update in sidebar
         setRooms((prev) => {
-            const currentRoom = prev.find((r) => r.id === selectedRoomId);
-            if (!currentRoom) return prev;
+            const room = prev.find((r) => r.id === selectedRoomId);
+            if (!room) return prev;
 
             const updatedRoom: ChatRoomSummary = {
-                ...currentRoom,
+                ...room,
                 updatedAt: new Date(),
                 unreadCount: 0,
                 lastMessage: {
@@ -223,12 +267,17 @@ export default function ChatPage() {
             return [updatedRoom, ...prev.filter((r) => r.id !== selectedRoomId)];
         });
 
-        // 3. Send message in background
+        // 4. Send message in background
         try {
             const res = await sendMessage(selectedRoomId, body, attachment);
             if (res.error) {
                 console.error("Failed to send message:", res.error);
                 setMessages((prev) => prev.filter((m) => m.id !== tempId));
+                messagesCacheRef.current.set(
+                    selectedRoomId,
+                    (messagesCacheRef.current.get(selectedRoomId) || []).filter((m) => m.id !== tempId)
+                );
+                setIsAiTyping(false);
                 alert("ไม่สามารถส่งข้อความได้: " + res.error);
                 return;
             }
@@ -238,14 +287,19 @@ export default function ChatPage() {
                 setMessages((prev) =>
                     prev.map((m) => (m.id === tempId ? newMsg : m))
                 );
+                messagesCacheRef.current.set(
+                    selectedRoomId,
+                    (messagesCacheRef.current.get(selectedRoomId) || []).map((m) =>
+                        m.id === tempId ? newMsg : m
+                    )
+                );
             }
         } catch (err: any) {
             setMessages((prev) => prev.filter((m) => m.id !== tempId));
+            setIsAiTyping(false);
             alert("ไม่สามารถส่งข้อความได้: " + (err?.message || "Error"));
         }
     };
-
-    const currentRoom = rooms.find((r) => r.id === selectedRoomId) || null;
 
     return (
         <div className="h-[calc(100vh-6.5rem)] flex rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl shadow-xl overflow-hidden relative">
@@ -275,6 +329,7 @@ export default function ChatPage() {
                     messages={messages}
                     currentUserId={currentUserId}
                     isLoadingMessages={isLoadingMessages}
+                    isAiTyping={isAiTyping}
                     onSendMessage={handleSendMessage}
                     onBack={() => setMobileView("sidebar")}
                 />

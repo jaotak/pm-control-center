@@ -28,6 +28,7 @@ interface ChatWindowProps {
     messages: ChatMessageItem[];
     currentUserId: string;
     isLoadingMessages: boolean;
+    isAiTyping?: boolean;
     onSendMessage: (body: string, attachment?: { url: string; name: string; type: string; size: number }) => Promise<boolean | void>;
     onBack?: () => void;
 }
@@ -69,16 +70,17 @@ export default function ChatWindow({
     messages,
     currentUserId,
     isLoadingMessages,
+    isAiTyping = false,
     onSendMessage,
     onBack,
 }: ChatWindowProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [showMemberDetails, setShowMemberDetails] = useState(false);
 
-    // Auto scroll to bottom when messages update
+    // Auto scroll to bottom when messages or typing state update
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    }, [messages, isAiTyping]);
 
     if (!room) {
         return (
@@ -321,6 +323,26 @@ export default function ChatWindow({
                         );
                     })
                 )}
+
+                {/* AI Typing Indicator */}
+                {isAiTyping && (
+                    <div className="flex gap-2.5 items-end justify-start animate-in fade-in duration-200">
+                        <div className="shrink-0 mb-1">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
+                                AI
+                            </div>
+                        </div>
+                        <div className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 rounded-2xl rounded-bl-xs flex items-center gap-2 shadow-2xs">
+                            <div className="flex items-center gap-1">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: "0ms" }} />
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: "150ms" }} />
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                            </div>
+                            <span className="text-xs text-slate-400 font-medium ml-1">AI กำลังคิดคำตอบ...</span>
+                        </div>
+                    </div>
+                )}
+
                 <div ref={messagesEndRef} />
             </div>
 

@@ -10,11 +10,14 @@ interface NewChatModalProps {
     onRoomCreated: (roomId: string) => void;
 }
 
+// In-memory module cache for instant reopening
+let cachedUsers: ChatUserSummary[] | null = null;
+
 export default function NewChatModal({ isOpen, onClose, onRoomCreated }: NewChatModalProps) {
     const [tab, setTab] = useState<"direct" | "group">("direct");
-    const [users, setUsers] = useState<ChatUserSummary[]>([]);
+    const [users, setUsers] = useState<ChatUserSummary[]>(cachedUsers || []);
     const [searchQuery, setSearchQuery] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(!cachedUsers);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [groupName, setGroupName] = useState("");
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
@@ -29,14 +32,24 @@ export default function NewChatModal({ isOpen, onClose, onRoomCreated }: NewChat
             return;
         }
 
-        setIsLoading(true);
+        if (cachedUsers) {
+            setUsers(cachedUsers);
+            setIsLoading(false);
+        } else {
+            setIsLoading(true);
+        }
+
+        // Fetch fresh users (Stale-While-Revalidate)
         getChatUsers()
             .then((res) => {
                 if (res.users) {
+                    cachedUsers = res.users;
                     setUsers(res.users);
                 }
             })
-            .catch(() => setErrorMsg("ไม่สามารถโหลดรายชื่อผู้ใช้ได้"))
+            .catch(() => {
+                if (!cachedUsers) setErrorMsg("ไม่สามารถโหลดรายชื่อผู้ใช้ได้");
+            })
             .finally(() => setIsLoading(false));
     }, [isOpen]);
 

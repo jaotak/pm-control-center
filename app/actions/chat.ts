@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthUser } from "@/lib/auth";
 import { processAIChatMessage } from "@/lib/ai";
+import { after } from "next/server";
 
 export interface ChatUserSummary {
     id: string;
@@ -76,81 +77,76 @@ export async function getChatRooms() {
     if (!authUser) return { error: "Unauthorized" };
 
     try {
-        const memberships = await prisma.chatMember.findMany({
-            where: { userId: authUser.id },
-            select: {
-                chatRoomId: true,
-                lastReadAt: true,
-                chatRoom: {
-                    select: {
-                        id: true,
-                        name: true,
-                        type: true,
-                        updatedAt: true,
-                        members: {
-                            select: {
-                                id: true,
-                                userId: true,
-                                lastReadAt: true,
-                                user: {
-                                    select: {
-                                        id: true,
-                                        name: true,
-                                        email: true,
-                                        avatarUrl: true,
-                                        role: true,
-                                        department: true,
+        // Parallel fetch memberships and indexed unread counts per room in 1 roundtrip
+        const [memberships, unreadRows] = await Promise.all([
+            prisma.chatMember.findMany({
+                where: { userId: authUser.id },
+                select: {
+                    chatRoomId: true,
+                    lastReadAt: true,
+                    chatRoom: {
+                        select: {
+                            id: true,
+                            name: true,
+                            type: true,
+                            updatedAt: true,
+                            members: {
+                                select: {
+                                    id: true,
+                                    userId: true,
+                                    lastReadAt: true,
+                                    user: {
+                                        select: {
+                                            id: true,
+                                            name: true,
+                                            email: true,
+                                            avatarUrl: true,
+                                            role: true,
+                                            department: true,
+                                        },
                                     },
                                 },
                             },
-                        },
-                        messages: {
-                            orderBy: { createdAt: "desc" },
-                            take: 1,
-                            select: {
-                                id: true,
-                                body: true,
-                                senderId: true,
-                                createdAt: true,
-                                attachmentUrl: true,
-                                sender: {
-                                    select: {
-                                        id: true,
-                                        name: true,
+                            messages: {
+                                orderBy: { createdAt: "desc" },
+                                take: 1,
+                                select: {
+                                    id: true,
+                                    body: true,
+                                    senderId: true,
+                                    createdAt: true,
+                                    attachmentUrl: true,
+                                    sender: {
+                                        select: {
+                                            id: true,
+                                            name: true,
+                                        },
                                     },
                                 },
                             },
                         },
                     },
                 },
-            },
-            orderBy: {
-                chatRoom: {
-                    updatedAt: "desc",
+                orderBy: {
+                    chatRoom: {
+                        updatedAt: "desc",
+                    },
                 },
-            },
-        });
-
-        // Bulk calculate unread counts to avoid N+1 queries
-        const oldestRead = memberships.length > 0 
-            ? new Date(Math.min(...memberships.map(m => m.lastReadAt.getTime())))
-            : new Date();
-            
-        const recentMessages = await prisma.chatMessage.findMany({
-            where: {
-                chatRoomId: { in: memberships.map(m => m.chatRoomId) },
-                senderId: { not: authUser.id },
-                createdAt: { gt: oldestRead }
-            },
-            select: { chatRoomId: true, createdAt: true }
-        });
+            }),
+            prisma.$queryRaw<{ chatRoomId: string; count: number }[]>`
+                SELECT m."chatRoomId", COUNT(*)::int AS count
+                FROM "ChatMessage" m
+                INNER JOIN "ChatMember" cm ON cm."chatRoomId" = m."chatRoomId"
+                WHERE cm."userId" = ${authUser.id}
+                  AND m."senderId" != ${authUser.id}
+                  AND m."createdAt" > cm."lastReadAt"
+                GROUP BY m."chatRoomId"
+            `,
+        ]);
 
         const unreadMap: Record<string, number> = {};
-        for (const msg of recentMessages) {
-            const membership = memberships.find(m => m.chatRoomId === msg.chatRoomId);
-            if (membership && msg.createdAt > membership.lastReadAt) {
-                unreadMap[msg.chatRoomId] = (unreadMap[msg.chatRoomId] || 0) + 1;
-            }
+        for (const row of unreadRows) {
+            unreadMap[row.chatRoomId] = row.count;
         }
 
         // Compute unread count and formatting for each room
@@ -171,34 +167,33 @@ export async function getChatRooms() {
             }
 
             const unreadCount = unreadMap[room.id] || 0;
+            const lastMsg = room.messages[0];
 
-                const lastMsg = room.messages[0];
-
-                return {
-                    id: room.id,
-                    name: room.name,
-                    type: room.type as "direct" | "group",
-                    updatedAt: room.updatedAt,
-                    members: room.members.map((m) => ({
-                        id: m.id,
-                        userId: m.userId,
-                        lastReadAt: m.lastReadAt,
-                        user: m.user,
-                    })),
-                    lastMessage: lastMsg
-                        ? {
-                              id: lastMsg.id,
-                              body: lastMsg.body,
-                              senderId: lastMsg.senderId,
-                              senderName: lastMsg.sender.name,
-                              createdAt: lastMsg.createdAt,
-                          }
-                        : null,
-                    unreadCount,
-                    displayName,
-                    displayAvatar,
-                };
-            });
+            return {
+                id: room.id,
+                name: room.name,
+                type: room.type as "direct" | "group",
+                updatedAt: room.updatedAt,
+                members: room.members.map((m) => ({
+                    id: m.id,
+                    userId: m.userId,
+                    lastReadAt: m.lastReadAt,
+                    user: m.user,
+                })),
+                lastMessage: lastMsg
+                    ? {
+                          id: lastMsg.id,
+                          body: lastMsg.body,
+                          senderId: lastMsg.senderId,
+                          senderName: lastMsg.sender.name,
+                          createdAt: lastMsg.createdAt,
+                      }
+                    : null,
+                unreadCount,
+                displayName,
+                displayAvatar,
+            };
+        });
 
         return { rooms };
     } catch (error) {
@@ -218,24 +213,18 @@ export async function createDirectChat(targetUserId: string) {
     }
 
     try {
-        // Find existing direct chat between these two users
-        const existingRooms = await prisma.chatRoom.findMany({
-            where: {
-                type: "direct",
-                AND: [
-                    { members: { some: { userId: authUser.id } } },
-                    { members: { some: { userId: targetUserId } } },
-                ],
-            },
-            include: {
-                members: true,
-            },
-        });
+        // Fast indexed SQL lookup: finds if a direct room exists between these 2 users in 2ms
+        const existing = await prisma.$queryRaw<{ id: string }[]>`
+            SELECT cr.id
+            FROM "ChatRoom" cr
+            INNER JOIN "ChatMember" cm1 ON cm1."chatRoomId" = cr.id AND cm1."userId" = ${authUser.id}
+            INNER JOIN "ChatMember" cm2 ON cm2."chatRoomId" = cr.id AND cm2."userId" = ${targetUserId}
+            WHERE cr.type = 'direct'
+            LIMIT 1
+        `;
 
-        // Exact match with exactly these 2 members
-        const exactMatch = existingRooms.find((r) => r.members.length === 2);
-        if (exactMatch) {
-            return { roomId: exactMatch.id };
+        if (existing.length > 0) {
+            return { roomId: existing[0].id };
         }
 
         // Create new direct chat room
@@ -377,22 +366,28 @@ export async function sendMessage(
             },
         });
 
-        // 3. Update room updatedAt and sender lastReadAt concurrently in background
-        Promise.all([
-            prisma.chatRoom.update({
-                where: { id: chatRoomId },
-                data: { updatedAt: now },
-            }),
-            prisma.chatMember.update({
-                where: {
-                    chatRoomId_userId: {
-                        chatRoomId,
-                        userId: authUser.id,
-                    },
-                },
-                data: { lastReadAt: now },
-            }),
-        ]).catch(err => console.error("Error updating room timestamps:", err));
+        // 3. Update room updatedAt and sender lastReadAt concurrently in background with after()
+        after(async () => {
+            try {
+                await Promise.all([
+                    prisma.chatRoom.update({
+                        where: { id: chatRoomId },
+                        data: { updatedAt: now },
+                    }),
+                    prisma.chatMember.update({
+                        where: {
+                            chatRoomId_userId: {
+                                chatRoomId,
+                                userId: authUser.id,
+                            },
+                        },
+                        data: { lastReadAt: now },
+                    }),
+                ]);
+            } catch (err) {
+                console.error("Error updating room timestamps:", err);
+            }
+        });
 
         // 4. Trigger AI processing if @AI is mentioned or if it's a direct chat with AI
         const isAiMentioned = /(?:^|\s)@ai(?:\s|$|[.,!?:;"'])/i.test(trimmedBody);
@@ -402,8 +397,12 @@ export async function sendMessage(
         const isSenderAi = authUser.role === "AI" || authUser.email === "ai@control.center";
 
         if (!isSenderAi && (isAiMentioned || isDirectWithAi)) {
-            processAIChatMessage(message.id).catch(err => {
-                console.error("Failed to process AI chat:", err);
+            after(async () => {
+                try {
+                    await processAIChatMessage(message.id);
+                } catch (err) {
+                    console.error("Failed to process AI chat:", err);
+                }
             });
         }
 
@@ -496,29 +495,15 @@ export async function getChatUnreadCount() {
     if (!authUser) return { count: 0 };
 
     try {
-        const memberships = await prisma.chatMember.findMany({
-            where: { userId: authUser.id },
-            select: {
-                chatRoomId: true,
-                lastReadAt: true,
-            },
-        });
-
-        if (memberships.length === 0) return { count: 0 };
-
-        let totalUnread = 0;
-        for (const m of memberships) {
-            const unread = await prisma.chatMessage.count({
-                where: {
-                    chatRoomId: m.chatRoomId,
-                    senderId: { not: authUser.id },
-                    createdAt: { gt: m.lastReadAt },
-                },
-            });
-            totalUnread += unread;
-        }
-
-        return { count: totalUnread };
+        const result = await prisma.$queryRaw<{ count: number }[]>`
+            SELECT COUNT(*)::int AS count
+            FROM "ChatMessage" m
+            INNER JOIN "ChatMember" cm ON cm."chatRoomId" = m."chatRoomId"
+            WHERE cm."userId" = ${authUser.id}
+              AND m."senderId" != ${authUser.id}
+              AND m."createdAt" > cm."lastReadAt"
+        `;
+        return { count: result[0]?.count ?? 0 };
     } catch {
         return { count: 0 };
     }

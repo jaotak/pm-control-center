@@ -25,12 +25,17 @@ export async function processAIChatMessage(messageId: string) {
             return;
         }
 
-        // 1. Get user and their projects for context
+        // 1. Get user and their projects for context (lean select)
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            include: {
-                projectsOwned: true,
-                projectsAssigned: true,
+            select: {
+                name: true,
+                projectsOwned: {
+                    select: { id: true, name: true, code: true }
+                },
+                projectsAssigned: {
+                    select: { id: true, name: true, code: true }
+                }
             }
         });
 
@@ -80,12 +85,20 @@ ${projectContext || "ไม่มีโปรเจกต์"}
 ถ้าผู้ใช้ไม่ได้ระบุว่าโปรเจกต์ไหน ให้ถามกลับก่อนเสมอเพื่อขอ Project ID หรือชื่อโปรเจกต์
 ตอบกลับเป็นภาษาไทยอย่างเป็นมิตร`;
 
-        // 4. Fetch history for context (last 5 messages)
+        // 4. Fetch history for context (last 5 messages, lean select)
         const history = await prisma.chatMessage.findMany({
             where: { chatRoomId },
             orderBy: { createdAt: "desc" },
             take: 5,
-            include: { sender: true }
+            select: {
+                id: true,
+                body: true,
+                attachmentUrl: true,
+                attachmentType: true,
+                sender: {
+                    select: { role: true, email: true }
+                }
+            }
         });
         history.reverse(); // oldest to newest
 

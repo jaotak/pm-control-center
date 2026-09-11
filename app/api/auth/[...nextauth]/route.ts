@@ -77,10 +77,19 @@ export const authOptions = {
                 session.user.theme = token.theme || "light";
             }
             return session;
+        },
+        async redirect({ url, baseUrl }: any) {
+            // Allow relative callback URLs (e.g. "/login") to stay on current host/origin
+            if (url.startsWith("/")) return url;
+            try {
+                if (new URL(url).origin === baseUrl) return url;
+            } catch { }
+            return "/login";
         }
     },
     pages: {
         signIn: '/login',
+        signOut: '/login',
     }
 };
 

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -10,9 +11,10 @@ export default async function EditProjectPage({
 }) {
     const { id } = await params;
 
-    // ดึงข้อมูลเดิมมาแสดงในฟอร์ม
+    // ดึงเฉพาะข้อมูลที่จำเป็นมาแสดงในฟอร์ม
     const project = await prisma.project.findUnique({
         where: { id },
+        select: { id: true, code: true, name: true, customer: true },
     });
 
     if (!project) notFound();
@@ -21,16 +23,21 @@ export default async function EditProjectPage({
     async function updateProject(formData: FormData) {
         "use server";
 
-        const code = formData.get("code") as string;
-        const name = formData.get("name") as string;
-        const customer = formData.get("customer") as string;
+        const code = (formData.get("code") as string)?.trim();
+        const name = (formData.get("name") as string)?.trim();
+        const customer = (formData.get("customer") as string)?.trim();
 
+        if (!code || !name || !customer) {
+            throw new Error("กรุณากรอกข้อมูลให้ครบถ้วน");
+        }
 
         await prisma.project.update({
             where: { id },
             data: { code, name, customer },
         });
 
+        revalidatePath("/projects");
+        revalidatePath(`/projects/${id}`);
         redirect(`/projects/${id}`);
     }
 

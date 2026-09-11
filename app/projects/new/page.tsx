@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { ArrowLeft, Save } from "lucide-react";
+import { getAuthUser } from "@/lib/auth";
 
 export default async function CreateProjectPage() {
-    // ดึงข้อมูล User คนแรกจากระบบมาเป็น Owner ชั่วคราว (เพราะเรายังไม่มีระบบ Login แบบเต็ม)
-    const defaultUser = await prisma.user.findFirst();
+    const authUser = await getAuthUser();
 
     // ----------------------------------------------------
     // Server Action สำหรับบันทึกข้อมูลลง Database
@@ -13,31 +14,25 @@ export default async function CreateProjectPage() {
     async function createProject(formData: FormData) {
         "use server";
 
-        const code = formData.get("code") as string;
-        const name = formData.get("name") as string;
-        const customer = formData.get("customer") as string;
+        const code = (formData.get("code") as string)?.trim();
+        const name = (formData.get("name") as string)?.trim();
+        const customer = (formData.get("customer") as string)?.trim();
 
         // 1. ตรวจสอบข้อมูลจากฟอร์มให้ชัดเจน
         if (!code || !name || !customer) {
             throw new Error(`ข้อมูลฟอร์มขาดหาย -> รหัส:${code || '-'}, ชื่อ:${name || '-'}, ลูกค้า:${customer || '-'}`);
         }
 
-        // 2. ดึงข้อมูล User ภายใน Action (เพื่อแก้ปัญหา Scope)
-        let actionUser = await prisma.user.findFirst();
+        // 2. ดึง Auth User ที่ล็อกอินอยู่เป็น Owner
+        const authUser = await getAuthUser();
+        let ownerId = authUser?.id;
 
-        // 3. ถ้าฐานข้อมูลยังว่างเปล่าจริงๆ ให้สร้าง User อัตโนมัติไปเลย
-        if (!actionUser) {
-            actionUser = await prisma.user.create({
-                data: {
-                    name: "System Admin",
-                    email: "admin@example.com",
-                    password: "",
-                    role: "PM",
-                }
-            });
+        if (!ownerId) {
+            const firstUser = await prisma.user.findFirst({ select: { id: true } });
+            ownerId = firstUser?.id;
         }
 
-        // 4. บันทึกข้อมูลลง Database
+        // 3. บันทึกข้อมูลลง Database
         await prisma.project.create({
             data: {
                 code,
@@ -45,11 +40,13 @@ export default async function CreateProjectPage() {
                 customer,
                 stage: "REQUIREMENT",
                 progress: 0,
-                ownerId: actionUser.id,
+                ownerId: ownerId ?? undefined,
             },
         });
 
-        // เมื่อบันทึกเสร็จ ให้ Redirect กลับไปที่หน้ารายการโปรเจกต์
+        // Revalidate cache และ Redirect กลับไปที่หน้ารายการโปรเจกต์
+        revalidatePath("/");
+        revalidatePath("/projects");
         redirect("/projects");
     }
 
@@ -121,7 +118,7 @@ export default async function CreateProjectPage() {
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">ผู้รับผิดชอบ (Project Owner)</label>
                         <div className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-500">
-                            {defaultUser?.name || "System Admin"} (ดึงจากระบบอัตโนมัติ)
+                            {authUser?.name || "System Admin"} (ดึงจากบัญชีผู้ใช้ปัจจุบัน)
                         </div>
                     </div>
 

@@ -11,7 +11,7 @@ export default async function ProjectList({
     searchParams: Promise<{ q?: string }>
 }) {
     const resolvedParams = await searchParams;
-    const searchQuery = resolvedParams.q || "";
+    const searchQuery = resolvedParams.q ? resolvedParams.q.trim() : "";
 
     const session = await getServerSession(authOptions);
     const role = (session?.user as any)?.role;
@@ -24,19 +24,20 @@ export default async function ProjectList({
         roleWhereCondition = { developers: { some: { id: userId } } };
     }
 
+    const whereCondition: any = {
+        ...roleWhereCondition,
+    };
+
+    if (searchQuery) {
+        whereCondition.OR = [
+            { code: { contains: searchQuery, mode: 'insensitive' } },
+            { name: { contains: searchQuery, mode: 'insensitive' } },
+            { customer: { contains: searchQuery, mode: 'insensitive' } },
+        ];
+    }
+
     const projects = await prisma.project.findMany({
-        where: {
-            AND: [
-                roleWhereCondition,
-                {
-                    OR: [
-                        { code: { contains: searchQuery } },
-                        { name: { contains: searchQuery } },
-                        { customer: { contains: searchQuery } },
-                    ]
-                }
-            ]
-        },
+        where: whereCondition,
         select: {
             id: true,
             code: true,
@@ -45,13 +46,13 @@ export default async function ProjectList({
             stage: true,
             progress: true,
             owner: { select: { id: true, name: true } },
-            developers: { select: { id: true } },
+            _count: { select: { developers: true } },
         },
         orderBy: { updatedAt: "desc" },
     });
 
     const getStageStyle = (stage: string) => {
-        if (stage === 'DONE') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
+        if (stage === 'DONE' || stage === 'Completed') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
         if (stage === 'UAT') return 'bg-teal-50 text-teal-700 border-teal-200/80';
         if (stage === 'DEVELOPMENT') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
         return 'bg-amber-50 text-amber-700 border-amber-200/80';
@@ -77,6 +78,7 @@ export default async function ProjectList({
                 {role !== "DEV" && (
                     <Link
                         href="/projects/new"
+                        prefetch={true}
                         className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs shadow-md shadow-emerald-500/20 transition-all hover:scale-105"
                     >
                         <Plus size={17} />
@@ -86,7 +88,7 @@ export default async function ProjectList({
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between gap-4">
                 <SearchProject />
                 <div className="text-xs font-bold text-slate-500 hidden sm:block">
                     พบทั้งหมด <strong className="text-emerald-600 font-extrabold text-sm">{projects.length}</strong> โครงการ
@@ -110,9 +112,9 @@ export default async function ProjectList({
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {projects.map((prj) => (
-                                <tr key={prj.id} className="hover:bg-emerald-50/30 transition-all group">
+                                <tr key={prj.id} className="hover:bg-emerald-50/30 transition-colors duration-150 group">
                                     <td className="px-6 py-4 font-bold text-emerald-600">
-                                        <Link href={`/projects/${prj.id}`} className="hover:underline flex items-center gap-1.5">
+                                        <Link href={`/projects/${prj.id}`} prefetch={true} className="hover:underline flex items-center gap-1.5">
                                             {prj.code}
                                         </Link>
                                     </td>
@@ -136,7 +138,7 @@ export default async function ProjectList({
                                         <div className="flex items-center gap-1">
                                             <Users size={14} className="text-slate-400 mr-1" />
                                             <span className="text-xs font-semibold text-slate-600">
-                                                {prj.developers.length} คน
+                                                {prj._count.developers} คน
                                             </span>
                                         </div>
                                     </td>
@@ -159,7 +161,8 @@ export default async function ProjectList({
                                     <td className="px-6 py-4 text-right">
                                         <Link
                                             href={`/projects/${prj.id}`}
-                                            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-all"
+                                            prefetch={true}
+                                            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors duration-150"
                                         >
                                             เข้าชม <ArrowRight size={13} />
                                         </Link>

@@ -7,6 +7,7 @@ import {
     getChatMessages,
     sendMessage,
     markAsRead,
+    deleteChatRoom,
     ChatRoomSummary,
 } from "@/app/actions/chat";
 import ChatSidebar from "@/components/ChatSidebar";
@@ -203,6 +204,27 @@ export default function ChatPage() {
         await fetchRooms();
     };
 
+    const handleDeleteRoom = async (roomId: string) => {
+        // Optimistic: remove from UI immediately
+        setRooms((prev) => prev.filter((r) => r.id !== roomId));
+        messagesCacheRef.current.delete(roomId);
+
+        // If the deleted room was selected, clear the view
+        if (selectedRoomId === roomId) {
+            setSelectedRoomId(null);
+            setMessages([]);
+            setIsAiTyping(false);
+        }
+
+        // Call server action in background
+        const res = await deleteChatRoom(roomId);
+        if (res.error) {
+            console.error("Failed to delete room:", res.error);
+            // Revert on failure by refetching
+            await fetchRooms();
+        }
+    };
+
     const currentRoom = rooms.find((r) => r.id === selectedRoomId) || null;
 
     const handleSendMessage = async (body: string, attachment?: { url: string; name: string; type: string; size: number }) => {
@@ -314,6 +336,7 @@ export default function ChatPage() {
                     selectedRoomId={selectedRoomId}
                     onSelectRoom={handleSelectRoom}
                     onRoomCreated={handleRoomCreated}
+                    onDeleteRoom={handleDeleteRoom}
                     currentUserId={currentUserId}
                 />
             </div>

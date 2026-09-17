@@ -508,3 +508,39 @@ export async function getChatUnreadCount() {
         return { count: 0 };
     }
 }
+
+/**
+ * Delete a chat room and all its messages/members (cascade)
+ * Only members of the room can delete it.
+ */
+export async function deleteChatRoom(chatRoomId: string) {
+    const authUser = await getAuthUser();
+    if (!authUser) return { error: "Unauthorized" };
+
+    try {
+        // Verify the current user is a member of this room
+        const membership = await prisma.chatMember.findUnique({
+            where: {
+                chatRoomId_userId: {
+                    chatRoomId,
+                    userId: authUser.id,
+                },
+            },
+            select: { id: true },
+        });
+
+        if (!membership) {
+            return { error: "You are not a member of this chat room" };
+        }
+
+        // Delete the room — ChatMember and ChatMessage cascade automatically
+        await prisma.chatRoom.delete({
+            where: { id: chatRoomId },
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting chat room:", error);
+        return { error: "Failed to delete chat room" };
+    }
+}

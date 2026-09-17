@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
                         },
                     });
 
-                    const roomLatestMessages: Record<string, any> = {};
+                    const roomLatestMessages: Record<string, { id: string, body: string, senderId: string, senderName?: string | null, createdAt: Date }> = {};
                     for (const m of memberships) {
                         if (m.chatRoom?.messages?.length > 0) {
                             const latest = m.chatRoom.messages[0];
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
                         newMessages: [],
                         timestamp: Date.now(),
                     });
-                } catch (e) {
+                } catch {
                     // Ignore initial error
                 }
             };
@@ -156,7 +156,7 @@ export async function GET(req: NextRequest) {
                         const { map: roomUnreadMap, total: totalUnread } = await fetchUnreadMap();
 
                         // Build updated latest message snippet for affected rooms
-                        const roomLatestMessages: Record<string, any> = {};
+                        const roomLatestMessages: Record<string, { id: string, body: string, senderId: string, senderName?: string | null, createdAt: Date }> = {};
                         for (const msg of newMessages) {
                             roomLatestMessages[msg.chatRoomId] = {
                                 id: msg.id,

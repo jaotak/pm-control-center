@@ -30,7 +30,7 @@ export default function ViewItemModal({ type, item }: ViewModalProps) {
         return "bg-emerald-50 text-emerald-700 border-emerald-200";
     };
 
-    let attachments: any[] = [];
+    let attachments: { url: string; name: string; type?: string; size?: number }[] = [];
     if (item.attachmentUrls) {
         try {
             attachments = JSON.parse(item.attachmentUrls);
@@ -94,11 +94,12 @@ export default function ViewItemModal({ type, item }: ViewModalProps) {
                                 <div>
                                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1"><Paperclip size={14}/> ไฟล์แนบ (Attachments)</h4>
                                     <div className="flex flex-wrap gap-3">
-                                        {attachments.map((file: any, idx: number) => {
+                                        {attachments.map((file, idx: number) => {
                                             const isImage = file.type?.startsWith('image/');
                                             return (
                                                 <a key={idx} href={file.url} target="_blank" rel="noopener noreferrer" className="group relative flex flex-col items-center justify-center p-2 border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-emerald-300 transition-all overflow-hidden w-24 h-24">
                                                     {isImage ? (
+                                                        // eslint-disable-next-line @next/next/no-img-element
                                                         <img src={file.url} alt={file.name} className="object-cover w-full h-full rounded-lg" />
                                                     ) : (
                                                         <div className="flex flex-col items-center justify-center text-slate-500 group-hover:text-emerald-500">

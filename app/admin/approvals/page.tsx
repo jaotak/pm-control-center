@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, UserCheck, Clock, Building2, Phone } from "lucide-react";
@@ -8,7 +8,7 @@ import ApprovalActions from "@/app/admin/approvals/ApprovalActions";
 
 export default async function ApprovalsPage() {
     const session = await getServerSession(authOptions);
-    const role = (session?.user as any)?.role;
+    const role = session?.user?.role;
     if (role !== "ADMIN") redirect("/403");
 
     const pendingUsers = await prisma.user.findMany({

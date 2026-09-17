@@ -2,9 +2,12 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { requireProjectAccess } from "@/lib/auth";
 
 // สำหรับ Admin: เปลี่ยนตัว PM ของโปรเจกต์
 export async function assignProjectOwner(projectId: string, ownerId: string) {
+    const user = await requireProjectAccess(projectId, "manager");
+    if (user.role !== "ADMIN") throw new Error("Forbidden");
     await prisma.project.update({
         where: { id: projectId },
         data: { ownerId: ownerId === "" ? null : ownerId }
@@ -14,6 +17,7 @@ export async function assignProjectOwner(projectId: string, ownerId: string) {
 
 // สำหรับ PM: ดึงตัว Dev เข้าโปรเจกต์
 export async function addDeveloperToProject(projectId: string, developerId: string) {
+    await requireProjectAccess(projectId, "manager");
     await prisma.project.update({
         where: { id: projectId },
         data: { developers: { connect: { id: developerId } } }
@@ -23,6 +27,7 @@ export async function addDeveloperToProject(projectId: string, developerId: stri
 
 // สำหรับ PM: เอา Dev ออกจากโปรเจกต์
 export async function removeDeveloperFromProject(projectId: string, developerId: string) {
+    await requireProjectAccess(projectId, "manager");
     await prisma.project.update({
         where: { id: projectId },
         data: { developers: { disconnect: { id: developerId } } }

@@ -20,7 +20,7 @@ function Sidebar() {
     const pathname = usePathname();
     const { data: session } = useSession();
     const { isOpen, closeSidebar } = useSidebar();
-    const role = (session?.user as any)?.role || "";
+    const role = session?.user?.role || "";
     const userEmail = session?.user?.email || "";
 
     const initialCache = getCachedBadgeData();
@@ -46,7 +46,6 @@ function Sidebar() {
     useEffect(() => {
         if (pathname === '/chat') {
             clearChatUnreadCount();
-            setChatUnreadCount(0);
         }
     }, [pathname]);
 

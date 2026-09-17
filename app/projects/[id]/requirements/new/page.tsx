@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Paperclip } from "lucide-react";
 import { uploadFile } from "@/app/actions/upload";
+import { requireProjectAccess } from "@/lib/auth";
 
 export default async function NewRequirementPage({
     params
@@ -27,6 +28,7 @@ export default async function NewRequirementPage({
     // ----------------------------------------------------
     async function createRequirement(formData: FormData) {
         "use server";
+        await requireProjectAccess(id, "manager");
 
         const reqCode = formData.get("reqCode") as string;
         const title = formData.get("title") as string;

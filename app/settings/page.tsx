@@ -1,5 +1,5 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { Notification } from "@prisma/client";
 import { User, Settings as SettingsIcon, Shield, Bell } from "lucide-react";
 import ProfileForm from "./ProfileForm";
 import { getAuthUser } from "@/lib/auth";
@@ -16,7 +16,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     const resolvedParams = await searchParams;
     const currentTab = resolvedParams.tab || "profile";
     
-    let notifications: any[] = [];
+    let notifications: Notification[] = [];
     if (currentTab === "notifications") {
         notifications = await prisma.notification.findMany({
             where: { userId: user.id },

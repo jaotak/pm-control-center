@@ -16,12 +16,12 @@ type Props = {
     totalEstimated: number;
 };
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; color: string; dataKey: string }>; label?: string }) => {
     if (!active || !payload?.length) return null;
     return (
         <div className="bg-white border border-slate-200 rounded-xl px-3 py-2.5 shadow-lg text-xs">
             <p className="font-bold text-slate-700 mb-1">{label}</p>
-            {payload.map((p: any) => (
+            {payload.map((p) => (
                 <p key={p.dataKey} style={{ color: p.color }} className="font-semibold">
                     {p.name}: {p.value.toFixed(1)}h
                 </p>

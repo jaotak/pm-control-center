@@ -1,22 +1,23 @@
 import CalendarView from "@/components/CalendarView";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 
 export default async function CalendarPage() {
     const session = await getServerSession(authOptions);
-    const role = (session?.user as any)?.role || "USER";
-    const userId = (session?.user as any)?.id;
+    const role = session?.user?.role || "USER";
+    const userId = session?.user?.id as string;
 
     // 1. กรองงาน (Tasks) ตามสิทธิ์ (เฉพาะที่ยังไม่ถูกลบ และมีกำหนดวันส่ง)
-    let roleTaskCondition: any = {};
+    let roleTaskCondition: Prisma.TaskWhereInput = {};
     if (role === "DEV") {
-        roleTaskCondition = { assigneeId: userId }; // DEV เห็นเฉพาะงานตัวเอง
+        roleTaskCondition = { assigneeId: userId! }; // DEV เห็นเฉพาะงานตัวเอง
     } else if (role === "PM") {
         roleTaskCondition = {
             OR: [
-                { assigneeId: userId },             // งานส่วนตัว & งานที่ได้รับมอบหมาย
-                { project: { ownerId: userId } }    // งานของทุกคนในโปรเจกต์ที่ตัวเองเป็นเจ้าของ
+                { assigneeId: userId! },             // งานส่วนตัว & งานที่ได้รับมอบหมาย
+                { project: { ownerId: userId! } }    // งานของทุกคนในโปรเจกต์ที่ตัวเองเป็นเจ้าของ
             ]
         };
     }
@@ -27,7 +28,7 @@ export default async function CalendarPage() {
     };
 
     // 2. กรองโปรเจกต์สำหรับ Dropdown สร้างงาน
-    let projectCondition: any = {};
+    let projectCondition: Prisma.ProjectWhereInput = {};
     if (role === "DEV") {
         projectCondition = { developers: { some: { id: userId } } };
     } else if (role === "PM") {

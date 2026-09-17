@@ -17,6 +17,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     // โหลด Role ล่าสุดจาก LocalStorage (ถ้ามี) จะได้ไม่หลุดเวลา Refresh หน้าจอ
     useEffect(() => {
         const savedRole = localStorage.getItem("app_role") as Role;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (savedRole) setRole(savedRole);
     }, []);
 

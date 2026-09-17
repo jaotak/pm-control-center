@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import { getSystemStats, getAdminLogs } from "@/app/actions/admin";
 import { FolderKanban, Users, AlertCircle, CheckSquare, Shield, ClipboardList, Bell, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { AdminLog } from "@prisma/client";
 
 const ACTION_LABELS: Record<string, { label: string; color: string }> = {
     ROLE_CHANGE:    { label: "Role Changed",    color: "bg-violet-100 text-violet-700" },
@@ -17,7 +18,7 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
 
 export default async function AdminPage() {
     const session = await getServerSession(authOptions);
-    const role = (session?.user as any)?.role;
+    const role = session?.user?.role;
     if (role !== "ADMIN") redirect("/403");
 
     const [stats, adminLogs, adminUsers, pendingApprovals] = await Promise.all([
@@ -121,11 +122,11 @@ export default async function AdminPage() {
                     <span className="ml-auto text-xs font-medium text-slate-400">(30 รายการล่าสุด)</span>
                 </h2>
 
-                {(adminLogs as any[]).length === 0 ? (
+                {(adminLogs as AdminLog[]).length === 0 ? (
                     <p className="text-center text-slate-400 text-sm py-8">ยังไม่มีรายการ Admin Activity</p>
                 ) : (
                     <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
-                        {(adminLogs as any[]).map((log: any) => {
+                        {(adminLogs as AdminLog[]).map((log) => {
                             const badge = ACTION_LABELS[log.action] ?? { label: log.action, color: "bg-slate-100 text-slate-600" };
                             return (
                                 <div key={log.id} className="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100">

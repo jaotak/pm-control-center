@@ -36,7 +36,7 @@ export default function LoginPage() {
             }
             setIsLoading(false);
         } else {
-            window.location.href = "/";
+            router.push("/");
         }
     };
 

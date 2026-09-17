@@ -2,10 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { updateProjectProgress, logActivity } from "./progress";
 import { uploadFile } from "./upload";
+import { requireProjectAccess } from "@/lib/auth";
 
 // ฟังก์ชันสร้าง UAT Case
 export async function createUATCase(formData: FormData) {
@@ -16,8 +15,7 @@ export async function createUATCase(formData: FormData) {
     const isMandatory = formData.get("isMandatory") === "on"; // Checkbox
     const attachmentFiles = formData.getAll("attachments") as File[];
 
-    const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
+    const user = await requireProjectAccess(projectId, "manager");
 
     // ระบบ Auto-Generate รหัส (เช่น UAT-001)
     const count = await prisma.uATCase.count({ where: { projectId } });
@@ -43,9 +41,7 @@ export async function createUATCase(formData: FormData) {
         }
     });
 
-    if (userId) {
-        await logActivity(projectId, userId, `สร้าง UAT Case ใหม่ [${uatCode}]: "${title}"`);
-    }
+    await logActivity(projectId, user.id, `สร้าง UAT Case ใหม่ [${uatCode}]: "${title}"`);
 
     await updateProjectProgress(projectId);
     redirect(`/projects/${projectId}?tab=uat`);
@@ -58,8 +54,7 @@ export async function createRequirement(formData: FormData) {
     const assigneeId = formData.get("assigneeId") as string;
     const attachmentFiles = formData.getAll("attachments") as File[];
 
-    const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
+    const user = await requireProjectAccess(projectId, "manager");
 
     const count = await prisma.requirement.count({ where: { projectId } });
     const reqCode = `REQ-${String(count + 1).padStart(3, '0')}`;
@@ -76,9 +71,7 @@ export async function createRequirement(formData: FormData) {
         data: { reqCode, title, projectId, assigneeId: assigneeId || null, attachmentUrls: JSON.stringify(uploadedAttachments) }
     });
 
-    if (userId) {
-        await logActivity(projectId, userId, `สร้าง Requirement ใหม่ [${reqCode}]: "${title}"`);
-    }
+    await logActivity(projectId, user.id, `สร้าง Requirement ใหม่ [${reqCode}]: "${title}"`);
 
     await updateProjectProgress(projectId);
     redirect(`/projects/${projectId}?tab=requirements`);

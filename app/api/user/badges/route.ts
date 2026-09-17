@@ -11,11 +11,11 @@ export async function GET(req: NextRequest) {
         );
     }
     const userId = token.sub;
-    const role = (token as any)?.role || "USER";
+    const role = token?.role || "USER";
 
     try {
         // Parallel fetch notifications, indexed unread chat count, and (if admin) pending approvals in 1 round-trip
-        const queries: [Promise<any>, Promise<any>, Promise<number>?] = [
+        const queries: Array<Promise<unknown>> = [
             prisma.notification.findMany({
                 where: { userId, isRead: false },
                 orderBy: { createdAt: "desc" },
@@ -36,7 +36,11 @@ export async function GET(req: NextRequest) {
             queries.push(prisma.user.count({ where: { isApproved: false } }));
         }
 
-        const [notifications, chatResult, pendingApprovalsCount = 0] = await Promise.all(queries);
+        const [notifications, chatResult, pendingApprovalsCount = 0] = await Promise.all(queries) as [
+            { id: string, title: string, message: string, link: string | null, createdAt: Date, isRead: boolean, userId: string }[],
+            { count: number }[],
+            number?
+        ];
         const unreadChatCount = chatResult[0]?.count ?? 0;
 
         return NextResponse.json(

@@ -1,16 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Trash2, RotateCcw, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Trash2, AlertTriangle } from "lucide-react";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import TrashActions from "@/components/TrashActions";
 
 export default async function TrashPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     const session = await getServerSession(authOptions);
-    const userRole = (session?.user as any)?.role || "";
+    const userRole = session?.user?.role || "";
 
     if (userRole === "DEV") {
         return (

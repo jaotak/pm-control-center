@@ -1,4 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
+
+type ExportProject = Prisma.ProjectGetPayload<{
+    include: {
+        owner: { select: { name: true } },
+        developers: { select: { id: true } },
+        requirements: {
+            include: {
+                uatCases: {
+                    include: {
+                        issues: true
+                    }
+                }
+            }
+        }
+    }
+}>;
 import { prisma } from '@/lib/prisma';
 import { getAuthUser } from '@/lib/auth';
 
@@ -27,6 +44,7 @@ export async function GET(
     const project = await prisma.project.findUnique({
         where: { id: projectId },
         include: {
+            owner: { select: { name: true } },
             developers: { select: { id: true } },
             requirements: {
                 where: { deletedAt: null },
@@ -65,7 +83,7 @@ export async function GET(
 
 // ── CSV ─────────────────────────────────────────────────────────────────────
 
-function buildCsvResponse(project: any) {
+function buildCsvResponse(project: ExportProject) {
     // BOM for Excel Thai charset compatibility
     let csv = '\uFEFF';
     csv += csvRow('Req Code', 'Requirement Title', 'UAT Code', 'UAT Title', 'UAT Status',
@@ -98,7 +116,7 @@ function buildCsvResponse(project: any) {
 
 // ── XLSX ─────────────────────────────────────────────────────────────────────
 
-async function buildXlsxResponse(project: any) {
+async function buildXlsxResponse(project: ExportProject) {
     const ExcelJS = (await import('exceljs')).default;
     const wb = new ExcelJS.Workbook();
     wb.creator = 'PM Control Center';
@@ -165,7 +183,7 @@ async function buildXlsxResponse(project: any) {
     });
 }
 
-function applyStatusColor(row: any, key: string, value: string, colorMap: Record<string, string>) {
+function applyStatusColor(row: { getCell: (key: string) => { font?: unknown, fill?: unknown, alignment?: unknown } }, key: string, value: string, colorMap: Record<string, string>) {
     const col = row.getCell(key);
     const color = colorMap[value];
     if (color) {

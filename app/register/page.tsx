@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { FolderKanban, UserPlus, Eye, EyeOff, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { registerUser } from "@/app/actions/register";
@@ -10,7 +9,6 @@ import PasswordStrength from "@/components/PasswordStrength";
 const DEPARTMENTS = ["Engineering", "QA", "Design", "Management", "Other"];
 
 export default function RegisterPage() {
-    const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [showPassword, setShowPassword] = useState(false);
     const [success, setSuccess] = useState(false);

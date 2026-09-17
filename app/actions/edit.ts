@@ -2,9 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { logActivity } from "./progress";
+import { assertItemBelongsToProject, requireProjectAccess } from "@/lib/auth";
 
 export async function editRequirement(
     id: string,
@@ -14,8 +13,10 @@ export async function editRequirement(
     priority?: string,
     dueDate?: string | null
 ) {
-    const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
+    const user = await requireProjectAccess(projectId, "manager");
+    const existing = await prisma.requirement.findUnique({ where: { id }, select: { projectId: true } });
+    if (!existing) throw new Error("Requirement not found");
+    assertItemBelongsToProject(existing.projectId, projectId);
 
     const req = await prisma.requirement.update({
         where: { id },
@@ -27,9 +28,7 @@ export async function editRequirement(
         }
     });
 
-    if (userId) {
-        await logActivity(projectId, userId, `แก้ไขข้อมูล Requirement [${req.reqCode}]: "${title}"`);
-    }
+    await logActivity(projectId, user.id, `แก้ไขข้อมูล Requirement [${req.reqCode}]: "${title}"`);
 
     revalidatePath(`/projects/${projectId}`);
 }
@@ -42,8 +41,10 @@ export async function editUATCase(
     priority?: string,
     dueDate?: string | null
 ) {
-    const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
+    const user = await requireProjectAccess(projectId, "manager");
+    const existing = await prisma.uATCase.findUnique({ where: { id }, select: { projectId: true } });
+    if (!existing) throw new Error("UAT Case not found");
+    assertItemBelongsToProject(existing.projectId, projectId);
 
     const uat = await prisma.uATCase.update({
         where: { id },
@@ -55,9 +56,7 @@ export async function editUATCase(
         }
     });
 
-    if (userId) {
-        await logActivity(projectId, userId, `แก้ไขข้อมูล UAT Case [${uat.uatCode}]: "${title}"`);
-    }
+    await logActivity(projectId, user.id, `แก้ไขข้อมูล UAT Case [${uat.uatCode}]: "${title}"`);
 
     revalidatePath(`/projects/${projectId}`);
 }
@@ -70,8 +69,10 @@ export async function editIssue(
     priority?: string,
     dueDate?: string | null
 ) {
-    const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
+    const user = await requireProjectAccess(projectId, "manager");
+    const existing = await prisma.issue.findUnique({ where: { id }, select: { projectId: true } });
+    if (!existing) throw new Error("Issue not found");
+    assertItemBelongsToProject(existing.projectId, projectId);
 
     const issue = await prisma.issue.update({
         where: { id },
@@ -83,9 +84,7 @@ export async function editIssue(
         }
     });
 
-    if (userId) {
-        await logActivity(projectId, userId, `แก้ไขข้อมูล Issue [${issue.issueCode}]: "${title}"`);
-    }
+    await logActivity(projectId, user.id, `แก้ไขข้อมูล Issue [${issue.issueCode}]: "${title}"`);
 
     revalidatePath(`/projects/${projectId}`);
 }

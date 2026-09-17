@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, startTransition } from "react";
@@ -52,8 +53,8 @@ export default function ProfileForm({ user }: { user: UserProps }) {
             } else if (result?.error) {
                 setError(result.error);
             }
-        } catch (err: any) {
-            setError(err?.message || "เกิดข้อผิดพลาดในการอัปโหลดรูป");
+        } catch (err: unknown) {
+            setError((err as Error)?.message || "เกิดข้อผิดพลาดในการอัปโหลดรูป");
         } finally {
             setIsUploading(false);
         }
@@ -87,8 +88,8 @@ export default function ProfileForm({ user }: { user: UserProps }) {
                 setNewPassword("");
                 setMessage("บันทึกข้อมูลเรียบร้อยแล้ว!");
                 setTimeout(() => setMessage(""), 4000);
-            } catch (err: any) {
-                setError(err?.message || "เกิดข้อผิดพลาด");
+            } catch (err: unknown) {
+                setError((err as Error)?.message || "เกิดข้อผิดพลาด");
             } finally {
                 setIsPending(false);
             }

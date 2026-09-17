@@ -1,8 +1,9 @@
 // Centralized badge service with deduplication and caching for Sidebar & NotificationBell
+import { Notification } from "@prisma/client";
 
 export interface BadgeData {
     unreadNotificationsCount: number;
-    unreadNotifications: any[];
+    unreadNotifications: Notification[];
     unreadChatCount: number;
     pendingApprovalsCount: number;
 }

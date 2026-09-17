@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { Plus, FolderKanban, ArrowRight, UserCheck, Users, Shield } from "lucide-react";
 import SearchProject from "@/components/SearchProject";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 
 export default async function ProjectList({
     searchParams
@@ -14,17 +15,17 @@ export default async function ProjectList({
     const searchQuery = resolvedParams.q ? resolvedParams.q.trim() : "";
 
     const session = await getServerSession(authOptions);
-    const role = (session?.user as any)?.role;
-    const userId = (session?.user as any)?.id;
+    const role = session?.user?.role;
+    const userId = session?.user?.id;
 
-    let roleWhereCondition: any = {};
+    let roleWhereCondition: Prisma.ProjectWhereInput = {};
     if (role === "PM") {
         roleWhereCondition = { ownerId: userId };
     } else if (role === "DEV") {
         roleWhereCondition = { developers: { some: { id: userId } } };
     }
 
-    const whereCondition: any = {
+    const whereCondition: Prisma.ProjectWhereInput = {
         ...roleWhereCondition,
     };
 

@@ -1,17 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
-import { CheckSquare, AlertCircle, TestTube, ListTodo, Calendar, ArrowRight } from "lucide-react";
+import { CheckSquare, AlertCircle, TestTube, ListTodo } from "lucide-react";
 import TaskCheckbox from "@/components/TaskCheckbox";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import DeleteTaskButton from "@/components/DeleteTaskButton";
 
 export default async function MyTasksPage() {
     const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
-    const role = (session?.user as any)?.role || "USER";
+    const userId = session?.user?.id;
+    const role = session?.user?.role || "USER";
 
-    let taskCondition: any = {};
+    let taskCondition: Prisma.TaskWhereInput = {};
     if (role === "DEV") {
         taskCondition = { assigneeId: userId };
     } else if (role === "PM") {

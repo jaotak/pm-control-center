@@ -22,9 +22,12 @@ export function ThemeProvider({
     // On mount, prefer localStorage (instant) then fall back to server-provided initialTheme
     useEffect(() => {
         const stored = (localStorage.getItem("pm-theme") as Theme) || initialTheme;
-        setTheme(stored);
+        if (theme !== stored) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setTheme(stored);
+        }
         document.documentElement.setAttribute("data-theme", stored);
-    }, [initialTheme]);
+    }, [initialTheme, theme]);
 
     const toggle = () => {
         const next: Theme = theme === "light" ? "dark" : "light";

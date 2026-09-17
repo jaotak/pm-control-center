@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Users, Shield, KeyRound, UserX, UserCheck, Plus, X, Save } from "lucide-react";
+import { KeyRound, UserX, UserCheck, Plus, X, Save } from "lucide-react";
 import { updateUserRole, toggleUserActive, adminResetPassword, adminCreateUser } from "@/app/actions/admin";
 
 type User = {
@@ -64,8 +64,9 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
     const handleCreateUser = () => {
         startTransition(async () => {
             const res = await adminCreateUser(createForm.name, createForm.email, createForm.password, createForm.role);
-            if ((res as any)?.error) {
-                showFeedback((res as any).error);
+            const response = res as { error?: string };
+            if (response?.error) {
+                showFeedback(response.error);
             } else {
                 setShowCreate(false);
                 setCreateForm({ name: "", email: "", password: "", role: "DEV" });

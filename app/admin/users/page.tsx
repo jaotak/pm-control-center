@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import { getAllUsers } from "@/app/actions/admin";
 import { Users, ArrowLeft } from "lucide-react";
@@ -8,10 +8,11 @@ import UsersTable from "./UsersTable";
 
 export default async function AdminUsersPage() {
     const session = await getServerSession(authOptions);
-    const role = (session?.user as any)?.role;
+    const role = session?.user?.role;
     if (role !== "ADMIN") redirect("/403");
 
-    const users = await getAllUsers();
+    const usersData = await getAllUsers();
+    const users = Array.isArray(usersData) ? usersData : [];
 
     return (
         <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -29,7 +30,7 @@ export default async function AdminUsersPage() {
             </div>
 
             <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-7">
-                <UsersTable users={users as any} />
+                <UsersTable users={users} />
             </div>
         </div>
     );

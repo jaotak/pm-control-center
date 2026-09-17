@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
@@ -7,9 +6,7 @@ import { AuthProvider } from "@/app/Providers";
 import { ThemeProvider } from "@/app/context/ThemeContext";
 import { SidebarProvider } from "@/app/context/SidebarContext";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
-const inter = Inter({ subsets: ["latin"] });
+import { authOptions } from "@/lib/auth-options";
 
 export const metadata: Metadata = {
   title: "PM Control Center",
@@ -20,7 +17,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let initialTheme: "light" | "dark" = "light";
   try {
     const session = await getServerSession(authOptions);
-    if ((session?.user as any)?.theme === "dark") {
+    if (session?.user?.theme === "dark") {
       initialTheme = "dark";
     }
   } catch {
@@ -29,7 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="th" suppressHydrationWarning data-theme={initialTheme}>
-      <body className={`${inter.className} bg-gray-50 dark:bg-slate-950 transition-colors`}>
+      <body className="font-sans bg-gray-50 dark:bg-slate-950 transition-colors">
         <AuthProvider>
           <ThemeProvider initialTheme={initialTheme}>
             <SidebarProvider>

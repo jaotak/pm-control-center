@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import ProjectDetailView from "@/components/ProjectDetailView";
 
 const USER_SELECT = {
@@ -76,7 +77,14 @@ export default async function ProjectDetailPage({
 
     if (!project) notFound();
 
-    const userRole = (session?.user as any)?.role || "";
+    const currentUser = session?.user;
+    const userRole = currentUser?.role || "";
+    const isAllowed = currentUser && (
+        currentUser.role === "ADMIN" ||
+        project.ownerId === currentUser.id ||
+        project.developers.some((developer) => developer.id === currentUser.id)
+    );
+    if (!isAllowed) redirect("/projects");
 
     return (
         <ProjectDetailView

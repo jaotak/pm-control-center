@@ -2,19 +2,20 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { assertItemBelongsToProject, requireProjectAccess } from "@/lib/auth";
 
 export async function createLabel(name: string, color: string, projectId: string) {
-    const session = await getServerSession(authOptions);
-    const userId = (session?.user as any)?.id;
-    if (!userId) return;
+    await requireProjectAccess(projectId, "manager");
 
     await prisma.label.create({ data: { name, color, projectId } });
     revalidatePath(`/projects/${projectId}`);
 }
 
 export async function deleteLabel(labelId: string, projectId: string) {
+    await requireProjectAccess(projectId, "manager");
+    const label = await prisma.label.findUnique({ where: { id: labelId }, select: { projectId: true } });
+    if (!label) throw new Error("Label not found");
+    assertItemBelongsToProject(label.projectId, projectId);
     await prisma.label.delete({ where: { id: labelId } });
     revalidatePath(`/projects/${projectId}`);
 }
@@ -26,6 +27,10 @@ export async function toggleLabelOnItem(
     projectId: string,
     isAttaching: boolean
 ) {
+    await requireProjectAccess(projectId, "manager");
+    const label = await prisma.label.findUnique({ where: { id: labelId }, select: { projectId: true } });
+    if (!label) throw new Error("Label not found");
+    assertItemBelongsToProject(label.projectId, projectId);
     const connectDisconnect = isAttaching
         ? { connect: { id: labelId } }
         : { disconnect: { id: labelId } };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
     ArrowLeft, LayoutDashboard, ListTodo, TestTube,
@@ -25,9 +25,25 @@ import DueDateBadge from "@/components/DueDateBadge";
 import KanbanBoard from "@/components/KanbanBoard";
 import TimeTracker from "@/components/TimeTracker";
 
+import { Project, Task, Issue, Requirement, UATCase, ActivityLog } from "@prisma/client";
+
+interface FullRequirement extends Requirement {
+    uatCases: (UATCase & { issues: Issue[] })[];
+}
+
+interface FullProject extends Project {
+    owner: { id: string; name: string } | null;
+    developers: { id: string; name: string; email: string; role: string; avatarUrl: string | null; }[];
+    requirements: FullRequirement[];
+    uatCases: UATCase[];
+    issues: (Issue & { assignee?: { name: string } | null })[];
+    tasks: Task[];
+    activityLogs: (ActivityLog & { user: { id: string; name: string; email: string; role: string; avatarUrl: string | null; } })[];
+}
+
 interface ProjectDetailViewProps {
-    project: any;
-    allUsers: any[];
+    project: FullProject;
+    allUsers: { id: string; name: string; email: string; role: string; }[];
     userRole: string;
     initialTab?: string;
     initialIssueView?: string;
@@ -89,13 +105,13 @@ export default function ProjectDetailView({
         const team: { id: string; name: string }[] = [];
         if (project.owner) team.push({ id: project.owner.id, name: project.owner.name });
         if (Array.isArray(project.developers)) {
-            project.developers.forEach((dev: any) => team.push({ id: dev.id, name: dev.name }));
+            project.developers.forEach((dev) => team.push({ id: dev.id, name: dev.name }));
         }
         return team;
     }, [project.owner, project.developers]);
 
     // Fast in-memory filtering helper
-    const filterItem = (item: any) => {
+    const filterItem = useCallback((item: { status?: string, priority?: string, assigneeId?: string | null, dueDate?: Date | null }) => {
         if (filterStatus && item.status !== filterStatus) return false;
         if (filterPriority && item.priority !== filterPriority) return false;
         if (filterAssignee && item.assigneeId !== filterAssignee) return false;
@@ -116,22 +132,22 @@ export default function ProjectDetailView({
             }
         }
         return true;
-    };
+    }, [filterStatus, filterPriority, filterAssignee, filterDue]);
 
     const filteredRequirements = useMemo(() => {
         return (project.requirements || []).filter(filterItem);
-    }, [project.requirements, filterStatus, filterPriority, filterAssignee, filterDue]);
+    }, [project.requirements, filterItem]);
 
     const filteredUatCases = useMemo(() => {
         return (project.uatCases || []).filter(filterItem);
-    }, [project.uatCases, filterStatus, filterPriority, filterAssignee, filterDue]);
+    }, [project.uatCases, filterItem]);
 
     const filteredIssues = useMemo(() => {
         return (project.issues || []).filter(filterItem);
-    }, [project.issues, filterStatus, filterPriority, filterAssignee, filterDue]);
+    }, [project.issues, filterItem]);
 
     const filteredTasks = useMemo(() => {
-        return (project.tasks || []).filter((task: any) => {
+        return (project.tasks || []).filter((task) => {
             if (filterAssignee && task.assigneeId !== filterAssignee) return false;
             if (filterDue) {
                 const now = new Date();
@@ -387,7 +403,7 @@ export default function ProjectDetailView({
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
-                                        {filteredRequirements.map((req: any) => (
+                                        {filteredRequirements.map((req) => (
                                             <tr key={req.id} className="hover:bg-slate-50/60 transition-colors">
                                                 <td className="px-5 py-3.5 font-bold text-emerald-600">{req.reqCode}</td>
                                                 <td className="px-5 py-3.5 font-semibold text-slate-800">{req.title}</td>
@@ -467,7 +483,7 @@ export default function ProjectDetailView({
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
-                                        {filteredUatCases.map((uat: any) => (
+                                        {filteredUatCases.map((uat) => (
                                             <tr key={uat.id} className="hover:bg-slate-50/60 transition-colors">
                                                 <td className="px-5 py-3.5 font-bold text-teal-600">{uat.uatCode}</td>
                                                 <td className="px-5 py-3.5 font-semibold text-slate-800">{uat.title}</td>
@@ -566,7 +582,7 @@ export default function ProjectDetailView({
 
                         {filteredIssues.length > 0 ? (
                             issueView === "kanban" ? (
-                                <KanbanBoard initialIssues={filteredIssues as any} projectId={project.id} />
+                                <KanbanBoard initialIssues={filteredIssues as Array<{ id: string, issueCode: string, title: string, severity: string, status: string, priority: string, assignee: { name: string } | null }>} projectId={project.id} />
                             ) : (
                                 <div className="overflow-x-auto border border-slate-200/80 rounded-2xl">
                                     <table className="w-full text-left border-collapse text-sm">
@@ -583,7 +599,7 @@ export default function ProjectDetailView({
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
-                                            {filteredIssues.map((issue: any) => (
+                                            {filteredIssues.map((issue) => (
                                                 <tr key={issue.id} className="hover:bg-slate-50/60 transition-colors">
                                                     <td className="px-5 py-3.5 font-bold text-rose-600">{issue.issueCode}</td>
                                                     <td className="px-5 py-3.5 font-semibold text-slate-800">{issue.title}</td>
@@ -686,7 +702,7 @@ export default function ProjectDetailView({
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200/80">
-                                    {(project.requirements || []).map((req: any) => (
+                                    {(project.requirements || []).map((req) => (
                                         <tr key={req.id} className="hover:bg-slate-50/40 align-top">
                                             <td className="px-5 py-4 border-r border-slate-200/80 bg-white">
                                                 <div className="font-extrabold text-emerald-600">{req.reqCode}</div>
@@ -698,7 +714,7 @@ export default function ProjectDetailView({
                                             <td colSpan={2} className="p-0">
                                                 {Array.isArray(req.uatCases) && req.uatCases.length > 0 ? (
                                                     <div className="flex flex-col h-full w-full">
-                                                        {req.uatCases.map((uat: any, index: number) => (
+                                                        {req.uatCases.map((uat, index: number) => (
                                                             <div key={uat.id} className={`flex w-full ${index !== 0 ? 'border-t border-slate-200/80' : ''}`}>
                                                                 <div className="w-1/2 px-4 py-4 border-r border-slate-200/80 hover:bg-slate-50 transition-colors">
                                                                     <div className="flex items-center gap-2 mb-1">
@@ -711,7 +727,7 @@ export default function ProjectDetailView({
                                                                 <div className="w-1/2 px-4 py-4 bg-slate-50/30">
                                                                     {Array.isArray(uat.issues) && uat.issues.length > 0 ? (
                                                                         <div className="space-y-2">
-                                                                            {uat.issues.map((issue: any) => (
+                                                                            {uat.issues.map((issue) => (
                                                                                 <div key={issue.id} className="p-2.5 border border-rose-200/80 bg-white rounded-xl flex flex-col gap-1 shadow-2xs hover:shadow-xs transition-all">
                                                                                     <div className="flex justify-between items-start">
                                                                                         <span className="text-xs font-bold text-rose-600">{issue.issueCode}</span>
@@ -767,7 +783,7 @@ export default function ProjectDetailView({
 
                         {filteredTasks.length > 0 ? (
                             <div className="space-y-2.5">
-                                {filteredTasks.map((task: any) => (
+                                {filteredTasks.map((task) => (
                                     <div key={task.id} className="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50/80 transition-all">
                                         <TaskCheckbox
                                             taskId={task.id}

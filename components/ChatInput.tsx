@@ -63,7 +63,7 @@ export default function ChatInput({
                 const formData = new FormData();
                 formData.append("file", selectedFile);
                 const res = await uploadItemAttachment(formData);
-                attachmentData = res as any;
+                attachmentData = res as { name: string; url: string; type: string; size: number };
             }
 
             await onSend(trimmed, attachmentData);

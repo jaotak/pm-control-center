@@ -7,13 +7,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
-type Notification = {
-    id: string;
-    title: string;
-    message: string;
-    link: string | null;
-    createdAt?: string | Date;
-};
+import { Notification } from "@prisma/client";
 
 function formatTimeAgo(dateStr?: string | Date | null): string {
     if (!dateStr) return "";

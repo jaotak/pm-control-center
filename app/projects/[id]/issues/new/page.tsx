@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Bug, Paperclip } from "lucide-react";
 import { uploadFile } from "@/app/actions/upload";
+import { requireProjectAccess } from "@/lib/auth";
 
 
 export default async function NewIssuePage({
@@ -34,6 +35,7 @@ export default async function NewIssuePage({
     // ----------------------------------------------------
     async function createIssue(formData: FormData) {
         "use server";
+        await requireProjectAccess(id, "manager");
 
         const issueCode = formData.get("issueCode") as string;
         const title = formData.get("title") as string;

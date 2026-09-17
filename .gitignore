@@ -20,6 +20,9 @@
 # production
 /build
 
+# User-generated files are stored in Supabase, not source control.
+/public/uploads/
+
 # misc
 .DS_Store
 *.pem

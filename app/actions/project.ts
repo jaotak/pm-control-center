@@ -30,8 +30,6 @@ export async function deleteProject(projectId: string) {
         prisma.task.findMany({ where: { projectId }, select: { id: true } }).then(r => r.map(x => x.id)),
     ]);
 
-    const allItemIds = [...reqIds, ...uatIds, ...issueIds, ...taskIds];
-
     // Batch all deletes in a single transaction
     await prisma.$transaction([
         // Comments referencing any child entity

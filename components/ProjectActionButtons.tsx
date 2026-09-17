@@ -6,7 +6,7 @@ import DeleteProjectButton from "./DeleteProjectButton";
 import { useSession } from "next-auth/react";
 
 export default function ProjectActionButtons({ projectId }: { projectId: string }) {
-    const { data: session } = useSession(); const role = (session?.user as any)?.role;
+    const { data: session } = useSession(); const role = session?.user?.role;
 
     // ถ้าเป็น DEV ให้ซ่อนปุ่มทั้งหมดไปเลย (ไม่คืนค่าอะไรกลับไป)
     if (role === "DEV") return null;

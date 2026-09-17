@@ -9,27 +9,27 @@ generator client {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  email            String    @unique
+  id               String  @id @default(uuid())
+  email            String  @unique
   name             String
   password         String
-  role             String    // "ADMIN", "PM", "DEV"
-  isActive         Boolean   @default(true)
-  isApproved       Boolean   @default(false)   // false until admin approves registration
-  theme            String    @default("light")
-  avatarUrl        String?                     // profile picture URL
-  department       String?                     // "Engineering", "QA", "Design", "Management", "Other"
-  phone            String?                     // contact phone number
-  pinnedProjectIds String    @default("[]") // JSON array of project IDs
+  role             String // "ADMIN", "PM", "DEV"
+  isActive         Boolean @default(true)
+  isApproved       Boolean @default(false) // false until admin approves registration
+  theme            String  @default("light")
+  avatarUrl        String? // profile picture URL
+  department       String? // "Engineering", "QA", "Design", "Management", "Other"
+  phone            String? // contact phone number
+  pinnedProjectIds String  @default("[]") // JSON array of project IDs
 
   projectsOwned    Project[] @relation("ProjectOwner")
   projectsAssigned Project[] @relation("ProjectDevelopers")
 
-  createdAt        DateTime  @default(now())
-  assignedReqs     Requirement[] @relation("ReqAssignee")
-  assignedUATs     UATCase[]     @relation("UATAssignee")
-  assignedIssues   Issue[]       @relation("IssueAssignee")
-  assignedTasks    Task[]        @relation("TaskAssignee")
+  createdAt        DateTime       @default(now())
+  assignedReqs     Requirement[]  @relation("ReqAssignee")
+  assignedUATs     UATCase[]      @relation("UATAssignee")
+  assignedIssues   Issue[]        @relation("IssueAssignee")
+  assignedTasks    Task[]         @relation("TaskAssignee")
   notifications    Notification[]
   activityLogs     ActivityLog[]
   comments         Comment[]
@@ -38,18 +38,18 @@ model User {
 }
 
 model Project {
-  id          String       @id @default(uuid())
-  code        String
-  name        String
-  customer    String
-  stage       String       @default("REQUIREMENT")
-  progress    Int          @default(0)
-  deadline    DateTime?
+  id       String    @id @default(uuid())
+  code     String
+  name     String
+  customer String
+  stage    String    @default("REQUIREMENT")
+  progress Int       @default(0)
+  deadline DateTime?
 
-  ownerId     String?
-  owner       User?        @relation("ProjectOwner", fields: [ownerId], references: [id])
+  ownerId String?
+  owner   User?   @relation("ProjectOwner", fields: [ownerId], references: [id])
 
-  developers  User[]       @relation("ProjectDevelopers")
+  developers User[] @relation("ProjectDevelopers")
 
   requirements Requirement[]
   uatCases     UATCase[]
@@ -59,112 +59,115 @@ model Project {
   milestones   Milestone[]
   attachments  Attachment[]
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   activityLogs ActivityLog[]
 }
 
 model Requirement {
-  id            String    @id @default(uuid())
-  reqCode       String
-  title         String
-  status        String    @default("Draft")
-  priority      String    @default("Normal")
-  dueDate       DateTime?
-  projectId     String
-  project       Project   @relation(fields: [projectId], references: [id])
-  uatCases      UATCase[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
-  assigneeId    String?
-  assignee      User?    @relation("ReqAssignee", fields: [assigneeId], references: [id])
-  description   String?
-  milestoneId   String?
-  milestone     Milestone? @relation(fields: [milestoneId], references: [id])
-  labels        Label[]   @relation("LabelToRequirement")
-  attachmentUrls String   @default("[]")
+  id             String     @id @default(uuid())
+  reqCode        String
+  title          String
+  status         String     @default("Draft")
+  priority       String     @default("Normal")
+  dueDate        DateTime?
+  projectId      String
+  project        Project    @relation(fields: [projectId], references: [id])
+  uatCases       UATCase[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+  assigneeId     String?
+  assignee       User?      @relation("ReqAssignee", fields: [assigneeId], references: [id])
+  description    String?
+  milestoneId    String?
+  milestone      Milestone? @relation(fields: [milestoneId], references: [id])
+  labels         Label[]    @relation("LabelToRequirement")
+  attachmentUrls String     @default("[]")
 
+  @@unique([projectId, reqCode])
   @@index([projectId, deletedAt])
   @@index([assigneeId, deletedAt])
   @@index([assigneeId])
 }
 
 model UATCase {
-  id            String    @id @default(uuid())
-  uatCode       String
-  title         String
-  isMandatory   Boolean
-  status        String    @default("Pending")
-  priority      String    @default("Normal")
-  dueDate       DateTime?
-  projectId     String
-  project       Project   @relation(fields: [projectId], references: [id])
-  requirementId String?
-  requirement   Requirement? @relation(fields: [requirementId], references: [id])
-  issues        Issue[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
-  assigneeId    String?
-  assignee      User?    @relation("UATAssignee", fields: [assigneeId], references: [id])
+  id             String       @id @default(uuid())
+  uatCode        String
+  title          String
+  isMandatory    Boolean
+  status         String       @default("Pending")
+  priority       String       @default("Normal")
+  dueDate        DateTime?
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id])
+  requirementId  String?
+  requirement    Requirement? @relation(fields: [requirementId], references: [id])
+  issues         Issue[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+  assigneeId     String?
+  assignee       User?        @relation("UATAssignee", fields: [assigneeId], references: [id])
   expectedResult String?
-  milestoneId   String?
-  milestone     Milestone? @relation(fields: [milestoneId], references: [id])
-  labels        Label[]   @relation("LabelToUATCase")
-  attachmentUrls String   @default("[]")
+  milestoneId    String?
+  milestone      Milestone?   @relation(fields: [milestoneId], references: [id])
+  labels         Label[]      @relation("LabelToUATCase")
+  attachmentUrls String       @default("[]")
 
+  @@unique([projectId, uatCode])
   @@index([projectId, deletedAt])
   @@index([assigneeId, deletedAt])
   @@index([assigneeId])
 }
 
 model Issue {
-  id               String    @id @default(uuid())
+  id               String     @id @default(uuid())
   issueCode        String
   title            String
   severity         String
-  status           String    @default("Open")
-  priority         String    @default("Normal")
+  status           String     @default("Open")
+  priority         String     @default("Normal")
   dueDate          DateTime?
   projectId        String
-  project          Project   @relation(fields: [projectId], references: [id])
+  project          Project    @relation(fields: [projectId], references: [id])
   uatCaseId        String?
-  uatCase          UATCase?  @relation(fields: [uatCaseId], references: [id])
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  uatCase          UATCase?   @relation(fields: [uatCaseId], references: [id])
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
   deletedAt        DateTime?
   assigneeId       String?
-  assignee         User?    @relation("IssueAssignee", fields: [assigneeId], references: [id])
+  assignee         User?      @relation("IssueAssignee", fields: [assigneeId], references: [id])
   stepsToReproduce String?
   milestoneId      String?
   milestone        Milestone? @relation(fields: [milestoneId], references: [id])
-  labels           Label[]   @relation("LabelToIssue")
-  attachmentUrls   String   @default("[]")
+  labels           Label[]    @relation("LabelToIssue")
+  attachmentUrls   String     @default("[]")
 
+  @@unique([projectId, issueCode])
   @@index([projectId, deletedAt])
   @@index([assigneeId, deletedAt])
   @@index([assigneeId])
 }
 
 model Task {
-  id              String    @id @default(uuid())
-  title           String
-  description     String?
-  isCompleted     Boolean   @default(false)
-  dueDate         DateTime?
-  estimatedHours  Float?
-  loggedHours     Float?    @default(0)
-  projectId       String?
-  project         Project?  @relation(fields: [projectId], references: [id])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  deletedAt       DateTime?
-  assigneeId      String?
-  assignee        User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
-  milestoneId     String?
-  milestone       Milestone? @relation(fields: [milestoneId], references: [id])
-  labels          Label[]   @relation("LabelToTask")
+  id             String     @id @default(uuid())
+  title          String
+  description    String?
+  isCompleted    Boolean    @default(false)
+  dueDate        DateTime?
+  estimatedHours Float?
+  loggedHours    Float?     @default(0)
+  projectId      String?
+  project        Project?   @relation(fields: [projectId], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+  assigneeId     String?
+  assignee       User?      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  milestoneId    String?
+  milestone      Milestone? @relation(fields: [milestoneId], references: [id])
+  labels         Label[]    @relation("LabelToTask")
 
   @@index([projectId, deletedAt])
   @@index([assigneeId, deletedAt])
@@ -201,17 +204,17 @@ model ActivityLog {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   body      String
   authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  itemType  String   // "req" | "uat" | "issue" | "task"
+  author    User      @relation(fields: [authorId], references: [id])
+  itemType  String // "req" | "uat" | "issue" | "task"
   itemId    String
   parentId  String?
-  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies   Comment[] @relation("CommentReplies")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([itemType, itemId])
 }
@@ -272,30 +275,30 @@ model ChatRoom {
 }
 
 model ChatMember {
-  id         String    @id @default(uuid())
+  id         String   @id @default(uuid())
   chatRoomId String
-  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   userId     String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  joinedAt   DateTime  @default(now())
-  lastReadAt DateTime  @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt   DateTime @default(now())
+  lastReadAt DateTime @default(now())
 
   @@unique([chatRoomId, userId])
   @@index([userId])
 }
 
 model ChatMessage {
-  id             String    @id @default(uuid())
+  id             String   @id @default(uuid())
   body           String
   attachmentUrl  String?
   attachmentName String?
   attachmentType String?
   attachmentSize Int?
   senderId       String
-  sender     User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  chatRoomId String
-  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  createdAt  DateTime  @default(now())
+  sender         User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  chatRoomId     String
+  chatRoom       ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  createdAt      DateTime @default(now())
 
   @@index([chatRoomId, createdAt])
   @@index([senderId])

@@ -35,6 +35,7 @@ export default function ProjectActivityLog({ logs }: { logs: Log[] }) {
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0 overflow-hidden border border-green-200">
                                         {userLogs[0].user.avatarUrl ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
                                             <img src={userLogs[0].user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
                                             <UserCircle2 size={20} />

@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getAuthUser } from "@/lib/auth";
+import { assertItemBelongsToProject, requireProjectAccess } from "@/lib/auth";
 
 export async function createMilestone(
     name: string,
@@ -10,8 +10,7 @@ export async function createMilestone(
     endDate: string,
     projectId: string
 ) {
-    const user = await getAuthUser();
-    if (!user) return;
+    await requireProjectAccess(projectId, "manager");
 
     await prisma.milestone.create({
         data: {
@@ -26,8 +25,10 @@ export async function createMilestone(
 }
 
 export async function updateMilestoneStatus(milestoneId: string, status: string, projectId: string) {
-    const user = await getAuthUser();
-    if (!user) return;
+    await requireProjectAccess(projectId, "manager");
+    const milestone = await prisma.milestone.findUnique({ where: { id: milestoneId }, select: { projectId: true } });
+    if (!milestone) throw new Error("Milestone not found");
+    assertItemBelongsToProject(milestone.projectId, projectId);
 
     await prisma.milestone.update({
         where: { id: milestoneId },
@@ -38,6 +39,10 @@ export async function updateMilestoneStatus(milestoneId: string, status: string,
 }
 
 export async function deleteMilestone(milestoneId: string, projectId: string) {
+    await requireProjectAccess(projectId, "manager");
+    const milestone = await prisma.milestone.findUnique({ where: { id: milestoneId }, select: { projectId: true } });
+    if (!milestone) throw new Error("Milestone not found");
+    assertItemBelongsToProject(milestone.projectId, projectId);
     // Unlink all items first
     await prisma.requirement.updateMany({ where: { milestoneId }, data: { milestoneId: null } });
     await prisma.uATCase.updateMany({ where: { milestoneId }, data: { milestoneId: null } });
@@ -54,6 +59,12 @@ export async function assignItemToMilestone(
     itemId: string,
     projectId: string
 ) {
+    await requireProjectAccess(projectId, "manager");
+    if (milestoneId) {
+        const milestone = await prisma.milestone.findUnique({ where: { id: milestoneId }, select: { projectId: true } });
+        if (!milestone) throw new Error("Milestone not found");
+        assertItemBelongsToProject(milestone.projectId, projectId);
+    }
     if (itemType === "req") {
         await prisma.requirement.update({ where: { id: itemId }, data: { milestoneId } });
     } else if (itemType === "uat") {

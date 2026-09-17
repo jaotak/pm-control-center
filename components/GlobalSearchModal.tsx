@@ -20,9 +20,11 @@ export default function GlobalSearchModal({ isOpen, onClose }: { isOpen: boolean
 
     useEffect(() => {
         if (!isOpen) {
-            setQuery("");
-            setResults([]);
-            return;
+            const timer = setTimeout(() => {
+                setQuery("");
+                setResults([]);
+            }, 200);
+            return () => clearTimeout(timer);
         }
     }, [isOpen]);
 

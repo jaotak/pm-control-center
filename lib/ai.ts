@@ -1,7 +1,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { prisma } from './prisma';
-import fs from 'fs/promises';
-import path from 'path';
+
 
 export async function processAIChatMessage(messageId: string) {
     if (!process.env.GEMINI_API_KEY) {
@@ -102,11 +101,11 @@ ${projectContext || "ไม่มีโปรเจกต์"}
         });
         history.reverse(); // oldest to newest
 
-        const contentsInput: any[] = [];
+        const contentsInput: Array<{ role: string, parts: Array<{ text?: string, inlineData?: { data: string, mimeType: string } }> }> = [];
 
         for (const msg of history) {
             const role = (msg.sender.role === "AI" || msg.sender.email === "ai@control.center") ? "model" : "user";
-            const parts: any[] = [];
+            const parts: Array<{ text?: string, inlineData?: { data: string, mimeType: string } }> = [];
             
             // Try to download attachment if it exists and is public
             if (msg.attachmentUrl) {
@@ -162,7 +161,7 @@ ${projectContext || "ไม่มีโปรเจกต์"}
             let replyMessage = "ดำเนินการเรียบร้อยค่ะ:\n";
 
             for (const call of functionCalls) {
-                const args = call.args as any;
+                const args = call.args as { title: string, severity?: string, projectId: string, estimatedHours?: number };
                 
                 if (call.name === 'create_issue') {
                     const issueCode = `AI-ISSUE-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -170,15 +169,15 @@ ${projectContext || "ไม่มีโปรเจกต์"}
                         data: {
                             issueCode,
                             title: args.title,
-                            severity: args.severity,
+                            severity: args.severity || "Medium",
                             projectId: args.projectId,
                             status: "Open"
                         }
                     });
-                    replyMessage += `- สร้าง Issue ${issue.issueCode} (${args.severity}): ${args.title}\n`;
+                    replyMessage += `- สร้าง Issue ${issue.issueCode} (${args.severity || 'Medium'}): ${args.title}\n`;
                 } 
                 else if (call.name === 'create_task') {
-                    const task = await prisma.task.create({
+                    await prisma.task.create({
                         data: {
                             title: args.title,
                             estimatedHours: args.estimatedHours || 0,
@@ -198,7 +197,7 @@ ${projectContext || "ไม่มีโปรเจกต์"}
             await sendAIResponse(chatRoomId, text);
         }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("AI Error:", error);
         
         // Ensure chatRoomId is available if it failed early
@@ -207,9 +206,9 @@ ${projectContext || "ไม่มีโปรเจกต์"}
             try {
                 const msg = await prisma.chatMessage.findUnique({ where: { id: messageId } });
                 if (msg) {
-                    await sendAIResponse(msg.chatRoomId, "ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ AI: " + (error.message || "Unknown error"));
+                    await sendAIResponse(msg.chatRoomId, "ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ AI: " + ((error as Error).message || "Unknown error"));
                 }
-            } catch(e) {}
+            } catch {}
         }
     }
 }

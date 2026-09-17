@@ -37,6 +37,7 @@ export default function CommentThread({ itemType, itemId, projectId, currentUser
     const [body, setBody] = useState("");
     const [isPending, startTransition] = useTransition();
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     useEffect(() => { setComments(initialComments); }, [initialComments]);
 
     const handleSubmit = (e: React.FormEvent) => {

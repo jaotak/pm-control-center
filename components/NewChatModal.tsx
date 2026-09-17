@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -25,11 +26,13 @@ export default function NewChatModal({ isOpen, onClose, onRoomCreated }: NewChat
 
     useEffect(() => {
         if (!isOpen) {
-            setSearchQuery("");
-            setGroupName("");
-            setSelectedUserIds([]);
-            setErrorMsg(null);
-            return;
+            const timer = setTimeout(() => {
+                setSearchQuery("");
+                setGroupName("");
+                setSelectedUserIds([]);
+                setErrorMsg(null);
+            }, 200);
+            return () => clearTimeout(timer);
         }
 
         if (cachedUsers) {
@@ -225,6 +228,7 @@ export default function NewChatModal({ isOpen, onClose, onRoomCreated }: NewChat
                                     >
                                         <div className="flex items-center gap-3">
                                             {user.avatarUrl ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
                                                 <img
                                                     src={user.avatarUrl}
                                                     alt={user.name}
@@ -331,6 +335,7 @@ export default function NewChatModal({ isOpen, onClose, onRoomCreated }: NewChat
                                                     {isSelected && <Check size={13} strokeWidth={3} />}
                                                 </div>
                                                 {user.avatarUrl ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
                                                     <img
                                                         src={user.avatarUrl}
                                                         alt={user.name}

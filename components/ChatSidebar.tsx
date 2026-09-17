@@ -1,7 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Search, Plus, MessageSquare, Users, Trash2, X } from "lucide-react";
+import React, { useState } from "react";
+import { Search, Plus, MessageSquare, Users, Trash2 } from "lucide-react";
 import { ChatRoomSummary } from "@/app/actions/chat";
 import NewChatModal from "./NewChatModal";
 

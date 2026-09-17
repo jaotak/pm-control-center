@@ -1,24 +1,25 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { FolderKanban, CheckSquare, AlertCircle, Clock, ArrowRight, Sparkles, TrendingUp, TestTube } from "lucide-react";
 import TaskCheckbox from "@/components/TaskCheckbox";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 import UATPassRateDonut from "@/components/UATPassRateDonut";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
-  const role = (session?.user as any)?.role || "USER";
-  const userId = (session?.user as any)?.id;
+  const role = session?.user?.role || "USER";
+  const userId = session?.user?.id;
 
-  let projectCondition: any = {};
+  let projectCondition: Prisma.ProjectWhereInput = {};
   if (role === "PM") {
     projectCondition = { ownerId: userId };
   } else if (role === "DEV") {
     projectCondition = { developers: { some: { id: userId } } };
   }
 
-  let taskCondition: any = {};
+  let taskCondition: Prisma.TaskWhereInput = {};
   if (role === "PM") {
     taskCondition = {
       OR: [
@@ -30,7 +31,7 @@ export default async function DashboardPage() {
     taskCondition = { assigneeId: userId };
   }
 
-  let issueCondition: any = {};
+  let issueCondition: Prisma.IssueWhereInput = {};
   if (role === "PM") {
     issueCondition = { project: { ownerId: userId } };
   } else if (role === "DEV") {

@@ -1,7 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Users, Shield, Clock, CheckCheck, Check } from "lucide-react";
+import { ArrowLeft, Users, Clock, CheckCheck, Check } from "lucide-react";
 import { ChatRoomSummary } from "@/app/actions/chat";
 import ChatInput from "./ChatInput";
 

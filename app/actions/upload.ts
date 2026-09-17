@@ -2,8 +2,14 @@
 
 import { supabase } from "@/lib/supabase";
 import { getAuthUser } from "@/lib/auth";
+import { randomUUID } from "crypto";
+
+const ALLOWED_EXTENSIONS = new Set(["pdf", "doc", "docx", "xls", "xlsx", "csv", "txt", "png", "jpg", "jpeg", "webp"]);
 
 export async function uploadFile(file: File) {
+    const user = await getAuthUser();
+    if (!user) throw new Error("Unauthorized");
+
     // 10MB limit
     if (file.size > 10 * 1024 * 1024) {
         throw new Error("File size exceeds 10MB limit");
@@ -12,17 +18,19 @@ export async function uploadFile(file: File) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = file.name.split(".").pop();
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (!ext || !ALLOWED_EXTENSIONS.has(ext)) {
+        throw new Error("Unsupported file type");
+    }
     const originalName = file.name;
-    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const fileName = `${uniqueId}.${ext}`;
+    const fileName = `${user.id}/${randomUUID()}.${ext}`;
     
     // Upload to Supabase
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
         .from('attachments')
         .upload(fileName, buffer, {
             contentType: file.type,
-            upsert: true
+            upsert: false
         });
 
     if (error) {

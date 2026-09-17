@@ -26,7 +26,7 @@ async function rejectUser(userId: string) {
     return res.json();
 }
 
-export default function ApprovalActions({ userId, userName }: Props) {
+export default function ApprovalActions({ userId }: Props) {
     const [isPending, startTransition] = useTransition();
     const [done, setDone] = useState<"approved" | "rejected" | null>(null);
     const [confirmReject, setConfirmReject] = useState(false);

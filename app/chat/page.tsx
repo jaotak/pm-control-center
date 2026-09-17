@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
@@ -15,12 +16,11 @@ import ChatWindow, { ChatMessageItem } from "@/components/ChatWindow";
 
 export default function ChatPage() {
     const { data: session } = useSession();
-    const currentUserId = (session?.user as any)?.id || "";
+    const currentUserId = (session?.user as { id?: string })?.id || "";
 
     const [rooms, setRooms] = useState<ChatRoomSummary[]>([]);
     const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
     const [messages, setMessages] = useState<ChatMessageItem[]>([]);
-    const [isLoadingRooms, setIsLoadingRooms] = useState(true);
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
     const [isAiTyping, setIsAiTyping] = useState(false);
     const [mobileView, setMobileView] = useState<"sidebar" | "window">("sidebar");
@@ -28,7 +28,7 @@ export default function ChatPage() {
     // Client-side instant message cache: Map<roomId, ChatMessageItem[]>
     const messagesCacheRef = useRef<Map<string, ChatMessageItem[]>>(new Map());
     const selectedRoomIdRef = useRef<string | null>(null);
-    selectedRoomIdRef.current = selectedRoomId;
+    useEffect(() => { selectedRoomIdRef.current = selectedRoomId; }, [selectedRoomId]);
 
     // Load initial rooms
     const fetchRooms = useCallback(async () => {
@@ -42,9 +42,7 @@ export default function ChatPage() {
 
     useEffect(() => {
         if (!currentUserId) return;
-        setIsLoadingRooms(true);
         fetchRooms().then((loadedRooms) => {
-            setIsLoadingRooms(false);
             // Default select the first room on desktop if available
             if (loadedRooms.length > 0 && !selectedRoomIdRef.current) {
                 if (window.innerWidth >= 768) {
@@ -78,9 +76,9 @@ export default function ChatPage() {
         getChatMessages(selectedRoomId)
             .then((res) => {
                 if (res.messages) {
-                    messagesCacheRef.current.set(selectedRoomId, res.messages as any);
+                    messagesCacheRef.current.set(selectedRoomId, res.messages as unknown as ChatMessageItem[]);
                     if (selectedRoomIdRef.current === selectedRoomId) {
-                        setMessages(res.messages as any);
+                        setMessages(res.messages as unknown as ChatMessageItem[]);
                     }
                 }
             })
@@ -231,7 +229,7 @@ export default function ChatPage() {
         if (!selectedRoomId || !currentUserId) return;
 
         const tempId = `temp-${Date.now()}`;
-        const optimisticMsg: any = {
+        const optimisticMsg: ChatMessageItem = {
             id: tempId,
             body,
             attachmentUrl: attachment?.url || null,
@@ -242,10 +240,10 @@ export default function ChatPage() {
             createdAt: new Date(),
             sender: {
                 id: currentUserId,
-                name: (session?.user as any)?.name || "Me",
-                avatarUrl: (session?.user as any)?.avatarUrl || null,
-                email: (session?.user as any)?.email || "",
-                role: (session?.user as any)?.role || "DEV",
+                name: session?.user?.name || "Me",
+                avatarUrl: session?.user?.avatarUrl || null,
+                email: session?.user?.email || "",
+                role: session?.user?.role || "DEV",
             },
         };
 
@@ -281,7 +279,7 @@ export default function ChatPage() {
                     id: tempId,
                     body: body || (attachment?.url ? "[ไฟล์แนบ]" : ""),
                     senderId: currentUserId,
-                    senderName: (session?.user as any)?.name || "Me",
+                    senderName: session?.user?.name || "Me",
                     createdAt: new Date(),
                 },
             };
@@ -305,7 +303,7 @@ export default function ChatPage() {
             }
 
             if (res.message) {
-                const newMsg = res.message as any;
+                const newMsg = res.message as unknown as ChatMessageItem;
                 setMessages((prev) =>
                     prev.map((m) => (m.id === tempId ? newMsg : m))
                 );
@@ -316,10 +314,10 @@ export default function ChatPage() {
                     )
                 );
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             setMessages((prev) => prev.filter((m) => m.id !== tempId));
             setIsAiTyping(false);
-            alert("ไม่สามารถส่งข้อความได้: " + (err?.message || "Error"));
+            alert("ไม่สามารถส่งข้อความได้: " + ((err as Error)?.message || "Error"));
         }
     };
 

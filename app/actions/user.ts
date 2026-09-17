@@ -27,7 +27,7 @@ export async function updateProfile(name: string, email: string, department?: st
         });
         revalidatePath("/settings");
         return { success: true };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("updateProfile error:", err);
         return { error: "เกิดข้อผิดพลาดในการบันทึกข้อมูล" };
     }
@@ -93,7 +93,7 @@ export async function uploadAvatar(formData: FormData) {
         const fileName = `${user.id}-${uniqueId}.${ext}`;
         
         // Upload to Supabase Storage
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
             .from('avatars')
             .upload(fileName, buffer, {
                 contentType: file.type,
@@ -120,7 +120,7 @@ export async function uploadAvatar(formData: FormData) {
 
         revalidatePath("/settings");
         return { avatarUrl };
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("uploadAvatar error:", err);
         return { error: "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ" };
     }

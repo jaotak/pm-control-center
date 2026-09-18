@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateUATStatus } from "@/app/actions/uat";
+import { updateUatStatus } from "@/app/actions/update";
 
-export default function UATStatusSelect({ uatId, initialStatus }: { uatId: string, initialStatus: string }) {
+export default function UATStatusSelect({ uatId, initialStatus, projectId }: { uatId: string, initialStatus: string, projectId: string }) {
     const [status, setStatus] = useState(initialStatus);
     const [isPending, startTransition] = useTransition();
 
@@ -11,7 +11,7 @@ export default function UATStatusSelect({ uatId, initialStatus }: { uatId: strin
         const newStatus = e.target.value;
         setStatus(newStatus);
         startTransition(async () => {
-            const res = await updateUATStatus(uatId, newStatus);
+            const res = await updateUatStatus(uatId, newStatus, projectId);
             if (res?.error) {
                 alert(res.error);
                 setStatus(status); // revert

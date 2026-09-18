@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { assignProjectOwner, addDeveloperToProject, removeDeveloperFromProject } from "@/app/actions/team";
 import { UserPlus, Shield, UserMinus } from "lucide-react";
+import Link from "next/link";
 
 type User = { id: string; name: string; email: string; role: string };
 
@@ -86,7 +87,9 @@ export default function TeamManagement({
                 <div className="space-y-2">
                     {assignedDevs.map(dev => (
                         <div key={dev.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-100 rounded-lg">
-                            <span className="text-sm font-medium text-gray-700">{dev.name} <span className="text-xs text-gray-400">({dev.email})</span></span>
+                            <Link href={`/users/${dev.id}`} className="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors">
+                                {dev.name} <span className="text-xs text-slate-400">({dev.email})</span>
+                            </Link>
 
                             {(userRole === "PM" || userRole === "ADMIN") && (
                                 <button

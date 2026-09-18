@@ -5,6 +5,48 @@ import { Plus, FolderKanban, ArrowRight, UserCheck, Users, Shield } from "lucide
 import SearchProject from "@/components/SearchProject";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
+import { unstable_cache } from "next/cache";
+
+const getCachedProjectsList = (userId: string | undefined, role: string | undefined, searchQuery: string) => 
+    unstable_cache(
+        async (userIdArg: string | undefined, roleArg: string | undefined, searchArg: string) => {
+            let roleWhereCondition: Prisma.ProjectWhereInput = {};
+            if (roleArg === "PM") {
+                roleWhereCondition = { ownerId: userIdArg };
+            } else if (roleArg === "DEV") {
+                roleWhereCondition = { developers: { some: { id: userIdArg } } };
+            }
+
+            const whereCondition: Prisma.ProjectWhereInput = {
+                ...roleWhereCondition,
+            };
+
+            if (searchArg) {
+                whereCondition.OR = [
+                    { code: { contains: searchArg, mode: 'insensitive' } },
+                    { name: { contains: searchArg, mode: 'insensitive' } },
+                    { customer: { contains: searchArg, mode: 'insensitive' } },
+                ];
+            }
+
+            return prisma.project.findMany({
+                where: whereCondition,
+                select: {
+                    id: true,
+                    code: true,
+                    name: true,
+                    customer: true,
+                    stage: true,
+                    progress: true,
+                    owner: { select: { id: true, name: true } },
+                    _count: { select: { developers: true } },
+                },
+                orderBy: { updatedAt: "desc" },
+            });
+        },
+        [`projects-list-${userId || 'all'}-${role || 'all'}-${searchQuery}`],
+        { tags: ['projects', '/projects'], revalidate: 3600 }
+    )(userId, role, searchQuery);
 
 export default async function ProjectList({
     searchParams
@@ -18,39 +60,7 @@ export default async function ProjectList({
     const role = session?.user?.role;
     const userId = session?.user?.id;
 
-    let roleWhereCondition: Prisma.ProjectWhereInput = {};
-    if (role === "PM") {
-        roleWhereCondition = { ownerId: userId };
-    } else if (role === "DEV") {
-        roleWhereCondition = { developers: { some: { id: userId } } };
-    }
-
-    const whereCondition: Prisma.ProjectWhereInput = {
-        ...roleWhereCondition,
-    };
-
-    if (searchQuery) {
-        whereCondition.OR = [
-            { code: { contains: searchQuery, mode: 'insensitive' } },
-            { name: { contains: searchQuery, mode: 'insensitive' } },
-            { customer: { contains: searchQuery, mode: 'insensitive' } },
-        ];
-    }
-
-    const projects = await prisma.project.findMany({
-        where: whereCondition,
-        select: {
-            id: true,
-            code: true,
-            name: true,
-            customer: true,
-            stage: true,
-            progress: true,
-            owner: { select: { id: true, name: true } },
-            _count: { select: { developers: true } },
-        },
-        orderBy: { updatedAt: "desc" },
-    });
+    const projects = await getCachedProjectsList(userId, role, searchQuery);
 
     const getStageStyle = (stage: string) => {
         if (stage === 'DONE' || stage === 'Completed') return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';

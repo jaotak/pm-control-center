@@ -304,13 +304,13 @@ export default function ProjectDetailView({
                                     <button
                                         type="button"
                                         onClick={() => handleTabChange("uat")}
-                                        className="p-3.5 rounded-xl bg-slate-50 hover:bg-teal-50/60 border border-slate-200/70 hover:border-teal-200 transition-colors group text-left cursor-pointer"
+                                        className="p-3.5 rounded-xl bg-slate-50 hover:bg-emerald-50/60 border border-slate-200/70 hover:border-emerald-200 transition-colors group text-left cursor-pointer"
                                     >
-                                        <div className="flex items-center justify-between text-slate-400 group-hover:text-teal-600 mb-1">
+                                        <div className="flex items-center justify-between text-slate-400 group-hover:text-emerald-600 mb-1">
                                             <TestTube size={16} />
                                             <span className="text-[11px] font-semibold">UAT</span>
                                         </div>
-                                        <div className="text-xl font-extrabold text-slate-800 group-hover:text-teal-700">
+                                        <div className="text-xl font-extrabold text-slate-800 group-hover:text-emerald-700">
                                             {project.uatCases?.length ?? 0}
                                         </div>
                                     </button>
@@ -410,7 +410,7 @@ export default function ProjectDetailView({
                                                 <td className="px-5 py-3.5"><PriorityBadge priority={req.priority} /></td>
                                                 <td className="px-5 py-3.5"><DueDateBadge dueDate={req.dueDate} /></td>
                                                 <td className="px-5 py-3.5">
-                                                    <RequirementStatusSelect reqId={req.id} initialStatus={req.status} />
+                                                    <RequirementStatusSelect reqId={req.id} initialStatus={req.status} projectId={project.id} />
                                                 </td>
                                                 <td className="px-5 py-3.5">
                                                     <AssigneeSelect
@@ -498,7 +498,7 @@ export default function ProjectDetailView({
                                                 <td className="px-5 py-3.5"><PriorityBadge priority={uat.priority} /></td>
                                                 <td className="px-5 py-3.5"><DueDateBadge dueDate={uat.dueDate} /></td>
                                                 <td className="px-5 py-3.5 text-center">
-                                                    <UATStatusSelect uatId={uat.id} initialStatus={uat.status || 'Pending'} />
+                                                    <UATStatusSelect uatId={uat.id} initialStatus={uat.status || 'Pending'} projectId={project.id} />
                                                 </td>
                                                 <td className="px-5 py-3.5">
                                                     <AssigneeSelect
@@ -600,7 +600,7 @@ export default function ProjectDetailView({
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
                                             {filteredIssues.map((issue) => (
-                                                <tr key={issue.id} className="hover:bg-slate-50/60 transition-colors">
+                                                <tr key={issue.id} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors group">
                                                     <td className="px-5 py-3.5 font-bold text-rose-600">{issue.issueCode}</td>
                                                     <td className="px-5 py-3.5 font-semibold text-slate-800">{issue.title}</td>
                                                     <td className="px-5 py-3.5 text-center">
@@ -615,7 +615,7 @@ export default function ProjectDetailView({
                                                     <td className="px-5 py-3.5"><PriorityBadge priority={issue.priority} /></td>
                                                     <td className="px-5 py-3.5"><DueDateBadge dueDate={issue.dueDate} /></td>
                                                     <td className="px-5 py-3.5 text-center">
-                                                        <IssueStatusSelect issueId={issue.id} initialStatus={issue.status} />
+                                                        <IssueStatusSelect issueId={issue.id} initialStatus={issue.status} projectId={project.id} />
                                                     </td>
                                                     <td className="px-5 py-3.5">
                                                         <AssigneeSelect
@@ -718,7 +718,7 @@ export default function ProjectDetailView({
                                                             <div key={uat.id} className={`flex w-full ${index !== 0 ? 'border-t border-slate-200/80' : ''}`}>
                                                                 <div className="w-1/2 px-4 py-4 border-r border-slate-200/80 hover:bg-slate-50 transition-colors">
                                                                     <div className="flex items-center gap-2 mb-1">
-                                                                        <span className="font-bold text-teal-600 text-xs">{uat.uatCode}</span>
+                                                                        <span className="font-bold text-emerald-600 text-xs">{uat.uatCode}</span>
                                                                         {uat.status === 'Passed' && <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-2xs"></span>}
                                                                         {uat.status === 'Failed' && <span className="w-2 h-2 rounded-full bg-rose-500 shadow-2xs"></span>}
                                                                     </div>

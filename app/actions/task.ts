@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { updateProjectProgress, logActivity } from "./progress";
+import { updateProjectProgress, logActivity } from "@/lib/progress";
 import { getAuthUser, requireProjectAccess } from "@/lib/auth";
 
 // ==========================================

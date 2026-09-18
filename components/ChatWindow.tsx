@@ -2,9 +2,11 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Users, Clock, CheckCheck, Check } from "lucide-react";
+import { ArrowLeft, Users, Clock, CheckCheck, Check, Settings2 } from "lucide-react";
 import { ChatRoomSummary } from "@/app/actions/chat";
 import ChatInput from "./ChatInput";
+import Link from "next/link";
+import GroupSettingsModal from "./GroupSettingsModal";
 
 export interface ChatMessageItem {
     id: string;
@@ -31,6 +33,7 @@ interface ChatWindowProps {
     isLoadingMessages: boolean;
     isAiTyping?: boolean;
     onSendMessage: (body: string, attachment?: { url: string; name: string; type: string; size: number }) => Promise<boolean | void>;
+    onRoomUpdated?: () => void;
     onBack?: () => void;
 }
 
@@ -73,10 +76,12 @@ export default function ChatWindow({
     isLoadingMessages,
     isAiTyping = false,
     onSendMessage,
+    onRoomUpdated,
     onBack,
 }: ChatWindowProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [showMemberDetails, setShowMemberDetails] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
 
     // Auto scroll to bottom when messages or typing state update
     useEffect(() => {
@@ -160,6 +165,17 @@ export default function ChatWindow({
                         </div>
                     </div>
                 </div>
+
+                {/* Group Settings Button */}
+                {room.type === "group" && (
+                    <button
+                        onClick={() => setShowSettingsModal(true)}
+                        className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                        title="ตั้งค่ากลุ่ม"
+                    >
+                        <Settings2 size={20} />
+                    </button>
+                )}
             </header>
 
             {/* Group Members Popover Dropdown */}
@@ -179,23 +195,23 @@ export default function ChatWindow({
                     </div>
                     <div className="max-h-60 overflow-y-auto space-y-1.5 custom-scrollbar">
                         {room.members.map((m) => (
-                            <div key={m.userId} className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60">
-                                {m.user.avatarUrl ? (
-                                    <img src={m.user.avatarUrl} alt={m.user.name} className="w-7 h-7 rounded-full object-cover" />
-                                ) : (
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-[10px]">
-                                        {m.user.name.charAt(0).toUpperCase()}
-                                    </div>
-                                )}
+                            <Link href={`/users/${m.userId}`} key={m.userId} className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 group">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-[10px] overflow-hidden group-hover:ring-2 group-hover:ring-emerald-200 transition-all">
+                                    {m.user.avatarUrl ? (
+                                        <img src={m.user.avatarUrl} alt={m.user.name} className="w-full h-full object-cover bg-white" />
+                                    ) : (
+                                        m.user.name.charAt(0).toUpperCase()
+                                    )}
+                                </div>
                                 <div className="min-w-0 flex-1">
-                                    <div className="text-xs font-semibold text-slate-800 dark:text-white truncate">
+                                    <div className="text-xs font-semibold text-slate-800 dark:text-white truncate group-hover:text-emerald-600 transition-colors">
                                         {m.user.name} {m.userId === currentUserId && "(คุณ)"}
                                     </div>
                                     <div className="text-[10px] text-slate-400 truncate">
                                         {m.user.department || m.user.role}
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>
@@ -232,6 +248,8 @@ export default function ChatWindow({
                         // Determine if message is read by anyone else
                         const isReadBySomeone = otherMembers.some(m => new Date(m.lastReadAt) >= new Date(msg.createdAt));
 
+                        const isSystemMsg = msg.body === "ได้อัปเดตการตั้งค่ากลุ่ม" && !msg.attachmentUrl;
+
                         return (
                             <React.Fragment key={msg.id}>
                                 {showDateHeader && (
@@ -242,31 +260,39 @@ export default function ChatWindow({
                                     </div>
                                 )}
 
+                                {isSystemMsg ? (
+                                    <div className="flex items-center justify-center my-2">
+                                        <span className="px-3 py-1 text-[11px] font-medium text-slate-400 dark:text-slate-500 bg-slate-100/50 dark:bg-slate-800/30 rounded-full flex items-center gap-1.5">
+                                            <span>✏️</span>
+                                            {msg.sender.name} {msg.body}
+                                        </span>
+                                    </div>
+                                ) : (
                                 <div className={`flex gap-2.5 items-end ${isMe ? "justify-end" : "justify-start"}`}>
                                     {/* Sender Avatar for others */}
                                     {!isMe && (
-                                        <div className="shrink-0 mb-1">
-                                            {msg.sender.avatarUrl ? (
-                                                <img
-                                                    src={msg.sender.avatarUrl}
-                                                    alt={msg.sender.name}
-                                                    className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700"
-                                                />
-                                            ) : (
-                                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
-                                                    {msg.sender.name.charAt(0).toUpperCase()}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <Link href={`/users/${msg.sender.id}`} className="shrink-0 mb-1 group">
+                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow-xs overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-emerald-300 transition-all">
+                                                {msg.sender.avatarUrl ? (
+                                                    <img
+                                                        src={msg.sender.avatarUrl}
+                                                        alt={msg.sender.name}
+                                                        className="w-full h-full object-cover bg-white"
+                                                    />
+                                                ) : (
+                                                    msg.sender.name.charAt(0).toUpperCase()
+                                                )}
+                                            </div>
+                                        </Link>
                                     )}
 
                                     {/* Message Bubble + Meta */}
                                     <div className={`max-w-[78%] sm:max-w-[65%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                                         {/* Sender Name for group chats */}
                                         {!isMe && room.type === "group" && (
-                                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1 ml-1">
+                                            <Link href={`/users/${msg.sender.id}`} className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1 ml-1 hover:text-emerald-600 transition-colors">
                                                 {msg.sender.name}
-                                            </span>
+                                            </Link>
                                         )}
 
                                         {/* Attachment */}
@@ -320,6 +346,7 @@ export default function ChatWindow({
                                         </div>
                                     </div>
                                 </div>
+                                )}
                             </React.Fragment>
                         );
                     })
@@ -349,6 +376,17 @@ export default function ChatWindow({
 
             {/* Input Footer */}
             <ChatInput onSend={onSendMessage} roomId={room.id} />
+            {/* Group Settings Modal */}
+            {room && room.type === "group" && (
+                <GroupSettingsModal
+                    isOpen={showSettingsModal}
+                    onClose={() => setShowSettingsModal(false)}
+                    room={room}
+                    onUpdated={() => {
+                        if (onRoomUpdated) onRoomUpdated();
+                    }}
+                />
+            )}
         </section>
     );
 }

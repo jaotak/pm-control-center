@@ -19,16 +19,17 @@ export default async function ApprovalsPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6 pb-12">
             {/* Header */}
-            <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-8 flex items-center gap-4">
-                <Link href="/admin" className="p-2.5 hover:bg-slate-100 rounded-2xl text-slate-500 border border-slate-200/60">
+            <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/40 p-6 md:p-8 flex items-center gap-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <Link href="/admin" className="p-2.5 bg-white hover:bg-slate-50 rounded-full text-slate-500 border border-slate-200/80 shadow-sm relative z-10 hover:shadow">
                     <ArrowLeft size={18} />
                 </Link>
-                <div className="p-3.5 bg-amber-50 text-amber-600 rounded-2xl border border-amber-100/80">
+                <div className="p-3.5 bg-gradient-to-br from-amber-50 to-orange-50 text-amber-600 rounded-2xl border border-amber-100/80 shadow-sm relative z-10">
                     <UserCheck size={26} />
                 </div>
-                <div>
+                <div className="relative z-10">
                     <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Pending Approvals</h1>
-                    <p className="text-xs text-slate-500 mt-1">อนุมัติหรือปฏิเสธผู้ใช้งานใหม่ที่รอการอนุมัติ — {pendingUsers.length} รายการ</p>
+                    <p className="text-sm text-slate-500 mt-1">อนุมัติหรือปฏิเสธผู้ใช้งานใหม่ที่รอการอนุมัติ — <span className="font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md">{pendingUsers.length} รายการ</span></p>
                 </div>
             </div>
 
@@ -43,8 +44,13 @@ export default async function ApprovalsPage() {
                     {pendingUsers.map((user) => (
                         <div key={user.id} className="bg-white border border-slate-200/80 rounded-2xl shadow-xs p-5 flex flex-col sm:flex-row sm:items-center gap-4 hover:shadow-md transition-shadow">
                             {/* Avatar */}
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-lg font-extrabold shrink-0 shadow-md shadow-amber-500/20">
-                                {user.name.charAt(0).toUpperCase()}
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-lg font-extrabold shrink-0 shadow-md shadow-amber-500/20 overflow-hidden">
+                                {user.avatarUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover bg-white" />
+                                ) : (
+                                    user.name.charAt(0).toUpperCase()
+                                )}
                             </div>
 
                             {/* User Info */}

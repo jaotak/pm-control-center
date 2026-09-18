@@ -27,13 +27,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
 
     return (
         <div className="max-w-4xl mx-auto space-y-6 pb-12">
-            <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-8 flex items-center gap-4">
-                <div className="p-3.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/80 shadow-2xs">
+            {/* Header */}
+            <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/40 p-6 md:p-8 flex items-center gap-4 relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="p-3.5 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-600 rounded-2xl border border-emerald-100/80 shadow-sm relative z-10">
                     <SettingsIcon size={28} />
                 </div>
-                <div>
+                <div className="relative z-10">
                     <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">System Settings</h1>
-                    <p className="text-xs text-slate-500 mt-1">จัดการข้อมูลส่วนตัว, รหัสผ่าน และการตั้งค่าระบบ</p>
+                    <p className="text-sm text-slate-500 mt-1">จัดการข้อมูลส่วนตัว, รหัสผ่าน และการตั้งค่าระบบ</p>
                 </div>
             </div>
 

@@ -2,9 +2,9 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { sendNotification } from "./notification";
+import { sendNotification } from "@/lib/notifications";
 import { assertItemBelongsToProject, requireProjectAccess } from "@/lib/auth";
-import { logActivity } from "./progress";
+import { logActivity } from "@/lib/progress";
 
 export async function updateItemAssignee(
     type: 'req' | 'uat' | 'issue' | 'task',

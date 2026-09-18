@@ -24,11 +24,11 @@ export default async function AdminPage() {
     const [stats, adminLogs, adminUsers, pendingApprovals] = await Promise.all([
         getSystemStats(),
         getAdminLogs(30),
-        prisma.user.findMany({ select: { id: true, name: true } }),
+        prisma.user.findMany({ select: { id: true, name: true, avatarUrl: true } }),
         prisma.user.count({ where: { isApproved: false } }),
     ]);
 
-    const userMap = Object.fromEntries(adminUsers.map(u => [u.id, u.name]));
+    const userMap = Object.fromEntries(adminUsers.map(u => [u.id, u]));
 
     const statCards = [
         { label: "Total Projects",      value: stats.totalProjects,  icon: FolderKanban, color: "from-emerald-500 to-green-600", bg: "bg-emerald-50",  text: "text-emerald-700" },
@@ -41,13 +41,15 @@ export default async function AdminPage() {
     return (
         <div className="max-w-6xl mx-auto space-y-7 pb-12">
             {/* Header */}
-            <div className="bg-white border border-slate-200/80 rounded-3xl shadow-xs p-6 md:p-8 flex items-center gap-4">
-                <div className="p-3.5 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100/80">
+            <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/40 p-6 md:p-8 flex items-center gap-4 relative overflow-hidden">
+                {/* Decorative background accent */}
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div className="p-3.5 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-600 rounded-2xl border border-emerald-100/80 shadow-sm relative z-10">
                     <Shield size={28} />
                 </div>
-                <div>
+                <div className="relative z-10">
                     <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">Admin Control Panel</h1>
-                    <p className="text-xs text-slate-500 mt-1">ระบบจัดการผู้ใช้งานและภาพรวมทั้งหมดของระบบ</p>
+                    <p className="text-sm text-slate-500 mt-1">ระบบจัดการผู้ใช้งานและภาพรวมทั้งหมดของระบบ</p>
                 </div>
             </div>
 
@@ -130,15 +132,20 @@ export default async function AdminPage() {
                             const badge = ACTION_LABELS[log.action] ?? { label: log.action, color: "bg-slate-100 text-slate-600" };
                             return (
                                 <div key={log.id} className="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-slate-50 transition-colors border border-slate-100">
-                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-emerald-600 flex items-center justify-center text-[9px] font-extrabold text-white shrink-0 mt-0.5">
-                                        {(userMap[log.adminId] ?? "?").charAt(0).toUpperCase()}
+                                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-rose-500 to-emerald-600 flex items-center justify-center text-[9px] font-extrabold text-white shrink-0 mt-0.5 overflow-hidden">
+                                        {userMap[log.adminId]?.avatarUrl ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={userMap[log.adminId].avatarUrl!} alt="Avatar" className="w-full h-full object-cover bg-white" />
+                                        ) : (
+                                            (userMap[log.adminId]?.name ?? "?").charAt(0).toUpperCase()
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="text-xs font-bold text-slate-700">{userMap[log.adminId] ?? log.adminId}</span>
+                                            <span className="text-xs font-bold text-slate-700">{userMap[log.adminId]?.name ?? log.adminId}</span>
                                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badge.color}`}>{badge.label}</span>
                                             {log.targetId && (
-                                                <span className="text-[10px] text-slate-400">→ {userMap[log.targetId] ?? log.targetId}</span>
+                                                <span className="text-[10px] text-slate-400">→ {userMap[log.targetId]?.name ?? log.targetId}</span>
                                             )}
                                         </div>
                                         {log.metadata && (

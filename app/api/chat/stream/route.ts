@@ -112,6 +112,8 @@ export async function GET(req: NextRequest) {
                 }
             };
 
+            let consecutiveErrors = 0;
+
             // Lightweight delta poll: only runs 1 indexed query when idle
             const deltaPoll = async () => {
                 if (isClosed) return;
@@ -186,7 +188,22 @@ export async function GET(req: NextRequest) {
                     } else {
                         sendPing();
                     }
-                } catch {
+                    // Reset error counter on success
+                    consecutiveErrors = 0;
+                } catch (err: any) {
+                    consecutiveErrors++;
+                    
+                    // If we get multiple consecutive errors (likely DB connection dropped), close stream to force client reconnect
+                    if (consecutiveErrors >= 3) {
+                        isClosed = true;
+                        try {
+                            controller.close();
+                        } catch {
+                            // already closed
+                        }
+                        return;
+                    }
+
                     // Transient DB read error, send ping
                     sendPing();
                 }

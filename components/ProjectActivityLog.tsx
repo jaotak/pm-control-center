@@ -1,10 +1,11 @@
 import { History, UserCircle2, ChevronDown } from "lucide-react";
+import Link from "next/link";
 
 type Log = {
     id: string;
     action: string;
     createdAt: Date;
-    user: { name: string; avatarUrl?: string | null; };
+    user: { id: string; name: string; avatarUrl?: string | null; };
 };
 
 export default function ProjectActivityLog({ logs }: { logs: Log[] }) {
@@ -33,20 +34,22 @@ export default function ProjectActivityLog({ logs }: { logs: Log[] }) {
                         <details key={userName} className="group border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                             <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors font-bold text-gray-800 list-none select-none [&::-webkit-details-marker]:hidden">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0 overflow-hidden border border-green-200">
-                                        {userLogs[0].user.avatarUrl ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img src={userLogs[0].user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <UserCircle2 size={20} />
-                                        )}
-                                    </div>
-                                    <div>
-                                        {userName} 
-                                        <span className="text-xs text-gray-500 font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
-                                            {userLogs.length} รายการ
-                                        </span>
-                                    </div>
+                                    <Link href={`/users/${userLogs[0].user.id}`} className="flex items-center gap-3 group">
+                                        <div className="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0 overflow-hidden border border-green-200 group-hover:ring-2 group-hover:ring-green-400 transition-all">
+                                            {userLogs[0].user.avatarUrl ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img src={userLogs[0].user.avatarUrl} alt="Avatar" className="w-full h-full object-cover bg-white" />
+                                            ) : (
+                                                <UserCircle2 size={20} />
+                                            )}
+                                        </div>
+                                        <div className="group-hover:text-green-600 transition-colors">
+                                            {userName} 
+                                            <span className="text-xs text-gray-500 group-hover:text-green-500 font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded-full border border-gray-200">
+                                                {userLogs.length} รายการ
+                                            </span>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="text-gray-400 group-open:rotate-180 transition-transform duration-300">
                                     <ChevronDown size={20} />

@@ -62,6 +62,7 @@ export async function getChatUsers() {
             orderBy: { name: "asc" },
         });
 
+        console.log("getChatUsers returning", users.length, "users");
         return { users };
     } catch (error) {
         console.error("Error fetching chat users:", error);
@@ -543,4 +544,124 @@ export async function deleteChatRoom(chatRoomId: string) {
         console.error("Error deleting chat room:", error);
         return { error: "Failed to delete chat room" };
     }
+}
+
+export async function leaveChatRoom(chatRoomId: string) {
+    const authUser = await getAuthUser();
+    if (!authUser) return { error: "Unauthorized" };
+
+    const membership = await prisma.chatMember.findUnique({
+        where: { chatRoomId_userId: { chatRoomId, userId: authUser.id } },
+        select: { id: true, chatRoom: { select: { type: true, _count: { select: { members: true } } } } },
+    });
+    if (!membership) return { error: "You are not a member of this chat room" };
+
+    if (membership.chatRoom._count.members <= 1 || membership.chatRoom.type === "direct") {
+        await prisma.chatRoom.delete({ where: { id: chatRoomId } });
+        return { success: true, deleted: true };
+    }
+
+    await prisma.chatMember.delete({ where: { id: membership.id } });
+    return { success: true, deleted: false };
+}
+
+export async function addChatMembers(chatRoomId: string, memberIds: string[]) {
+    const authUser = await getAuthUser();
+    if (!authUser) return { error: "Unauthorized" };
+
+    const membership = await prisma.chatMember.findUnique({
+        where: { chatRoomId_userId: { chatRoomId, userId: authUser.id } },
+        select: { chatRoom: { select: { type: true } } },
+    });
+    if (!membership) return { error: "You are not a member of this chat room" };
+    if (membership.chatRoom.type !== "group") return { error: "Can only add members to group chats" };
+
+    const uniqueIds = [...new Set(memberIds.filter((id) => id && id !== authUser.id))];
+    if (uniqueIds.length === 0) return { error: "No members to add" };
+
+    await prisma.chatMember.createMany({
+        data: uniqueIds.map((userId) => ({ chatRoomId, userId })),
+        skipDuplicates: true,
+    });
+
+    return { success: true };
+}
+
+export async function deleteChatMessage(messageId: string) {
+    const authUser = await getAuthUser();
+    if (!authUser) return { error: "Unauthorized" };
+
+    const message = await prisma.chatMessage.findUnique({
+        where: { id: messageId },
+        select: { id: true, senderId: true, chatRoomId: true },
+    });
+    if (!message) return { error: "Message not found" };
+    if (message.senderId !== authUser.id && authUser.role !== "ADMIN") {
+        return { error: "Forbidden" };
+    }
+
+    const membership = await prisma.chatMember.findUnique({
+        where: { chatRoomId_userId: { chatRoomId: message.chatRoomId, userId: authUser.id } },
+        select: { id: true },
+    });
+    if (!membership) return { error: "Forbidden" };
+
+    await prisma.chatMessage.delete({ where: { id: messageId } });
+    return { success: true };
+}
+
+export async function updateGroupChat(chatRoomId: string, name: string, memberIds: string[]) {
+    const authUser = await getAuthUser();
+    if (!authUser) return { error: "Unauthorized" };
+
+    const membership = await prisma.chatMember.findUnique({
+        where: { chatRoomId_userId: { chatRoomId, userId: authUser.id } },
+        select: { chatRoom: { select: { type: true } } },
+    });
+    if (!membership) return { error: "You are not a member of this chat room" };
+    if (membership.chatRoom.type !== "group") return { error: "Can only update group chats" };
+
+    // Clean member IDs (ensure the current user is always included)
+    const uniqueIds = [...new Set([...memberIds.filter((id) => id), authUser.id])];
+    
+    // Update name
+    await prisma.chatRoom.update({
+        where: { id: chatRoomId },
+        data: { name: name.trim() || null },
+    });
+
+    // Get current members
+    const currentMembers = await prisma.chatMember.findMany({
+        where: { chatRoomId },
+        select: { userId: true, id: true },
+    });
+    const currentMemberIds = currentMembers.map(m => m.userId);
+
+    // Find who to add and who to remove
+    const toAdd = uniqueIds.filter(id => !currentMemberIds.includes(id));
+    const toRemove = currentMemberIds.filter(id => !uniqueIds.includes(id));
+
+    if (toAdd.length > 0) {
+        await prisma.chatMember.createMany({
+            data: toAdd.map(userId => ({ chatRoomId, userId })),
+            skipDuplicates: true,
+        });
+    }
+
+    if (toRemove.length > 0) {
+        await prisma.chatMember.deleteMany({
+            where: { chatRoomId, userId: { in: toRemove } },
+        });
+    }
+
+    // Insert a system message to indicate update
+    await prisma.chatMessage.create({
+        data: {
+            chatRoomId,
+            senderId: authUser.id,
+            body: `ได้อัปเดตการตั้งค่ากลุ่ม`,
+        },
+    });
+
+    return { success: true };
 }

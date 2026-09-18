@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { KeyRound, UserX, UserCheck, Plus, X, Save } from "lucide-react";
 import { updateUserRole, toggleUserActive, adminResetPassword, adminCreateUser } from "@/app/actions/admin";
+import Link from "next/link";
 
 type User = {
     id: string;
@@ -11,6 +12,7 @@ type User = {
     role: string;
     isActive: boolean;
     createdAt: Date;
+    avatarUrl: string | null;
     _count: { projectsOwned: number; projectsAssigned: number };
 };
 
@@ -22,8 +24,14 @@ const roleColors: Record<string, string> = {
     DEV: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
-export default function UsersTable({ users: initial }: { users: User[] }) {
-    const [users, setUsers] = useState(initial);
+export default function UsersTable({ users: initialUsers }: { users: User[] }) {
+    const [users, setUsers] = useState(initialUsers);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setUsers(initialUsers);
+    }, [initialUsers]);
+
     const [isPending, startTransition] = useTransition();
     const [resetTarget, setResetTarget] = useState<string | null>(null);
     const [newPassword, setNewPassword] = useState("");
@@ -38,16 +46,27 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
 
     const handleRoleChange = (userId: string, role: string) => {
         startTransition(async () => {
-            await updateUserRole(userId, role);
+            const originalUsers = [...users];
             setUsers(u => u.map(x => x.id === userId ? { ...x, role } : x));
-            showFeedback("Role updated");
+            const res = await updateUserRole(userId, role);
+            if (res.error) {
+                setUsers(originalUsers);
+                showFeedback(res.error);
+            } else {
+                showFeedback("Role updated");
+            }
         });
     };
 
     const handleToggleActive = (userId: string, isActive: boolean) => {
         startTransition(async () => {
-            await toggleUserActive(userId, !isActive);
+            const originalUsers = [...users];
             setUsers(u => u.map(x => x.id === userId ? { ...x, isActive: !isActive } : x));
+            const res = await toggleUserActive(userId, !isActive);
+            if (res.error) {
+                setUsers(originalUsers);
+                showFeedback(res.error);
+            }
         });
     };
 
@@ -106,15 +125,20 @@ export default function UsersTable({ users: initial }: { users: User[] }) {
                         {users.map(u => (
                             <tr key={u.id} className={`hover:bg-slate-50/60 transition-colors ${!u.isActive ? "opacity-50" : ""}`}>
                                 <td className="px-5 py-4">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0">
-                                            {u.name.charAt(0).toUpperCase()}
+                                    <Link href={`/users/${u.id}`} className="flex items-center gap-3 group">
+                                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white font-extrabold text-xs shrink-0 overflow-hidden ring-2 ring-transparent group-hover:ring-emerald-200 transition-all">
+                                            {u.avatarUrl ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img src={u.avatarUrl} alt={u.name} className="w-full h-full object-cover bg-white" />
+                                            ) : (
+                                                u.name.charAt(0).toUpperCase()
+                                            )}
                                         </div>
                                         <div>
-                                            <div className="font-bold text-slate-800 text-sm">{u.name}</div>
+                                            <div className="font-bold text-slate-800 text-sm group-hover:text-emerald-600 transition-colors">{u.name}</div>
                                             <div className="text-xs text-slate-500">{u.email}</div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </td>
                                 <td className="px-5 py-4">
                                     <select

@@ -76,7 +76,7 @@ export default function Topbar() {
                         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-600 to-green-600 flex items-center justify-center text-white font-bold text-xs shadow-md shadow-emerald-500/20 ring-2 ring-white overflow-hidden">
                             {session?.user?.avatarUrl ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={session?.user?.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+                                <img src={session?.user?.avatarUrl} alt="Profile" className="w-full h-full object-cover bg-white" />
                             ) : (
                                 initial
                             )}

@@ -62,3 +62,9 @@ export async function requireProjectAccess(projectId: string, access: ProjectAcc
 export function assertItemBelongsToProject(itemProjectId: string | null, projectId: string) {
     if (itemProjectId !== projectId) throw new Error("Item does not belong to this project");
 }
+
+/** Developers may mutate only items assigned to them; PMs and admins may mutate any item on the project. */
+export function assertAssigneeOrManager(user: AuthUser, assigneeId: string | null) {
+    if (user.role === "ADMIN" || user.role === "PM") return;
+    if (assigneeId !== user.id) throw new Error("Forbidden");
+}

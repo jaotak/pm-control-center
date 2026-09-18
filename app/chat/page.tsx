@@ -352,6 +352,7 @@ export default function ChatPage() {
                     isLoadingMessages={isLoadingMessages}
                     isAiTyping={isAiTyping}
                     onSendMessage={handleSendMessage}
+                    onRoomUpdated={fetchRooms}
                     onBack={() => setMobileView("sidebar")}
                 />
             </div>

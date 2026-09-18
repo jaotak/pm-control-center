@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { assertItemBelongsToProject, getAuthUser, requireProjectAccess } from "@/lib/auth";
-import { updateProjectProgress, logActivity } from "./progress";
+import { updateProjectProgress, logActivity } from "@/lib/progress";
 
 // ============================================
 // Soft-delete: sets deletedAt instead of removing

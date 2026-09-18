@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { prisma } from './prisma';
+import { createIssueRecord, createTaskRecord } from './items';
 
 
 export async function processAIChatMessage(messageId: string) {
@@ -163,27 +164,26 @@ ${projectContext || "ไม่มีโปรเจกต์"}
             for (const call of functionCalls) {
                 const args = call.args as { title: string, severity?: string, projectId: string, estimatedHours?: number };
                 
+                if (!uniqueProjects.some((p) => p.id === args.projectId)) {
+                    replyMessage += `- ไม่สามารถสร้างในโปรเจกต์นี้ได้ (ไม่มีสิทธิ์หรือไม่พบโปรเจกต์)\n`;
+                    continue;
+                }
+
                 if (call.name === 'create_issue') {
-                    const issueCode = `AI-ISSUE-${Math.floor(1000 + Math.random() * 9000)}`;
-                    const issue = await prisma.issue.create({
-                        data: {
-                            issueCode,
-                            title: args.title,
-                            severity: args.severity || "Medium",
-                            projectId: args.projectId,
-                            status: "Open"
-                        }
+                    const issue = await createIssueRecord({
+                        projectId: args.projectId,
+                        title: args.title,
+                        severity: args.severity || "Medium",
+                        actorUserId: userId,
                     });
                     replyMessage += `- สร้าง Issue ${issue.issueCode} (${args.severity || 'Medium'}): ${args.title}\n`;
                 } 
                 else if (call.name === 'create_task') {
-                    await prisma.task.create({
-                        data: {
-                            title: args.title,
-                            estimatedHours: args.estimatedHours || 0,
-                            projectId: args.projectId,
-                            isCompleted: false
-                        }
+                    await createTaskRecord({
+                        projectId: args.projectId,
+                        title: args.title,
+                        estimatedHours: args.estimatedHours || 0,
+                        actorUserId: userId,
                     });
                     replyMessage += `- สร้าง Task: ${args.title}\n`;
                 }

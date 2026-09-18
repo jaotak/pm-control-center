@@ -1,14 +1,16 @@
 "use client"; // ต้องเป็น Client Component เพื่อรับ Event onChange
 
 import { useState, useTransition } from "react";
-import { updateIssueStatus } from "@/app/actions/issue";
+import { updateIssueStatus } from "@/app/actions/update";
 
 export default function IssueStatusSelect({
     issueId,
     initialStatus,
+    projectId,
 }: {
     issueId: string;
     initialStatus: string;
+    projectId: string;
 }) {
     const [status, setStatus] = useState(initialStatus);
     const [isPending, startTransition] = useTransition();
@@ -19,7 +21,7 @@ export default function IssueStatusSelect({
 
         // แอบส่งข้อมูลไปอัปเดต Database เบื้องหลัง
         startTransition(async () => {
-            const res = await updateIssueStatus(issueId, newStatus, "");
+            const res = await updateIssueStatus(issueId, newStatus, projectId);
             if (res?.error) {
                 alert(res.error);
                 setStatus(status); // revert

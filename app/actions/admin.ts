@@ -25,6 +25,7 @@ export async function getAllUsers() {
             role: true,
             isActive: true,
             createdAt: true,
+            avatarUrl: true,
             _count: {
                 select: { projectsOwned: true, projectsAssigned: true }
             }
@@ -36,6 +37,8 @@ export async function updateUserRole(userId: string, role: string) {
     const caller = await getAuthUser();
     if (!caller || caller.role !== "ADMIN") return { error: "Unauthorized" };
 
+    if (caller.id === userId) return { error: "Cannot change your own role" };
+
     await prisma.user.update({ where: { id: userId }, data: { role } });
     await writeAdminLog(caller.id, "ROLE_CHANGE", userId, `Changed role to ${role}`);
     revalidatePath("/admin/users");
@@ -45,6 +48,8 @@ export async function updateUserRole(userId: string, role: string) {
 export async function toggleUserActive(userId: string, isActive: boolean) {
     const caller = await getAuthUser();
     if (!caller || caller.role !== "ADMIN") return { error: "Unauthorized" };
+
+    if (caller.id === userId) return { error: "Cannot deactivate yourself" };
 
     await prisma.user.update({ where: { id: userId }, data: { isActive } });
     await writeAdminLog(caller.id, "TOGGLE_ACTIVE", userId, `Set isActive=${isActive}`);

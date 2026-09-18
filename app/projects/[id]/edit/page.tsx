@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect, notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, FolderPen, Building2, Hash } from "lucide-react";
 
 export default async function EditProjectPage({
     params
@@ -42,40 +42,111 @@ export default async function EditProjectPage({
     }
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6">
-            <div className="flex items-center gap-4">
-                <Link href={`/projects/${id}`} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-600">
+        <div className="max-w-3xl mx-auto py-8 space-y-8">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-2">
+                <Link
+                    href={`/projects/${id}`}
+                    className="p-2.5 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-full transition-all text-slate-500 hover:text-slate-700 shadow-sm"
+                >
                     <ArrowLeft size={20} />
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-800">แก้ไขโครงการ</h1>
+                <div>
+                    <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+                        <FolderPen className="text-emerald-600" size={28} />
+                        แก้ไขโครงการ
+                    </h1>
+                    <p className="text-sm text-slate-500 mt-1">อัปเดตรายละเอียดของโครงการ <span className="font-semibold text-slate-700">{project.name}</span></p>
+                </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 md:p-8">
-                <form action={updateProject} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">รหัสโครงการ</label>
-                            <input type="text" name="code" defaultValue={project.code} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+            {/* Form Card */}
+            <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/40 p-6 md:p-8 relative overflow-hidden">
+                {/* Decorative background accent */}
+                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <form action={updateProject} className="space-y-7 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-7">
+                        {/* Project Code */}
+                        <div className="space-y-2 group">
+                            <label htmlFor="code" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                รหัสโครงการ <span className="text-rose-500">*</span>
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Hash size={18} className="text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                                </div>
+                                <input
+                                    type="text"
+                                    id="code"
+                                    name="code"
+                                    defaultValue={project.code}
+                                    placeholder="เช่น PRJ-002"
+                                    required
+                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-slate-700 font-medium"
+                                />
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700">ชื่อลูกค้า</label>
-                            <input type="text" name="customer" defaultValue={project.customer} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+
+                        {/* Customer */}
+                        <div className="space-y-2 group">
+                            <label htmlFor="customer" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                ชื่อลูกค้า / ผู้มีส่วนได้ส่วนเสีย <span className="text-rose-500">*</span>
+                            </label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <Building2 size={18} className="text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                                </div>
+                                <input
+                                    type="text"
+                                    id="customer"
+                                    name="customer"
+                                    defaultValue={project.customer}
+                                    placeholder="เช่น บริษัท ABC จำกัด"
+                                    required
+                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-slate-700 font-medium"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">ชื่อโครงการ</label>
-                        <input type="text" name="name" defaultValue={project.name} required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                    {/* Project Name */}
+                    <div className="space-y-2 group">
+                        <label htmlFor="name" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            ชื่อโครงการ <span className="text-rose-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FolderPen size={18} className="text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+                            </div>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                defaultValue={project.name}
+                                placeholder="เช่น ระบบ E-Commerce สำหรับค้าปลีก"
+                                required
+                                className="w-full pl-10 pr-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-slate-700 font-medium"
+                            />
+                        </div>
                     </div>
 
+                    <hr className="border-slate-100" />
 
-
-                    <hr className="border-gray-100" />
-
-                    <div className="flex justify-end gap-3 pt-2">
-                        <Link href={`/projects/${id}`} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">ยกเลิก</Link>
-                        <button type="submit" className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
-                            <Save size={18} /> บันทึกการเปลี่ยนแปลง
+                    {/* Submit Button */}
+                    <div className="flex justify-end gap-3 pt-4">
+                        <Link
+                            href={`/projects/${id}`}
+                            className="px-6 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm hover:shadow"
+                        >
+                            ยกเลิก
+                        </Link>
+                        <button
+                            type="submit"
+                            className="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-green-600 rounded-xl hover:from-emerald-700 hover:to-green-700 focus:ring-4 focus:ring-emerald-500/30 transition-all shadow-md shadow-emerald-500/20 hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                            <Save size={18} />
+                            บันทึกการเปลี่ยนแปลง
                         </button>
                     </div>
                 </form>

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { updateRequirementStatus } from "@/app/actions/requirement";
+import { updateRequirementStatus } from "@/app/actions/update";
 
-export default function RequirementStatusSelect({ reqId, initialStatus }: { reqId: string, initialStatus: string }) {
+export default function RequirementStatusSelect({ reqId, initialStatus, projectId }: { reqId: string, initialStatus: string, projectId: string }) {
     const [status, setStatus] = useState(initialStatus);
     const [isPending, startTransition] = useTransition();
 
@@ -11,7 +11,7 @@ export default function RequirementStatusSelect({ reqId, initialStatus }: { reqI
         const newStatus = e.target.value;
         setStatus(newStatus);
         startTransition(async () => {
-            const res = await updateRequirementStatus(reqId, newStatus);
+            const res = await updateRequirementStatus(reqId, newStatus, projectId);
             if (res?.error) {
                 alert(res.error);
                 setStatus(status); // revert to old status

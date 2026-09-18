@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getAuthUser } from "@/lib/auth";
-import { logActivity } from "./progress";
+import { logActivity } from "@/lib/progress";
 
 type ItemType = "req" | "uat" | "issue" | "task";
 

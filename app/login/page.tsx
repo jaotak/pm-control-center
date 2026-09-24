@@ -19,24 +19,29 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
 
-        const result = await signIn("credentials", {
-            username,
-            password,
-            redirect: false,
-        });
+        try {
+            const result = await signIn("credentials", {
+                username,
+                password,
+                redirect: false,
+            });
 
-        if (result?.error) {
-            // Parse specific error types from the auth callback
-            if (result.error.includes("PENDING_APPROVAL")) {
-                setError("บัญชีของคุณยังรอการอนุมัติจากผู้ดูแลระบบ กรุณารอสักครู่");
-            } else if (result.error.includes("ACCOUNT_DEACTIVATED")) {
-                setError("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
+            if (result?.error) {
+                // Parse specific error types from the auth callback
+                if (result.error.includes("PENDING_APPROVAL")) {
+                    setError("บัญชีของคุณยังรอการอนุมัติจากผู้ดูแลระบบ กรุณารอสักครู่");
+                } else if (result.error.includes("ACCOUNT_DEACTIVATED")) {
+                    setError("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
+                } else {
+                    setError("ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง");
+                }
+                setIsLoading(false);
             } else {
-                setError("ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง");
+                router.push("/");
             }
+        } catch {
+            setError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง");
             setIsLoading(false);
-        } else {
-            router.push("/");
         }
     };
 

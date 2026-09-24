@@ -44,7 +44,7 @@ function Sidebar() {
 
     // Fast local route response: zero chat badge immediately when entering /chat without network latency
     useEffect(() => {
-        if (pathname === '/chat') {
+        if (pathname.startsWith('/chat')) {
             clearChatUnreadCount();
         }
     }, [pathname]);

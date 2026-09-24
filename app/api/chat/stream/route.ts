@@ -190,7 +190,7 @@ export async function GET(req: NextRequest) {
                     }
                     // Reset error counter on success
                     consecutiveErrors = 0;
-                } catch (err: any) {
+                } catch {
                     consecutiveErrors++;
                     
                     // If we get multiple consecutive errors (likely DB connection dropped), close stream to force client reconnect

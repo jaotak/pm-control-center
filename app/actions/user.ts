@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { getAuthUser } from "@/lib/auth";
 
 export async function updateProfile(name: string, email: string, department?: string, phone?: string) {
@@ -42,13 +42,7 @@ export async function changePassword(currentPassword: string, newPassword: strin
     if (!user) throw new Error("User not found");
 
     // Verify current password
-    let isCurrentValid = false;
-    if (user.password.startsWith("$2a$") || user.password.startsWith("$2b$")) {
-        isCurrentValid = await bcrypt.compare(currentPassword, user.password);
-    } else {
-        // Legacy plaintext comparison
-        isCurrentValid = user.password === currentPassword;
-    }
+    const isCurrentValid = await bcrypt.compare(currentPassword, user.password);
 
     if (!isCurrentValid) {
         return { error: "รหัสผ่านปัจจุบันไม่ถูกต้อง" };

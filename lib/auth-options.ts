@@ -1,6 +1,6 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
@@ -21,10 +21,7 @@ export const authOptions: NextAuthOptions = {
                 if (!user.isActive) throw new Error("ACCOUNT_DEACTIVATED");
                 if (!user.isApproved) throw new Error("PENDING_APPROVAL");
 
-                // Retain legacy login support until old plaintext passwords are migrated.
-                const valid = user.password.startsWith("$2a$") || user.password.startsWith("$2b$")
-                    ? await bcrypt.compare(credentials.password, user.password)
-                    : user.password === credentials.password;
+                const valid = await bcrypt.compare(credentials.password, user.password);
                 if (!valid) return null;
 
                 return {

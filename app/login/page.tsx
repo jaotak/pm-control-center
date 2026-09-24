@@ -2,17 +2,16 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { FolderKanban, Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function LoginPage() {
-    const router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [loginSuccess, setLoginSuccess] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,7 +36,12 @@ export default function LoginPage() {
                 }
                 setIsLoading(false);
             } else {
-                router.push("/");
+                setLoginSuccess(true);
+                // Use window.location.replace to bypass Next.js App Router client-side cache
+                // which caches stale unauthenticated 307 redirects to /login
+                const searchParams = new URLSearchParams(window.location.search);
+                const callbackUrl = searchParams.get("callbackUrl") || "/";
+                window.location.replace(callbackUrl);
             }
         } catch {
             setError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง");
@@ -119,8 +123,10 @@ export default function LoginPage() {
                         disabled={isLoading}
                         className="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                        {isLoading ? (
+                        {isLoading && !loginSuccess ? (
                             <><Loader2 size={16} className="animate-spin" /> กำลังตรวจสอบ...</>
+                        ) : loginSuccess ? (
+                            <><Loader2 size={16} className="animate-spin" /> กำลังเข้าสู่ระบบ...</>
                         ) : (
                             <>เข้าสู่ระบบ <ArrowRight size={16} /></>
                         )}

@@ -5,8 +5,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import ProjectDetailView from "@/components/ProjectDetailView";
 
-import { unstable_cache } from "next/cache";
-
 const USER_SELECT = {
     id: true,
     name: true,
@@ -15,65 +13,56 @@ const USER_SELECT = {
     avatarUrl: true,
 } as const;
 
-const getCachedProject = (id: string) => 
-    unstable_cache(
-        async (projectId: string) => {
-            return prisma.project.findUnique({
-                where: { id: projectId },
+async function getProject(projectId: string) {
+    return prisma.project.findUnique({
+        where: { id: projectId },
+        include: {
+            owner: { select: USER_SELECT },
+            developers: { select: USER_SELECT },
+            milestones: true,
+            requirements: {
+                where: { deletedAt: null },
+                orderBy: { reqCode: 'asc' },
                 include: {
-                    owner: { select: USER_SELECT },
-                    developers: { select: USER_SELECT },
-                    milestones: true,
-                    requirements: {
-                        where: { deletedAt: null },
-                        orderBy: { reqCode: 'asc' },
-                        include: {
-                            uatCases: {
-                                where: { deletedAt: null },
-                                include: { issues: { where: { deletedAt: null } } }
-                            },
-                            assignee: { select: USER_SELECT }
-                        }
-                    },
                     uatCases: {
                         where: { deletedAt: null },
-                        orderBy: { uatCode: 'asc' },
-                        include: { assignee: { select: USER_SELECT } }
+                        include: { issues: { where: { deletedAt: null } } }
                     },
-                    issues: {
-                        where: { deletedAt: null },
-                        orderBy: { issueCode: 'asc' },
-                        include: { assignee: { select: USER_SELECT } }
-                    },
-                    tasks: {
-                        where: { deletedAt: null },
-                        orderBy: { createdAt: 'desc' },
-                        include: { assignee: { select: USER_SELECT } }
-                    },
-                    activityLogs: {
-                        where: { isHidden: false },
-                        orderBy: { createdAt: 'desc' },
-                        take: 25,
-                        include: { user: { select: USER_SELECT } }
-                    },
+                    assignee: { select: USER_SELECT }
                 }
-            });
-        },
-        [`project-${id}`],
-        { tags: [`/projects/${id}`], revalidate: 3600 }
-    )(id);
+            },
+            uatCases: {
+                where: { deletedAt: null },
+                orderBy: { uatCode: 'asc' },
+                include: { assignee: { select: USER_SELECT } }
+            },
+            issues: {
+                where: { deletedAt: null },
+                orderBy: { issueCode: 'asc' },
+                include: { assignee: { select: USER_SELECT } }
+            },
+            tasks: {
+                where: { deletedAt: null },
+                orderBy: { createdAt: 'desc' },
+                include: { assignee: { select: USER_SELECT } }
+            },
+            activityLogs: {
+                where: { isHidden: false },
+                orderBy: { createdAt: 'desc' },
+                take: 25,
+                include: { user: { select: USER_SELECT } }
+            },
+        }
+    });
+}
 
-const getCachedAllUsers = unstable_cache(
-    async () => {
-        return prisma.user.findMany({
-            where: { isActive: true, isApproved: true },
-            select: { id: true, name: true, email: true, role: true },
-            orderBy: { name: 'asc' }
-        });
-    },
-    ['all-users'],
-    { tags: ['users'], revalidate: 3600 }
-);
+async function getAllUsers() {
+    return prisma.user.findMany({
+        where: { isActive: true, isApproved: true },
+        select: { id: true, name: true, email: true, role: true },
+        orderBy: { name: 'asc' }
+    });
+}
 
 export default async function ProjectDetailPage({
     params,
@@ -89,8 +78,8 @@ export default async function ProjectDetailPage({
 
     // Single parallel query for project + allUsers + session (zero redundant roundtrips)
     const [project, allUsers, session] = await Promise.all([
-        getCachedProject(id),
-        getCachedAllUsers(),
+        getProject(id),
+        getAllUsers(),
         getServerSession(authOptions)
     ]);
 

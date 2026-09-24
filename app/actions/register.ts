@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 type RegisterInput = {
     name: string;
@@ -22,7 +22,7 @@ export async function registerUser(data: RegisterInput) {
 
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email) && email.length < 3) {
+    if (!emailRegex.test(email) || email.length < 3) {
         return { error: "รูปแบบอีเมล/username ไม่ถูกต้อง" };
     }
 

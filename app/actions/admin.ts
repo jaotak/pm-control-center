@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getAuthUser } from "@/lib/auth";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { prisma as db } from "@/lib/prisma";
 
 async function writeAdminLog(adminId: string, action: string, targetId?: string, detail?: string) {

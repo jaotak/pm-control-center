@@ -5,20 +5,28 @@ import { getToken } from "next-auth/jwt";
 export async function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // Allow public routes without authentication
-    const isPublicRoute =
-        pathname.startsWith("/login") ||
-        pathname.startsWith("/register") ||
+    // Fast path: bypass static assets and internal NextAuth APIs
+    if (
         pathname.startsWith("/api/auth") ||
         pathname.startsWith("/_next") ||
         pathname.startsWith("/uploads") ||
-        pathname === "/favicon.ico";
-
-    if (isPublicRoute) {
+        pathname === "/favicon.ico"
+    ) {
         return NextResponse.next();
     }
 
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register");
+
+    // If already logged in, redirect away from login/register to dashboard
+    if (token && isAuthRoute) {
+        return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    // Allow unauthenticated visitors to view login and register
+    if (isAuthRoute) {
+        return NextResponse.next();
+    }
 
     // Redirect unauthenticated users to login
     if (!token) {

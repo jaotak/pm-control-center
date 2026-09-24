@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
             let tickCount = 0;
 
             const send = (data: object) => {
-                if (isClosed) return;
+                if (isClosed || req.signal.aborted) return;
                 try {
                     controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
                 } catch {
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
             };
 
             const sendPing = () => {
-                if (isClosed) return;
+                if (isClosed || req.signal.aborted) return;
                 try {
                     controller.enqueue(encoder.encode(`: ping\n\n`));
                 } catch {
@@ -214,16 +214,17 @@ export async function GET(req: NextRequest) {
             // Poll every 2.5 seconds with lightweight query
             const interval = setInterval(deltaPoll, 2500);
 
-            // Cleanup when client disconnects
-            req.signal.addEventListener("abort", () => {
+            // Cleanup when client disconnects or aborts
+            const cleanup = () => {
+                if (isClosed) return;
                 isClosed = true;
                 clearInterval(interval);
-                try {
-                    controller.close();
-                } catch {
-                    // already closed
-                }
-            });
+            };
+
+            req.signal.addEventListener("abort", cleanup, { once: true });
+        },
+        cancel() {
+            // Called by the stream consumer when closed/cancelled
         },
     });
 

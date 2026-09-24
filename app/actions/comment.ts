@@ -88,7 +88,7 @@ export async function editComment(commentId: string, body: string, projectId: st
         include: { author: { select: { id: true, name: true } } },
     });
 
-    await notifyMentionedUsers(body, projectId, user.id, "คอมเมนต์");
+    await notifyMentionedUsers(body, projectId, user.id, "คอมเมนท์");
     revalidatePath(`/projects/${projectId}`);
     return { comment: updated };
 }

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { logActivity, updateProjectProgress } from "@/lib/progress";
 import { uploadFile } from "./upload";
 import { requireProjectAccess } from "@/lib/auth";
@@ -44,6 +45,7 @@ export async function createUATCase(formData: FormData) {
 
     await logActivity(projectId, user.id, `สร้าง UAT Case ใหม่ [${uatCode}]: "${title}"`);
     await updateProjectProgress(projectId);
+    revalidatePath(`/projects/${projectId}`);
     redirect(`/projects/${projectId}?tab=uat`);
 }
 
@@ -69,6 +71,7 @@ export async function createRequirement(formData: FormData) {
 
     await logActivity(projectId, user.id, `สร้าง Requirement ใหม่ [${reqCode}]: "${title}"`);
     await updateProjectProgress(projectId);
+    revalidatePath(`/projects/${projectId}`);
     redirect(`/projects/${projectId}?tab=requirements`);
 }
 
@@ -97,5 +100,6 @@ export async function createIssue(formData: FormData) {
         actorUserId: user.id,
     });
 
+    revalidatePath(`/projects/${projectId}`);
     redirect(`/projects/${projectId}?tab=issues`);
 }

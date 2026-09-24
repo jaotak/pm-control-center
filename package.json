@@ -36,5 +36,13 @@
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "@google/genai": true,
+    "@prisma/client": true,
+    "@prisma/engines": true,
+    "prisma": true,
+    "protobufjs": true,
+    "unrs-resolver": true
   }
 }
